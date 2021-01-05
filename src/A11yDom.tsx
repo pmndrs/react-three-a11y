@@ -10,8 +10,7 @@ export const A11yDom: React.FC<Props> = ({ children }) => {
   return (
     <>
       <Announcer />
-      <FocusListener />
-      {children}
+      <FocusListener>{children}</FocusListener>
     </>
   );
 };
