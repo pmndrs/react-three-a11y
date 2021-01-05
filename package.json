@@ -1,5 +1,15 @@
 {
+  "name": "@react-three/a11y",
   "version": "0.1.0",
+  "description": "👩‍🦯 Provide accessibility support to R3F such as focus indication, keyboard tab index, and screen reader support",
+  "keywords": [
+    "a11y",
+    "accessibility",
+    "three",
+    "react",
+    "react-three-fiber"
+  ],
+  "author": "Alaric Baraou",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -20,7 +30,9 @@
     "analyze": "size-limit --why"
   },
   "peerDependencies": {
-    "react": ">=16"
+    "react": ">=16",
+    "react-three-fiber": ">=5.0",
+    "three": "^0.124.0"
   },
   "husky": {
     "hooks": {
@@ -33,7 +45,6 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "@react-three/a11y",
   "module": "dist/a11y.esm.js",
   "size-limit": [
     {
@@ -52,9 +63,14 @@
     "husky": "^4.3.6",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-three-fiber": "5.3.11",
     "size-limit": "^4.9.1",
+    "three": "0.124.0",
     "tsdx": "^0.14.1",
     "tslib": "^2.0.3",
     "typescript": "^4.1.3"
+  },
+  "dependencies": {
+    "zustand": "^3.2.0"
   }
 }

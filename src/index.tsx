@@ -1,6 +1,3 @@
-import * as React from 'react';
-
-// Delete me
-export const Thing = () => {
-  return <div>the snozzberries taste like snozzberries</div>;
-};
+export * from './A11y';
+export * from './Helpers';
+export * from './A11yDom';
