@@ -15,9 +15,7 @@
     "react-three-fiber": "^5.3.11",
     "three": "^0.124.0"
   },
-  "alias": {
-    "scheduler/tracing": "../node_modules/scheduler/tracing-profiling"
-  },
+  "alias": {},
   "devDependencies": {
     "@types/react": "^16.9.11",
     "@types/react-dom": "^16.8.4",
