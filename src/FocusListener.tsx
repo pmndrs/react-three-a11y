@@ -30,7 +30,7 @@ export const FocusListener: React.FC = ({ children, ...props }) => {
   console.log('is rendering dom listenrs');
   useEffect(() => {
     console.log('setRequestedAnchorId');
-    setRequestedAnchorId(location.hash.replace('#', ''));
+    setRequestedAnchorId(window.location.hash.replace('#', ''));
   });
 
   function handleKeydown(e: KeyboardEvent<HTMLButtonElement>) {
