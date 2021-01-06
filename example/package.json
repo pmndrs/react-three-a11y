@@ -15,9 +15,6 @@
     "react-three-fiber": "^5.3.11",
     "three": "^0.124.0"
   },
-  "alias": {
-    "@react-three/a11y": "../."
-  },
   "devDependencies": {
     "@types/react": "^16.9.11",
     "@types/react-dom": "^16.8.4",
