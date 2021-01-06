@@ -1,9 +1,8 @@
 import 'react-app-polyfill/ie11';
 import ReactDOM from 'react-dom'
-import React, { useRef, useMemo, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import { Canvas, MeshProps, useFrame } from 'react-three-fiber';
 import type { Mesh } from 'three';
-import * as THREE from 'three'
 import { PerspectiveCamera } from '@react-three/drei'
 import { A11y, A11yDom, FocusHelper, ScreenReaderHelper } from '../.';
 
@@ -34,7 +33,7 @@ const Box: React.FC<MeshProps> = (props) => {
   )
 }
 
-const DemoScene: React.FC<MeshProps> = (props) => {
+const DemoScene: React.FC<MeshProps> = () => {
   
   // const cam = useRef()
   const [targetRotation, setTargetRotation] = useState(0);
