@@ -1,6 +1,6 @@
 {
   "sandboxes": ["ktvm3", "/example/"],
-  "packages": ["./"],
+  "packages": ["/"],
   "publishDirectory": {
     "a11y": "build/node_modules/@react-three/a11y"
   }
