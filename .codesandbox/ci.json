@@ -3,4 +3,5 @@
   "packages": ["./"],
   "publishDirectory": {
     "../": "build/node_modules/@react-three/a11y"
+  }
 }
