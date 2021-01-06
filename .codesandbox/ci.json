@@ -1,3 +1,4 @@
 {
-  "sandboxes": ["ktvm3", "/example/"]
+  "sandboxes": ["ktvm3", "/example/"],
+  "packages": ["./src"]
 }
