@@ -1,5 +1,6 @@
-import React, { KeyboardEvent, MouseEvent, useState } from 'react';
-import { useFocusStore } from './focusStore';
+import React, { KeyboardEvent, MouseEvent, useState, useEffect } from 'react';
+import useFocusStore from './focusStore';
+import useAnnounceStore from './announceStore';
 
 const offScreenStyle = {
   border: 0,
@@ -18,9 +19,19 @@ export const FocusListener: React.FC = ({ children, ...props }) => {
   const removeFocus = useFocusStore(state => state.removeFocus);
   const triggerClick = useFocusStore(state => state.triggerClick);
   const setHasFocusControl = useFocusStore(state => state.setHasFocusControl);
-  const indexfocusedItem = useFocusStore(state => state.currentIndex);
+  const getCurrentIndex = useFocusStore(state => state.getCurrentIndex);
+  const a11yScreenReader = useAnnounceStore(state => state.a11yScreenReader);
+  const setRequestedAnchorId = useFocusStore(
+    state => state.setRequestedAnchorId
+  );
 
   const [lastFocusedBtn, setLastFocusedBtn] = useState('');
+
+  console.log('is rendering dom listenrs');
+  useEffect(() => {
+    console.log('setRequestedAnchorId');
+    setRequestedAnchorId(location.hash.replace('#', ''));
+  });
 
   function handleKeydown(e: KeyboardEvent<HTMLButtonElement>) {
     // @ts-ignore
@@ -58,7 +69,7 @@ export const FocusListener: React.FC = ({ children, ...props }) => {
         onFocus={e => {
           setLastFocusedBtn('prevbtn');
           setHasFocusControl(true);
-          if (indexfocusedItem === -1) {
+          if (getCurrentIndex() === -1) {
             focusNext(e, 1);
           }
         }}
@@ -66,6 +77,7 @@ export const FocusListener: React.FC = ({ children, ...props }) => {
           setLastFocusedBtn('');
           removeFocus();
           setHasFocusControl(false);
+          a11yScreenReader('');
         }}
         focus-listener="true"
         // @ts-ignore
@@ -81,7 +93,7 @@ export const FocusListener: React.FC = ({ children, ...props }) => {
         onFocus={e => {
           setLastFocusedBtn('postbtn');
           setHasFocusControl(true);
-          if (indexfocusedItem === -1) {
+          if (getCurrentIndex() === -1) {
             focusNext(e, -1);
           }
         }}
@@ -89,6 +101,7 @@ export const FocusListener: React.FC = ({ children, ...props }) => {
           setLastFocusedBtn('');
           removeFocus();
           setHasFocusControl(false);
+          a11yScreenReader('');
         }}
         focus-listener="true"
         // @ts-ignore

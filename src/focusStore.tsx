@@ -5,6 +5,8 @@ type State = {
   clickedEl: string;
   focusedEl: string;
   focusableItems: string[];
+  itemsActions: { (...args: any[]): void }[];
+  requestedAnchorId: string;
   currentIndex: number;
   hasFocusControl: boolean;
   setHasFocusControl: (hasFocusControl: boolean) => void;
@@ -14,16 +16,21 @@ type State = {
     event: KeyboardEvent<HTMLButtonElement> | FocusEvent<HTMLButtonElement>,
     direction: number
   ) => void;
-  addFocusable: (uuid: string) => void;
+  addFocusable: (uuid: string, actionCall: (...args: any[]) => void) => void;
   removeFocusable: (uuid: string) => void;
+  getRequestedAnchorId: () => string;
+  getCurrentIndex: () => number;
+  setRequestedAnchorId: (anchorId: string) => void;
 };
 
 export const useFocusStore = create<State>((set, get) => {
   return {
     clickedEl: '',
     focusedEl: '',
+    itemsActions: [],
     focusableItems: [],
     currentIndex: -1,
+    requestedAnchorId: '',
     hasFocusControl: false,
     setHasFocusControl: hasFocusControl => {
       set(() => {
@@ -31,13 +38,20 @@ export const useFocusStore = create<State>((set, get) => {
       });
     },
     triggerClick: () => {
+      const curState = get();
+      curState.itemsActions[curState.currentIndex]();
       set(state => {
         return { clickedEl: state.focusedEl };
       });
     },
     removeFocus: () => {
-      set(() => {
-        return { currentIndex: -1, focusedEl: '' };
+      set(state => {
+        let newState = {
+          currentIndex: -1,
+        };
+        // @ts-ignore
+        newState[state.focusableItems[state.currentIndex]] = false;
+        return newState;
       });
     },
     focusNext: (event, direction) => {
@@ -62,16 +76,30 @@ export const useFocusStore = create<State>((set, get) => {
             //if index reach -1, we let the user tab out of the app
             event.preventDefault();
           }
-          return {
+          let newState = {
             currentIndex: newIndex,
             focusedEl: newIndex === -1 ? '' : state.focusableItems[newIndex],
           };
+          if (newIndex !== -1) {
+            // @ts-ignore
+            newState[state.focusableItems[newIndex]] = true;
+            // @ts-ignore
+            newState[state.focusableItems[state.currentIndex]] = false;
+          } else {
+            // @ts-ignore
+            newState[state.focusableItems[state.currentIndex]] = false;
+          }
+          return newState;
         });
       }
     },
-    addFocusable: uuid => {
+    addFocusable: (uuid, actionCall) => {
       set(state => {
-        return { uuid: false, focusableItems: [...state.focusableItems, uuid] };
+        return {
+          uuid: false,
+          focusableItems: [...state.focusableItems, uuid],
+          itemsActions: [...state.itemsActions, actionCall],
+        };
       });
     },
     removeFocusable: uuid => {
@@ -83,6 +111,17 @@ export const useFocusStore = create<State>((set, get) => {
         delete state[uuid];
         return { ...state };
       }, true);
+    },
+    getRequestedAnchorId: () => {
+      return get().requestedAnchorId;
+    },
+    getCurrentIndex: () => {
+      return get().currentIndex;
+    },
+    setRequestedAnchorId: anchorid => {
+      set(() => {
+        return { requestedAnchorId: anchorid };
+      });
     },
   };
 });
