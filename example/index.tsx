@@ -1,6 +1,6 @@
 import 'react-app-polyfill/ie11';
-import ReactDOM from 'react-dom'
-import React, { useRef, useEffect, useState } from 'react'
+import * as ReactDOM from 'react-dom'
+import * as React from 'react'
 import { Canvas, MeshProps, useFrame } from 'react-three-fiber';
 import type { Mesh } from 'three';
 import { PerspectiveCamera } from '@react-three/drei'
@@ -8,7 +8,7 @@ import { A11y, A11yDom, FocusHelper, ScreenReaderHelper } from '../.';
 
 const Box: React.FC<MeshProps> = (props) => {
   // This reference will give us direct access to the mesh
-  const mesh = useRef<Mesh>()
+  const mesh = React.useRef<Mesh>()
 
   // Rotate mesh every frame, this is outside of React without overhead
   useFrame(() => {
@@ -36,9 +36,9 @@ const Box: React.FC<MeshProps> = (props) => {
 const DemoScene: React.FC<MeshProps> = () => {
   
   // const cam = useRef()
-  const [targetRotation, setTargetRotation] = useState(0);
+  const [targetRotation, setTargetRotation] = React.useState(0);
 
-  useEffect(() => {
+  React.useEffect(() => {
     // @ts-ignore
     // cam.current.lookAt([0,0,0])
   }, [])
