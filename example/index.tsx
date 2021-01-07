@@ -3,12 +3,17 @@ import ReactDOM from 'react-dom'
 import React, { useRef, useEffect, useState } from 'react'
 import { Canvas, MeshProps, useFrame } from 'react-three-fiber';
 import type { Mesh } from 'three';
-import { PerspectiveCamera } from '@react-three/drei'
-import { A11y, A11yDom, FocusHelper, ScreenReaderHelper } from '@react-three/a11y';
+import * as THREE from 'three';
+import { PerspectiveCamera , useHelper} from '@react-three/drei'
+import { A11y, A11yDom, FocusHelper, ScreenReaderHelper, useA11yContext } from '../.';
 
 const Box: React.FC<MeshProps> = (props) => {
   // This reference will give us direct access to the mesh
   const mesh = useRef<Mesh>()
+  const a11yContext = useA11yContext();
+
+ 
+  useHelper(mesh, THREE.BoxHelper, a11yContext.focus || a11yContext.hover ? 'red' : 'white')
 
   // Rotate mesh every frame, this is outside of React without overhead
   useFrame(() => {
@@ -26,9 +31,9 @@ const Box: React.FC<MeshProps> = (props) => {
       <boxBufferGeometry args={[1, 1, 1]} />
       <meshStandardMaterial color={ 
       // @ts-ignore
-      props.a11yHasFocus ||
+      a11yContext.focus ||
       // @ts-ignore
-      props.a11yHasHover ? props.activeColor : 'orange'} />
+      a11yContext.hover ? props.activeColor : 'orange'} />
     </mesh>
   )
 }

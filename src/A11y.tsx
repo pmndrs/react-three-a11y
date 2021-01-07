@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, Children, cloneElement } from 'react';
+import { useEffect, useRef, useState, useContext } from 'react';
 import { useThree } from 'react-three-fiber';
 import useFocusStore from './focusStore';
 import React from 'react';
@@ -11,6 +11,15 @@ type Props = {
   actionCall: () => void;
   focusCall: (children: React.ReactNode) => void;
 };
+
+const A11yContext = React.createContext({ focus: false, hover: false });
+A11yContext.displayName = 'A11yContext';
+
+const useA11yContext = () => {
+  return useContext(A11yContext);
+};
+
+export { useA11yContext };
 
 export const A11y: React.FC<Props> = ({
   children,
@@ -80,33 +89,27 @@ export const A11y: React.FC<Props> = ({
     domElement.style.cursor = 'default';
   }
 
-  const childrenWithExtraProp = Children.map<React.ReactNode, React.ReactNode>(
-    children,
-    child => {
-      return cloneElement(child as React.ReactElement<any>, {
-        a11yHasFocus: a11yState.focused,
-        a11yHasHover: a11yState.hovered,
-      });
-    }
-  );
-
   return (
-    <group
-      ref={group}
-      {...props}
-      onClick={actionCall}
-      onPointerOver={() =>
-        setA11yState({ hovered: true, focused: a11yState.focused })
-      }
-      onPointerOut={() => {
-        // temporary fix to prevent error -> keep track of our component's mounted state
-        if (componentIsMounted.current) {
-          setA11yState({ hovered: false, focused: a11yState.focused });
-        }
-      }}
-      onPointerMissed={() => removeFocus()}
+    <A11yContext.Provider
+      value={{ hover: a11yState.hovered, focus: a11yState.focused }}
     >
-      {childrenWithExtraProp}
-    </group>
+      <group
+        ref={group}
+        {...props}
+        onClick={actionCall}
+        onPointerOver={() =>
+          setA11yState({ hovered: true, focused: a11yState.focused })
+        }
+        onPointerOut={() => {
+          // temporary fix to prevent error -> keep track of our component's mounted state
+          if (componentIsMounted.current) {
+            setA11yState({ hovered: false, focused: a11yState.focused });
+          }
+        }}
+        onPointerMissed={() => removeFocus()}
+      >
+        {children}
+      </group>
+    </A11yContext.Provider>
   );
 };
