@@ -1,160 +1,95 @@
-# TSDX React User Guide
+<h1>react-three-a11y👩‍🦯</h1>
 
-Congrats! You just saved yourself hours of work by bootstrapping this project with TSDX. Let’s get you oriented with what’s here and how to use it.
-
-> This TSDX setup is meant for developing React component libraries (not apps!) that can be published to NPM. If you’re looking to build a React-based app, you should use `create-react-app`, `razzle`, `nextjs`, `gatsby`, or `react-static`.
-
-> If you’re new to TypeScript and React, checkout [this handy cheatsheet](https://github.com/sw-yx/react-typescript-cheatsheet/)
-
-## Commands
-
-TSDX scaffolds your new library inside `/src`, and also sets up a [Parcel-based](https://parceljs.org) playground for it inside `/example`.
-
-The recommended workflow is to run TSDX in one terminal:
+An easy to use package designed to bring accessibility features to [react-three-fiber](https://github.com/pmndrs/react-three-fiber) such as focus indication, keyboard tab navigation, and screen reader support.
 
 ```bash
-npm start # or yarn start
+npm install @react-three/a11y
 ```
 
-This builds to `/dist` and runs the project in watch mode so any edits you save inside `src` causes a rebuild to `/dist`.
-
-Then run the example inside another:
-
-```bash
-cd example
-npm i # or yarn to install dependencies
-npm start # or yarn start
+```jsx
+import { A11y, A11yDom, ScreenReaderHelper, ... } from '@react-three/a11y'
 ```
 
-The default example imports and live reloads whatever is in `/dist`, so if you are seeing an out of date component, make sure TSDX is running in watch mode like we recommend above. **No symlinking required**, we use [Parcel's aliasing](https://parceljs.org/module_resolution.html#aliases).
+# How to use
 
-To do a one-off build, use `npm run build` or `yarn build`.
+## Initial setup
 
-To run tests, use `npm test` or `yarn test`.
+First, you'll have to import the <A11yDom /> component and wrap it around your r3f canvas
 
-## Configuration
-
-Code quality is set up for you with `prettier`, `husky`, and `lint-staged`. Adjust the respective fields in `package.json` accordingly.
-
-### Jest
-
-Jest tests are set up to run with `npm test` or `yarn test`.
-
-### Bundle analysis
-
-Calculates the real cost of your library using [size-limit](https://github.com/ai/size-limit) with `npm run size` and visulize it with `npm run analyze`.
-
-#### Setup Files
-
-This is the folder structure we set up for you:
-
-```txt
-/example
-  index.html
-  index.tsx       # test your component here in a demo app
-  package.json
-  tsconfig.json
-/src
-  index.tsx       # EDIT THIS
-/test
-  blah.test.tsx   # EDIT THIS
-.gitignore
-package.json
-README.md         # EDIT THIS
-tsconfig.json
+```jsx
+  <A11yDom >
+    <Canvas>
+      {...}
+    </Canvas>
+  </A11yDom>
 ```
 
-#### React Testing Library
+From there you're able to listen to focus / hover events on your canvas.
+But even if you already have a bunch of 3D Object in it, none of them is focusable yet.
 
-We do not set up `react-testing-library` for you yet, we welcome contributions and documentation on this.
+To add some accessibility features to a 3D Object / Group of 3D object you'll have to import the <A11y /> Component.
+Then you wrap the 3D objects you want to make focusable like so
 
-### Rollup
+```jsx
+  <A11yDom >
+    <Canvas>
+      {...}
+        <A11y>
+          <My3DComponent />
+        </A11y>
+      {...}
+        <A11y>
+          <AGroupOf3DComponent />
+        </A11y>
+      {...}
+    </Canvas>
+  </A11yDom>
+```
 
-TSDX uses [Rollup](https://rollupjs.org) as a bundler and generates multiple rollup configs for various module formats and build settings. See [Optimizations](#optimizations) for details.
+At this point both <My3DComponent /> and <AGroupOf3DComponent /> can receive focus.
+More presciesly, the emulated "focus" will be on the parent <A11y> that will act as a provider and give the possibility to it's children to react to those state.
 
-### TypeScript
+By default, without more configuration, your component will now display a pointer like it would on any native html link for example.
 
-`tsconfig.json` is set up to interpret `dom` and `esnext` types, as well as `react` for `jsx`. Adjust according to your needs.
+## accessing the hover / focused state
 
-## Continuous Integration
+For each child wrapped in a <A11y> component, you can access the focus / hover state like so
 
-### GitHub Actions
+import useA11yContext from '@react-three/a11y' then
 
-Two actions are added by default:
+```jsx
+  function My3DComponent(props) {
 
-- `main` which installs deps w/ cache, lints, tests, and builds on all pushes against a Node and OS matrix
-- `size` which comments cost comparison of your library on every pull request using [`size-limit`](https://github.com/ai/size-limit)
+  //call useA11yContext to get the A11yContext from the provider
+  const a11yContext = useA11yContext();
+  //now you have access to a11yContext.hover and a11yContext.focus
 
-## Optimizations
-
-Please see the main `tsdx` [optimizations docs](https://github.com/palmerhq/tsdx#optimizations). In particular, know that you can take advantage of development-only optimizations:
-
-```js
-// ./types/index.d.ts
-declare var __DEV__: boolean;
-
-// inside your code...
-if (__DEV__) {
-  console.log('foo');
+  return (
+    <mesh
+      {...props}
+      <boxBufferGeometry args={[1, 1, 1]} />
+      //here we'll change the material color depending on the a11yContext state
+      <meshStandardMaterial color={a11yContext.hover || a11yContext.focus ? 'hotpink' : 'orange'} />
+    </mesh>
+  )
 }
 ```
 
-You can also choose to install and use [invariant](https://github.com/palmerhq/tsdx#invariant) and [warning](https://github.com/palmerhq/tsdx#warning) functions.
+In this example, the component <My3DComponent /> will change color if he is either focused or hovered.
+What you do with a11yContext.hover and a11yContext.focus is up to you ! Just make sur it's intuitive for your user !
 
-## Module Formats
+## Call function on focus
 
-CJS, ESModules, and UMD module formats are supported.
+## Call function on click / keyboard Click
 
-The appropriate paths are configured in `package.json` and `dist/index.js` accordingly. Please report if any issues are found.
+## Anchor support : Automatically focus an element on page load
 
-## Deploying the Example Playground
+## Screen reader support
 
-The Playground is just a simple [Parcel](https://parceljs.org) app, you can deploy it anywhere you would normally deploy that. Here are some guidelines for **manually** deploying with the Netlify CLI (`npm i -g netlify-cli`):
+## Next steps
 
-```bash
-cd example # if not already in the example folder
-npm run build # builds to dist
-netlify deploy # deploy the dist folder
-```
+- [ ] Add suport for custom tabindex ( right now it'll go from top to bottom in the components order like the default DOM tab navigation )
 
-Alternatively, if you already have a git repo connected, you can set up continuous deployment with Netlify:
+### Maintainers :
 
-```bash
-netlify init
-# build command: yarn build && cd example && yarn && yarn build
-# directory to deploy: example/dist
-# pick yes for netlify.toml
-```
-
-## Named Exports
-
-Per Palmer Group guidelines, [always use named exports.](https://github.com/palmerhq/typescript#exports) Code split inside your React app instead of your React library.
-
-## Including Styles
-
-There are many ways to ship styles, including with CSS-in-JS. TSDX has no opinion on this, configure how you like.
-
-For vanilla CSS, you can include it at the root directory and add it to the `files` section in your `package.json`, so that it can be imported separately by your users and run through their bundler's loader.
-
-## Publishing to NPM
-
-We recommend using [np](https://github.com/sindresorhus/np).
-
-## Usage with Lerna
-
-When creating a new package with TSDX within a project set up with Lerna, you might encounter a `Cannot resolve dependency` error when trying to run the `example` project. To fix that you will need to make changes to the `package.json` file _inside the `example` directory_.
-
-The problem is that due to the nature of how dependencies are installed in Lerna projects, the aliases in the example project's `package.json` might not point to the right place, as those dependencies might have been installed in the root of your Lerna project.
-
-Change the `alias` to point to where those packages are actually installed. This depends on the directory structure of your Lerna project, so the actual path might be different from the diff below.
-
-```diff
-   "alias": {
--    "react": "../node_modules/react",
--    "react-dom": "../node_modules/react-dom"
-+    "react": "../../../node_modules/react",
-+    "react-dom": "../../../node_modules/react-dom"
-   },
-```
-
-An alternative to fixing this problem would be to remove aliases altogether and define the dependencies referenced as aliases as dev dependencies instead. [However, that might cause other problems.](https://github.com/palmerhq/tsdx/issues/64)
+- [`twitter 👋 @AlaricBaraou`](https://twitter.com/AlaricBaraou)
