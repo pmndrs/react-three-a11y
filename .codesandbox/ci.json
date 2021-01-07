@@ -1,7 +1,7 @@
 {
-  "sandboxes": ["ktvm3", "/example/"],
-  "packages": ["./"],
+  "packages": ["src/"],
   "publishDirectory": {
-    "/src": "build/node_modules/@react-three/a11y"
-  }
+    "a11y": "build/node_modules/@react-three/a11y"
+  },
+  "sandboxes": ["/example/"]
 }
