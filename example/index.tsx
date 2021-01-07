@@ -5,7 +5,7 @@ import { Canvas, MeshProps, useFrame } from 'react-three-fiber';
 import type { Mesh } from 'three';
 import * as THREE from 'three';
 import { PerspectiveCamera , useHelper} from '@react-three/drei'
-import { A11y, A11yDom, FocusHelper, ScreenReaderHelper, useA11yContext } from '../.';
+import { A11y, A11yDom, FocusHelper, ScreenReaderHelper, useA11yContext } from '@react-three/a11y';
 
 const Box: React.FC<MeshProps> = (props) => {
   // This reference will give us direct access to the mesh
