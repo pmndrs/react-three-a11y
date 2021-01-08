@@ -42,8 +42,11 @@ export const FocusHelper: React.FC = ({ ...props }) => {
   const hasFocusControl = useFocusStore(state => state.hasFocusControl);
   const items = focusableItems.map((item, index) => {
     return (
-      <li style={indexfocusedItem === index ? { color: 'red' } : {}} key={item}>
-        {item}
+      <li
+        style={indexfocusedItem === index ? { color: 'red' } : {}}
+        key={item.uuid}
+      >
+        {item.role} - {item.uuid}
       </li>
     );
   });

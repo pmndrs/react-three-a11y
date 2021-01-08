@@ -16,6 +16,8 @@ const offScreenStyle = {
 
 export const FocusListener: React.FC = ({ children, ...props }) => {
   const focusNext = useFocusStore(state => state.focusNext);
+  const focusByUuid = useFocusStore(state => state.focusByUuid);
+  const focusableItems = useFocusStore(state => state.focusableItems);
   const removeFocus = useFocusStore(state => state.removeFocus);
   const triggerClick = useFocusStore(state => state.triggerClick);
   const setHasFocusControl = useFocusStore(state => state.setHasFocusControl);
@@ -49,16 +51,53 @@ export const FocusListener: React.FC = ({ children, ...props }) => {
     }
   }
   function handleClick(
-    e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
+    e:
+      | MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
+      | MouseEvent<HTMLAnchorElement, globalThis.MouseEvent>
   ) {
     if (e.detail === 0) {
-      //enter pressed
       e.preventDefault();
       triggerClick();
     } else {
       removeFocus();
     }
   }
+
+  const a11yelements = focusableItems.map(item => {
+    if (item.role === 'button') {
+      return (
+        <button
+          key={item.uuid}
+          onClick={e => handleClick(e)}
+          onFocus={() => {
+            focusByUuid(item.uuid);
+          }}
+        ></button>
+      );
+    } else if (item.role === 'link') {
+      return (
+        <a
+          key={item.uuid}
+          onClick={e => handleClick(e)}
+          onFocus={() => {
+            focusByUuid(item.uuid);
+          }}
+        ></a>
+      );
+    } else {
+      return (
+        <div
+          tabIndex={0}
+          key={item.uuid}
+          onFocus={() => {
+            focusByUuid(item.uuid);
+          }}
+        ></div>
+      );
+    }
+  });
+
+  console.log(a11yelements);
 
   return (
     <>

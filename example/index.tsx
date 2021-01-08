@@ -5,7 +5,7 @@ import { Canvas, MeshProps, useFrame } from 'react-three-fiber';
 import type { Mesh } from 'three';
 import * as THREE from 'three';
 import { PerspectiveCamera , useHelper} from '@react-three/drei'
-import { A11y, A11yDom, FocusHelper, ScreenReaderHelper, useA11yContext } from '@react-three/a11y';
+import { A11y, A11yDom, FocusHelper, ScreenReaderHelper, useA11yContext } from '../.';
 
 const Box: React.FC<MeshProps> = (props) => {
   // This reference will give us direct access to the mesh
@@ -77,17 +77,17 @@ const DemoScene: React.FC<MeshProps> = () => {
   return (
     <>
     <PerspectiveCamera position={[0, 0, 3]} />
-      <A11y anchorId="left" title="A cube rotating on the left" focusCall={handleFocus_1} actionCall={actionCall} >
+      <A11y role="content" anchorId="left" title="A cube rotating on the left" focusCall={handleFocus_1} actionCall={actionCall} >
         <Box
         // @ts-ignore
         activeColor='hotpink' position={[-10.2, 0, 0]} />
       </A11y>
-      <A11y anchorId="right" title="A cube rotating on the right" focusCall={handleFocus_1} actionCall={actionCall} >
+      <A11y role="link" anchorId="right" title="A cube rotating on the right" focusCall={handleFocus_1} actionCall={actionCall} >
         <Box
         // @ts-ignore
         activeColor='blue' position={[10.2, 0, 0]} />
       </A11y>
-      <A11y anchorId="behind" title="A third cube placed behind the camera" focusCall={handleFocus_2} actionCall={actionCall} >
+      <A11y role="button" anchorId="behind" title="A third cube placed behind the camera" focusCall={handleFocus_2} actionCall={actionCall} >
         <Box
         // @ts-ignore
         activeColor='red' position={[0, 0, 10]} />

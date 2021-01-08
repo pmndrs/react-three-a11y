@@ -4,13 +4,14 @@ import useFocusStore from './focusStore';
 import React from 'react';
 import useAnnounceStore from './announceStore';
 
-type Props = {
+interface Props {
   children: React.ReactNode;
   title: string;
   anchorId: string;
+  role: 'button' | 'link' | 'content';
   actionCall: () => void;
   focusCall: (children: React.ReactNode) => void;
-};
+}
 
 const A11yContext = React.createContext({ focus: false, hover: false });
 A11yContext.displayName = 'A11yContext';
@@ -25,6 +26,7 @@ export const A11y: React.FC<Props> = ({
   children,
   title,
   anchorId,
+  role,
   actionCall,
   focusCall,
   ...props
@@ -56,7 +58,7 @@ export const A11y: React.FC<Props> = ({
     // @ts-ignore
     console.log('is mounting ' + group.current.uuid);
     // @ts-ignore
-    addFocusable(group.current.uuid, actionCall);
+    addFocusable({ uuid: group.current.uuid, role: role }, actionCall);
     const unsubfocus = useFocusStore.subscribe(
       val => {
         console.log('anchorid = ' + anchorId + ' val = ', val);
