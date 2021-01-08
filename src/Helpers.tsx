@@ -10,6 +10,7 @@ const messageHelperStyles = {
   background: '#f3f3f3',
   borderBottom: '1px solid #d8d8d8',
   borderLeft: '1px solid #d8d8d8',
+  zIndex: 9999,
 };
 
 export const ScreenReaderHelper: React.FC = ({ ...props }) => {
@@ -34,6 +35,7 @@ const FocusHelperStyles = {
   background: '#f3f3f3',
   borderBottom: '1px solid #d8d8d8',
   borderLeft: '1px solid #d8d8d8',
+  zIndex: 9999,
 };
 
 export const FocusHelper: React.FC = ({ ...props }) => {
@@ -42,8 +44,11 @@ export const FocusHelper: React.FC = ({ ...props }) => {
   const hasFocusControl = useFocusStore(state => state.hasFocusControl);
   const items = focusableItems.map((item, index) => {
     return (
-      <li style={indexfocusedItem === index ? { color: 'red' } : {}} key={item}>
-        {item}
+      <li
+        style={indexfocusedItem === index ? { color: 'red' } : {}}
+        key={item.uuid}
+      >
+        {item.role} - {item.uuid}
       </li>
     );
   });

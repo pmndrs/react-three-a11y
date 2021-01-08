@@ -1,15 +1,18 @@
 {
-  "name": "example",
+  "name": "r3f-wouter-routes",
   "version": "1.0.0",
-  "main": "index.js",
   "license": "MIT",
-  "scripts": {
-    "start": "parcel index.html",
-    "build": "parcel build index.html"
-  },
+  "description": "",
+  "keywords": [],
+  "main": "index.js",
   "dependencies": {
-    "react-app-polyfill": "^1.0.0",
-    "@react-three/drei": "^2.2.12"
+    "@pmndrs/branding": "0.0.4",
+    "@react-spring/three": "^9.0.0-rc.3",
+    "@react-spring/web": "^9.0.0-rc.3",
+    "@react-three/drei": "2.2.13",
+    "react-scripts": "4.0.1",
+    "styled-components": "5.2.1",
+    "wouter": "2.7.0"
   },
   "alias": {
     "react": "../node_modules/react",
@@ -19,9 +22,11 @@
     "scheduler/tracing": "../node_modules/scheduler/tracing-profiling"
   },
   "devDependencies": {
-    "@types/react": "^16.9.11",
-    "@types/react-dom": "^16.8.4",
     "parcel": "^1.12.3",
-    "typescript": "^3.4.5"
+    "typescript": "4.0.3"
+  },
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build index.html"
   }
 }

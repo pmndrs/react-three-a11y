@@ -1,21 +1,34 @@
-import { useEffect, useRef, useState, Children, cloneElement } from 'react';
+import React, { useEffect, useRef, useState, useContext } from 'react';
 import { useThree } from 'react-three-fiber';
 import useFocusStore from './focusStore';
-import React from 'react';
+
 import useAnnounceStore from './announceStore';
 
-type Props = {
+interface Props {
   children: React.ReactNode;
   title: string;
-  anchorId: string;
+  anchorId: string | undefined;
+  href: string | undefined;
+  role: 'button' | 'link' | 'content';
   actionCall: () => void;
   focusCall: (children: React.ReactNode) => void;
+}
+
+const A11yContext = React.createContext({ focus: false, hover: false });
+A11yContext.displayName = 'A11yContext';
+
+const useA11y = () => {
+  return useContext(A11yContext);
 };
+
+export { useA11y };
 
 export const A11y: React.FC<Props> = ({
   children,
   title,
   anchorId,
+  href,
+  role,
   actionCall,
   focusCall,
   ...props
@@ -26,11 +39,9 @@ export const A11y: React.FC<Props> = ({
     focused: false,
   });
   const addFocusable = useFocusStore(state => state.addFocusable);
+  const removeFocusable = useFocusStore(state => state.removeFocusable);
   const a11yScreenReader = useAnnounceStore(state => state.a11yScreenReader);
   const removeFocus = useFocusStore(state => state.removeFocus);
-  const getRequestedAnchorId = useFocusStore(
-    state => state.getRequestedAnchorId
-  );
 
   if (group.current) {
     // @ts-ignore
@@ -45,9 +56,20 @@ export const A11y: React.FC<Props> = ({
   const componentIsMounted = useRef(true);
   useEffect(() => {
     // @ts-ignore
-    console.log('is mounting ' + group.current.uuid);
+    group.current = { uuid: '' };
     // @ts-ignore
-    addFocusable(group.current.uuid, actionCall);
+    group.current.uuid = addFocusable({
+      // @ts-ignore
+      uuid: null,
+      role: role,
+      title: title,
+      anchorId: anchorId,
+      href: href,
+      actionCall: actionCall,
+      focusCall: focusCall,
+    });
+    // @ts-ignore
+    console.log('is mounting ' + group.current.uuid);
     const unsubfocus = useFocusStore.subscribe(
       val => {
         console.log('anchorid = ' + anchorId + ' val = ', val);
@@ -58,13 +80,14 @@ export const A11y: React.FC<Props> = ({
         setA11yState({ hovered: a11yState.hovered, focused: val });
       },
       // @ts-ignore
-      state => state[group.current.uuid]
+      state => (group.current ? state[group.current.uuid] : null)
     );
 
-    if (getRequestedAnchorId() === anchorId) {
-      if (typeof focusCall === 'function') focusCall(children);
-    }
     return () => {
+      // @ts-ignore
+      console.warn('unmount ' + group.current.uuid);
+      // @ts-ignore
+      removeFocusable(group.current.uuid);
       unsubfocus();
       domElement.style.cursor = 'default';
       componentIsMounted.current = false;
@@ -80,33 +103,26 @@ export const A11y: React.FC<Props> = ({
     domElement.style.cursor = 'default';
   }
 
-  const childrenWithExtraProp = Children.map<React.ReactNode, React.ReactNode>(
-    children,
-    child => {
-      return cloneElement(child as React.ReactElement<any>, {
-        a11yHasFocus: a11yState.focused,
-        a11yHasHover: a11yState.hovered,
-      });
-    }
-  );
-
   return (
-    <group
-      ref={group}
-      {...props}
-      onClick={actionCall}
-      onPointerOver={() =>
-        setA11yState({ hovered: true, focused: a11yState.focused })
-      }
-      onPointerOut={() => {
-        // temporary fix to prevent error -> keep track of our component's mounted state
-        if (componentIsMounted.current) {
-          setA11yState({ hovered: false, focused: a11yState.focused });
-        }
-      }}
-      onPointerMissed={() => removeFocus()}
+    <A11yContext.Provider
+      value={{ hover: a11yState.hovered, focus: a11yState.focused }}
     >
-      {childrenWithExtraProp}
-    </group>
+      <group
+        {...props}
+        onClick={actionCall}
+        onPointerOver={() =>
+          setA11yState({ hovered: true, focused: a11yState.focused })
+        }
+        onPointerOut={() => {
+          // temporary fix to prevent error -> keep track of our component's mounted state
+          if (componentIsMounted.current) {
+            setA11yState({ hovered: false, focused: a11yState.focused });
+          }
+        }}
+        onPointerMissed={() => removeFocus()}
+      >
+        {children}
+      </group>
+    </A11yContext.Provider>
   );
 };

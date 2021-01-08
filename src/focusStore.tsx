@@ -1,30 +1,43 @@
 import { KeyboardEvent, FocusEvent } from 'react';
 import create from 'zustand';
 
+type FocusableItem = {
+  uuid: string;
+  role: string;
+  anchorId: string | undefined;
+  title: string | undefined;
+  href: string | undefined;
+  actionCall: { (...args: any[]): void } | undefined;
+  focusCall: { (...args: any[]): void } | undefined;
+};
+
 type State = {
+  currentId: number;
   clickedEl: string;
   focusedEl: string;
-  focusableItems: string[];
-  itemsActions: { (...args: any[]): void }[];
+  focusableItems: FocusableItem[];
   requestedAnchorId: string;
   currentIndex: number;
   hasFocusControl: boolean;
   setHasFocusControl: (hasFocusControl: boolean) => void;
-  triggerClick: () => void;
+  triggerClick: (uuid: string) => void;
   removeFocus: () => void;
+  blurByUuid: (uuid: string) => void;
+  focusByUuid: (uuid: string) => void;
   focusNext: (
     event: KeyboardEvent<HTMLButtonElement> | FocusEvent<HTMLButtonElement>,
     direction: number
   ) => void;
-  addFocusable: (uuid: string, actionCall: (...args: any[]) => void) => void;
+  addFocusable: (item: FocusableItem) => string;
   removeFocusable: (uuid: string) => void;
   getRequestedAnchorId: () => string;
   getCurrentIndex: () => number;
   setRequestedAnchorId: (anchorId: string) => void;
 };
 
-export const useFocusStore = create<State>((set, get) => {
+const useFocusStore = create<State>((set, get) => {
   return {
+    currentId: 0,
     clickedEl: '',
     focusedEl: '',
     itemsActions: [],
@@ -37,20 +50,36 @@ export const useFocusStore = create<State>((set, get) => {
         return { hasFocusControl: hasFocusControl };
       });
     },
-    triggerClick: () => {
-      const curState = get();
-      curState.itemsActions[curState.currentIndex]();
-      set(state => {
-        return { clickedEl: state.focusedEl };
-      });
+    triggerClick: uuid => {
+      let item = get().focusableItems.find(
+        // @ts-ignore
+        item => item.uuid === uuid
+      );
+      if (item && typeof item.actionCall === 'function') item.actionCall();
     },
     removeFocus: () => {
+      const focusedEl = get().focusedEl;
       set(state => {
+        // @ts-ignore
+        if (state[focusedEl]) state[focusedEl] = false;
+        return state;
+      });
+    },
+    focusByUuid: uuid => {
+      set(() => {
         let newState = {
-          currentIndex: -1,
+          focusedEl: uuid,
         };
         // @ts-ignore
-        newState[state.focusableItems[state.currentIndex]] = false;
+        newState[uuid] = true;
+        return newState;
+      });
+    },
+    blurByUuid: uuid => {
+      set(() => {
+        let newState = {};
+        // @ts-ignore
+        newState[uuid] = false;
         return newState;
       });
     },
@@ -78,37 +107,53 @@ export const useFocusStore = create<State>((set, get) => {
           }
           let newState = {
             currentIndex: newIndex,
-            focusedEl: newIndex === -1 ? '' : state.focusableItems[newIndex],
+            focusedEl:
+              newIndex === -1 ? '' : state.focusableItems[newIndex].uuid,
           };
           if (newIndex !== -1) {
             // @ts-ignore
-            newState[state.focusableItems[newIndex]] = true;
+            newState[state.focusableItems[newIndex].uuid] = true;
             // @ts-ignore
-            newState[state.focusableItems[state.currentIndex]] = false;
+            newState[state.focusableItems[state.currentIndex].uuid] = false;
           } else {
             // @ts-ignore
-            newState[state.focusableItems[state.currentIndex]] = false;
+            newState[state.focusableItems[state.currentIndex].uuid] = false;
           }
           return newState;
         });
       }
     },
-    addFocusable: (uuid, actionCall) => {
+    addFocusable: item => {
+      let currentId = get().currentId;
       set(state => {
-        return {
-          uuid: false,
-          focusableItems: [...state.focusableItems, uuid],
-          itemsActions: [...state.itemsActions, actionCall],
+        item.uuid = '_' + currentId;
+        let newSate = {
+          currentId: currentId + 1,
+          focusableItems: [...state.focusableItems, item],
         };
+        // @ts-ignore
+        newSate['_' + currentId] = false;
+        return newSate;
       });
+      return '_' + currentId;
     },
     removeFocusable: uuid => {
-      console.log('remove focusableItems');
-      //todo filter array
+      let prevState = get();
+      let currentIndex = 0;
+      //@ts-ignore if current uuid have focus, set
+      if (prevState[uuid]) {
+        currentIndex = -1;
+      } else {
+        currentIndex = prevState.currentIndex;
+      }
       set(state => {
-        state.focusableItems = state.focusableItems.filter(id => id !== uuid);
+        state.focusableItems = state.focusableItems.filter(
+          // @ts-ignore
+          item => item.uuid !== uuid
+        );
         // @ts-ignore
         delete state[uuid];
+        state.currentIndex = currentIndex;
         return { ...state };
       }, true);
     },
@@ -119,61 +164,12 @@ export const useFocusStore = create<State>((set, get) => {
       return get().currentIndex;
     },
     setRequestedAnchorId: anchorid => {
+      //todo
       set(() => {
         return { requestedAnchorId: anchorid };
       });
     },
   };
 });
-
-// export const useFocusEmulator = (
-//   focusNext: State['focusNext'],
-//   removeFocus: State['removeFocus'],
-//   triggerClick: State['triggerClick']
-// ) => {
-//   useEffect(() => {
-//     function onKeydown(e: KeyboardEvent) {
-//       console.log(e.key);
-//       if (e.target) {
-//         // @ts-ignore
-//         if (e.target.id === 'canvasbtn') {
-//           if (e.key === 'Tab') {
-//             if (e.shiftKey) {
-//               focusNext(e, -1);
-//             } else {
-//               focusNext(e, 1);
-//             }
-//           }
-//           //triggered by ctrl + enter
-//           if (e.key === 'Enter') {
-//             e.preventDefault();
-//             triggerClick();
-//           }
-//         }
-//       }
-//     }
-//     function handleClick(e: MouseEvent) {
-//       console.log(e.detail);
-//       if (e.detail === 0) {
-//         //enter pressed
-//         e.preventDefault();
-//         triggerClick();
-//       } else {
-//         removeFocus();
-//       }
-//     }
-//     const canvasbtn = document.getElementById('canvasbtn');
-//     if (canvasbtn) {
-//       canvasbtn.addEventListener('keydown', onKeydown);
-//       canvasbtn.addEventListener('click', handleClick);
-//     }
-//     return () => {
-//       if (canvasbtn) {
-//         canvasbtn.removeEventListener('keydown', onKeydown);
-//         canvasbtn.removeEventListener('click', handleClick);
-//       }
-//     };
-//   });
-// };
 
 export default useFocusStore;
