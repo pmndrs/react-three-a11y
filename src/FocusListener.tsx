@@ -77,7 +77,7 @@ export const FocusListener: React.FC = ({ children, ...props }) => {
     } else if (item.role === 'link') {
       return (
         <a
-          href="#"
+          href="/"
           key={item.uuid}
           onClick={e => {
             e.preventDefault();
