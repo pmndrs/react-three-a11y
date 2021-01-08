@@ -77,8 +77,12 @@ export const FocusListener: React.FC = ({ children, ...props }) => {
     } else if (item.role === 'link') {
       return (
         <a
+          href="#"
           key={item.uuid}
-          onClick={e => handleClick(e)}
+          onClick={e => {
+            e.preventDefault();
+            handleClick(e);
+          }}
           onFocus={() => {
             focusByUuid(item.uuid);
           }}
