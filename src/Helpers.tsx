@@ -18,6 +18,7 @@ export const ScreenReaderHelper: React.FC = ({ ...props }) => {
 
   return (
     <div
+      aria-hidden="true"
       // @ts-ignore
       style={messageHelperStyles}
       {...props}
@@ -45,6 +46,8 @@ export const FocusHelper: React.FC = ({ ...props }) => {
   const items = focusableItems.map((item, index) => {
     return (
       <li
+        aria-hidden="true"
+        tabIndex={-1}
         style={indexfocusedItem === index ? { color: 'red' } : {}}
         key={item.uuid}
       >
@@ -54,6 +57,8 @@ export const FocusHelper: React.FC = ({ ...props }) => {
   });
   return (
     <div
+      aria-hidden="true"
+      tabIndex={-1}
       // @ts-ignore
       style={FocusHelperStyles}
       {...props}

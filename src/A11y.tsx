@@ -7,6 +7,8 @@ import useAnnounceStore from './announceStore';
 interface Props {
   children: React.ReactNode;
   title: string;
+  activationMsg: string;
+  desactivationMsg: string;
   anchorId: string | undefined;
   href: string | undefined;
   role: 'button' | 'link' | 'content';
@@ -26,6 +28,8 @@ export { useA11y };
 export const A11y: React.FC<Props> = ({
   children,
   title,
+  activationMsg,
+  desactivationMsg,
   anchorId,
   href,
   role,
@@ -63,6 +67,8 @@ export const A11y: React.FC<Props> = ({
       uuid: null,
       role: role,
       title: title,
+      activationMsg: activationMsg,
+      desactivationMsg: desactivationMsg,
       anchorId: anchorId,
       href: href,
       actionCall: actionCall,
@@ -94,7 +100,10 @@ export const A11y: React.FC<Props> = ({
     };
   }, []); // Using an empty dependency array ensures this on
 
-  if (a11yState.hovered || a11yState.focused) {
+  if (
+    (role === 'content' || role === 'button') &&
+    (a11yState.hovered || a11yState.focused)
+  ) {
     a11yScreenReader(title);
   }
   if (a11yState.hovered) {

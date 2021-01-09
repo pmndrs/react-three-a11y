@@ -9,6 +9,10 @@ import { useLocation, Switch, Route } from "wouter"
 import DistortionMaterial from "./DistortionMaterial"
 import { Container, Jumbo, Nav, Box, Line, Cover } from "./Styles"
 import { A11yDom, FocusHelper, ScreenReaderHelper, A11y, useA11y } from "../../."
+import textureimg1 from "../public/ao.jpg"
+import textureimg2 from "../public/normal.jpg"
+import textureimg3 from "../public/height.png"
+import textureimg4 from "../public/roughness.jpg"
 
 const torus = new THREE.TorusBufferGeometry(4, 1.2, 128, 128)
 const torusknot = new THREE.TorusKnotBufferGeometry(3, 0.8, 256, 16)
@@ -20,6 +24,36 @@ const jumbo = {
   "/": ["The sun", "is its father."],
   "/knot": ["The moon", "its mother."],
   "/bomb": ["The wind", "hath carried it", "in its belly."],
+}
+
+const BtnBox = props => {
+  const mesh = useRef()
+  const a11yContext = useA11y()
+
+  // Rotate mesh every frame, this is outside of React without overhead
+  useFrame(() => {
+    //@ts-ignore
+    if (mesh.current) mesh.current.rotation.x = mesh.current.rotation.y += 0.01
+  })
+
+  console.log("box render")
+
+  return (
+    <mesh {...props} ref={mesh}>
+      <boxBufferGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial
+        color={
+          // @ts-ignore
+          a11yContext.focus ||
+          // @ts-ignore
+          a11yContext.hover
+            ? // @ts-ignore
+              "blue"
+            : "orange"
+        }
+      />
+    </mesh>
+  )
 }
 
 function Shape({ geometry, material, args, textures, opacity, color, shadowScale = [9, 1.5, 1], ...props }) {
@@ -56,15 +90,11 @@ function Shape({ geometry, material, args, textures, opacity, color, shadowScale
 
 function Shapes({ transition, setLocation }) {
   // const { nodes } = useGLTF("http://127.0.0.1:5500/example/public/bomb-gp.glb")
-  const textures = useTexture([
-    "http://127.0.0.1:5500/example/public/ao.jpg",
-    "http://127.0.0.1:5500/example/public/normal.jpg",
-    "http://127.0.0.1:5500/example/public/height.png",
-    "http://127.0.0.1:5500/example/public/roughness.jpg",
-  ])
+  const textures = useTexture([textureimg1, textureimg2, textureimg3, textureimg4])
   useLayoutEffect(() => {
     textures.forEach(texture => ((texture.wrapT = texture.wrapS = THREE.RepeatWrapping), texture.repeat.set(4, 4)))
   }, [textures])
+  console.log(textures)
   return transition(({ opacity, ...props }, location) => (
     <a.group {...props}>
       <Switch location={location}>
@@ -78,6 +108,14 @@ function Shapes({ transition, setLocation }) {
             }}>
             <Shape geometry={torus} material={material1} textures={textures} color="white" opacity={opacity} />
           </A11y>
+          <A11y
+            role="button"
+            title="Dark mode button theme"
+            actionCall={() => console.log("some theme switch function")}
+            activationMsg="Theme Dark enabled"
+            desactivationMsg="Theme Dark disabled">
+            <BtnBox />
+          </A11y>
         </Route>
         <Route path="/knot">
           <A11y
@@ -88,6 +126,13 @@ function Shapes({ transition, setLocation }) {
               setLocation("/bomb")
             }}>
             <Shape geometry={torusknot} material={material2} textures={textures} color="#272730" opacity={opacity} />
+          </A11y>
+          <A11y
+            role="button"
+            title="press this button to call a console.log"
+            actionCall={() => console.log("some console.log")}
+            activationMsg="Console.log called">
+            <BtnBox />
           </A11y>
         </Route>
         <Route path="/bomb">

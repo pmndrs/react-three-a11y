@@ -1,6 +1,6 @@
 import React, { MouseEvent, useEffect } from 'react';
 import useFocusStore from './focusStore';
-// import useAnnounceStore from './announceStore';
+import useAnnounceStore from './announceStore';
 
 const offScreenStyle = {
   border: 0,
@@ -19,11 +19,11 @@ export const FocusListener: React.FC = ({ children }) => {
   const focusByUuid = useFocusStore(state => state.focusByUuid);
   const blurByUuid = useFocusStore(state => state.blurByUuid);
   const focusableItems = useFocusStore(state => state.focusableItems);
-  const removeFocus = useFocusStore(state => state.removeFocus);
+  // const removeFocus = useFocusStore(state => state.removeFocus);
   const triggerClick = useFocusStore(state => state.triggerClick);
   // const setHasFocusControl = useFocusStore(state => state.setHasFocusControl);
   // const getCurrentIndex = useFocusStore(state => state.getCurrentIndex);
-  // const a11yScreenReader = useAnnounceStore(state => state.a11yScreenReader);
+  const a11yScreenReader = useAnnounceStore(state => state.a11yScreenReader);
   const setRequestedAnchorId = useFocusStore(
     state => state.setRequestedAnchorId
   );
@@ -42,30 +42,81 @@ export const FocusListener: React.FC = ({ children }) => {
       | MouseEvent<HTMLAnchorElement, globalThis.MouseEvent>,
     uuid: string
   ) {
-    if (e.detail === 0) {
-      e.preventDefault();
-      triggerClick(uuid);
+    e.preventDefault();
+    triggerClick(uuid);
+  }
+
+  function handleBtnClick(item: Object) {
+    //msg is the same need to be clean for it to trigger again in case of multiple press in a row
+    a11yScreenReader('');
+    window.setTimeout(() => {
+      // @ts-ignore
+      a11yScreenReader(item.activationMsg);
+    }, 10);
+    // @ts-ignore
+    triggerClick(item.uuid);
+  }
+
+  function handleToggleBtnClick(
+    e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>,
+    item: Object
+  ) {
+    // @ts-ignore
+    if (e.target.getAttribute('aria-pressed') === 'true') {
+      // @ts-ignore
+      e.target.setAttribute('aria-pressed', 'false');
+      // @ts-ignore
+      a11yScreenReader(item.desactivationMsg);
     } else {
-      removeFocus();
+      // @ts-ignore
+      e.target.setAttribute('aria-pressed', 'true');
+      // @ts-ignore
+      a11yScreenReader(item.activationMsg);
     }
+    // @ts-ignore
+    triggerClick(item.uuid);
   }
 
   const a11yelements = focusableItems.map(item => {
     if (item.role === 'button') {
-      return (
-        <button
-          // @ts-ignore
-          style={offScreenStyle}
-          key={item.uuid}
-          onClick={e => handleClick(e, item.uuid)}
-          onFocus={() => {
-            focusByUuid(item.uuid);
-          }}
-          onBlur={() => {
-            blurByUuid(item.uuid);
-          }}
-        ></button>
-      );
+      if (item.desactivationMsg) {
+        //btn has two distinct state
+        return (
+          <button
+            aria-pressed="false"
+            // @ts-ignore
+            style={offScreenStyle}
+            key={item.uuid}
+            onClick={e => handleToggleBtnClick(e, item)}
+            onFocus={() => {
+              focusByUuid(item.uuid);
+            }}
+            onBlur={() => {
+              blurByUuid(item.uuid);
+            }}
+          >
+            {item.title}
+          </button>
+        );
+      } else {
+        //regular btn
+        return (
+          <button
+            // @ts-ignore
+            style={offScreenStyle}
+            key={item.uuid}
+            onClick={() => handleBtnClick(item)}
+            onFocus={() => {
+              focusByUuid(item.uuid);
+            }}
+            onBlur={() => {
+              blurByUuid(item.uuid);
+            }}
+          >
+            {item.title}
+          </button>
+        );
+      }
     } else if (item.role === 'link') {
       return (
         <a

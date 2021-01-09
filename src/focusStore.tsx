@@ -6,6 +6,8 @@ type FocusableItem = {
   role: string;
   anchorId: string | undefined;
   title: string | undefined;
+  activationMsg: string | undefined;
+  desactivationMsg: string | undefined;
   href: string | undefined;
   actionCall: { (...args: any[]): void } | undefined;
   focusCall: { (...args: any[]): void } | undefined;
