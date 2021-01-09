@@ -6,6 +6,7 @@ import { useTransition, useSpring } from "@react-spring/core"
 import { a } from "@react-spring/three"
 import { useLocation, Switch, Route } from "wouter"
 import { Container, Jumbo, Nav, Box, Line, Cover } from "./Styles"
+import polyfill from "@juggle/resize-observer"
 import { A11yDom, A11y, useA11y } from "../../."
 
 const jumbo = {
@@ -23,6 +24,8 @@ const SimpleBox = props => {
     //@ts-ignore
     if (mesh.current) mesh.current.rotation.x = mesh.current.rotation.y += 0.01
   })
+
+  console.warn(a11yContext)
 
   return (
     <mesh {...props} ref={mesh}>
@@ -145,24 +148,25 @@ export default function App() {
           ))}
         </Jumbo>
       </Container>
-      <Nav style={{ color: props.color }} />
       <div
         style={{
           position: "fixed",
           top: 0,
           left: 0,
         }}>
-        <p>
-          <ul>
-            <li>Link is blue</li>
-            <li>button is green</li>
-            <li>content is black</li>
-            <li>focus is red</li>
-          </ul>
-        </p>
+        <ul>
+          <li>Link is blue</li>
+          <li>button is green</li>
+          <li>content is black</li>
+          <li>focus is red</li>
+        </ul>
       </div>
       <A11yDom>
-        <Canvas concurrent camera={{ position: [0, 0, 20], fov: 50 }} onCreated={({ gl }) => (gl.toneMappingExposure = 1.5)}>
+        <Canvas
+          resize={{ polyfill }}
+          concurrent
+          camera={{ position: [0, 0, 20], fov: 50 }}
+          onCreated={({ gl }) => (gl.toneMappingExposure = 1.5)}>
           <spotLight position={[0, 30, 40]} />
           <spotLight position={[-50, 30, 40]} />
           <Suspense fallback={null}>
@@ -170,6 +174,7 @@ export default function App() {
           </Suspense>
         </Canvas>
       </A11yDom>
+      <Nav style={{ color: props.color }} />
       <Loader />
     </>
   )

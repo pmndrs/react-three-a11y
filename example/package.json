@@ -6,6 +6,7 @@
   "keywords": [],
   "main": "index.js",
   "dependencies": {
+    "@juggle/resize-observer": "^3.2.0",
     "@pmndrs/branding": "0.0.4",
     "@react-spring/three": "^9.0.0-rc.3",
     "@react-spring/web": "^9.0.0-rc.3",
