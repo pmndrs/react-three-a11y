@@ -12,6 +12,8 @@ const offScreenStyle = {
   padding: 0,
   width: '1px',
   position: 'absolute',
+  left: '50%',
+  top: '50%',
 };
 
 export const FocusListener: React.FC = ({ children }) => {
