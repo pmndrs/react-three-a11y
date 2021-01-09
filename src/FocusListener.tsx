@@ -140,18 +140,20 @@ export const FocusListener: React.FC = ({ children }) => {
       );
     } else {
       return (
-        <div
+        <p
           // @ts-ignore
           style={offScreenStyle}
           tabIndex={0}
           key={item.uuid}
           onBlur={() => {
-            focusByUuid(item.uuid);
-          }}
-          onFocus={() => {
             blurByUuid(item.uuid);
           }}
-        ></div>
+          onFocus={() => {
+            focusByUuid(item.uuid);
+          }}
+        >
+          {item.title}
+        </p>
       );
     }
   });

@@ -154,6 +154,15 @@ function Shapes({ transition, setLocation }) {
               opacity={opacity}
             />
           </A11y>
+          <A11y role="content" title="A cube that is like a cube ">
+            <BtnBox position={[0, -5, 5]} />
+          </A11y>
+          <A11y role="content" title="Another cube how fascinating ">
+            <BtnBox position={[0, 3, 5]} />
+          </A11y>
+          <A11y role="content" title="And a third cube">
+            <BtnBox position={[0, 5, 5]} />
+          </A11y>
         </Route>
       </Switch>
     </a.group>

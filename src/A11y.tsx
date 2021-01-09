@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useContext } from 'react';
 import { useThree } from 'react-three-fiber';
 import useFocusStore from './focusStore';
 
-import useAnnounceStore from './announceStore';
+// import useAnnounceStore from './announceStore';
 
 interface Props {
   children: React.ReactNode;
@@ -44,7 +44,7 @@ export const A11y: React.FC<Props> = ({
   });
   const addFocusable = useFocusStore(state => state.addFocusable);
   const removeFocusable = useFocusStore(state => state.removeFocusable);
-  const a11yScreenReader = useAnnounceStore(state => state.a11yScreenReader);
+  // const a11yScreenReader = useAnnounceStore(state => state.a11yScreenReader);
   const removeFocus = useFocusStore(state => state.removeFocus);
 
   if (group.current) {
@@ -100,12 +100,12 @@ export const A11y: React.FC<Props> = ({
     };
   }, []); // Using an empty dependency array ensures this on
 
-  if (
-    (role === 'content' || role === 'button') &&
-    (a11yState.hovered || a11yState.focused)
-  ) {
-    a11yScreenReader(title);
-  }
+  // if (
+  //   (role === 'content' || role === 'button') &&
+  //   (a11yState.hovered || a11yState.focused)
+  // ) {
+  //   a11yScreenReader(title);
+  // }
   if (a11yState.hovered) {
     domElement.style.cursor = 'pointer';
   } else {
