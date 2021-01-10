@@ -305,7 +305,7 @@ export const A11y: React.FC<Props> = ({
       >
         {children}
         <Html
-          style={{ pointerEvents: 'none' }}
+          style={{ pointerEvents: 'none', minWidth: '300px' }}
           position={
             // @ts-ignore
             children.props.position ? children.props.position : [0, 0, 0]
