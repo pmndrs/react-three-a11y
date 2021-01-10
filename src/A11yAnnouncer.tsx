@@ -7,23 +7,17 @@ const offScreenStyle = {
   height: '1px',
   margin: '-1px',
   overflow: 'hidden',
-  whiteSpace: 'nowrap',
+  whiteSpace: 'nowrap' as const,
   padding: 0,
   width: '1px',
-  position: 'absolute',
+  position: 'absolute' as const,
 };
 
-export const Announcer: React.FC = ({ ...props }) => {
+export const A11yAnnouncer: React.FC = () => {
   const message = useAnnounceStore(state => state.message);
 
   return (
-    <div
-      // @ts-ignore
-      style={offScreenStyle}
-      aria-atomic="true"
-      aria-live="polite"
-      {...props}
-    >
+    <div style={offScreenStyle} aria-atomic="true" aria-live="assertive">
       {message}
     </div>
   );

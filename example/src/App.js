@@ -1,18 +1,25 @@
 import * as THREE from "three"
-import React, { Suspense, useRef } from "react"
+import React, { Suspense, useEffect, useRef, useState } from "react"
 import { Canvas, useFrame } from "react-three-fiber"
 import { Loader } from "@react-three/drei"
 import { useTransition, useSpring } from "@react-spring/core"
 import { a } from "@react-spring/three"
-import { useLocation, Switch, Route } from "wouter"
-import { Container, Jumbo, Nav, Box, Line, Cover } from "./Styles"
+import { useLocation, Switch, Route, Link } from "wouter"
 import polyfill from "@juggle/resize-observer"
-import { A11yDom, A11y, useA11y } from "../../."
+import { Badge } from "@pmndrs/branding"
+import { A11y, useA11y, A11yAnnouncer } from "../../."
 
-const jumbo = {
-  "/": ["The sun", "is its father."],
-  "/knot": ["The moon", "its mother."],
-  "/bomb": ["The wind", "hath carried it", "in its belly."],
+function Nav(props) {
+  return (
+    <>
+      <div {...props}>
+        <Link to="/">Torus</Link>
+        <Link to="/knot">Knot</Link>
+        <Link to="/bomb">Bomb</Link>
+      </div>
+      <Badge style={{ position: "absolute", bottom: 25, left: "50%", transform: "translate3d(-50%,0,0)" }} />
+    </>
+  )
 }
 
 const SimpleBox = props => {
@@ -25,15 +32,25 @@ const SimpleBox = props => {
     if (mesh.current) mesh.current.rotation.x = mesh.current.rotation.y += 0.01
   })
 
-  console.warn(a11yContext)
+  let material = null
+  if (a11yContext.pressed) {
+    material = <octahedronBufferGeometry args={[1, 0]} />
+  } else {
+    if (a11yContext.focus) {
+      material = <icosahedronBufferGeometry args={[1, 0]} />
+    } else {
+      material = <boxBufferGeometry args={[1, 1, 1]} />
+    }
+  }
+
+  if (a11yContext.hover) {
+  }
 
   return (
     <mesh {...props} ref={mesh}>
-      <boxBufferGeometry args={[1, 1, 1]} />
+      {material}
       <meshStandardMaterial
         color={
-          // @ts-ignore
-          a11yContext.focus ||
           // @ts-ignore
           a11yContext.hover
             ? // @ts-ignore
@@ -45,7 +62,7 @@ const SimpleBox = props => {
   )
 }
 
-function Shapes({ transition, setLocation }) {
+function Shapes({ transition, setLocation, setShowDialog }) {
   return transition(({ opacity, ...props }, location) => (
     <a.group {...props}>
       <Switch location={location}>
@@ -53,7 +70,7 @@ function Shapes({ transition, setLocation }) {
           <A11y
             role="link"
             href="/knot"
-            title="Link to knot page"
+            description="Link to knot page"
             actionCall={() => {
               setLocation("/knot")
             }}>
@@ -61,18 +78,26 @@ function Shapes({ transition, setLocation }) {
           </A11y>
           <A11y
             role="button"
-            title="Dark mode button theme"
+            description="Dark mode button theme"
+            pressedDescription="Dark mode button theme, activated"
             actionCall={() => console.log("some theme switch function")}
             activationMsg="Theme Dark enabled"
             desactivationMsg="Theme Dark disabled">
             <SimpleBox primaryColor="green" position={[0, 0, 0]} />
+          </A11y>
+          <A11y
+            role="button"
+            description="press this button to show a dialog"
+            actionCall={() => setShowDialog(true)}
+            activationMsg="Dialog opened">
+            <SimpleBox primaryColor="green" position={[0, 5, 5]} />
           </A11y>
         </Route>
         <Route path="/knot">
           <A11y
             role="link"
             href="/bomb"
-            title="Link to bomb page"
+            description="Link to bomb page"
             actionCall={() => {
               setLocation("/bomb")
             }}>
@@ -80,7 +105,7 @@ function Shapes({ transition, setLocation }) {
           </A11y>
           <A11y
             role="button"
-            title="press this button to call a console.log"
+            description="press this button to call a console.log"
             actionCall={() => console.log("some console.log")}
             activationMsg="Console.log called">
             <SimpleBox primaryColor="green" position={[0, 0, 0]} />
@@ -89,20 +114,20 @@ function Shapes({ transition, setLocation }) {
         <Route path="/bomb">
           <A11y
             role="link"
-            title="back to home page"
+            description="back to home page"
             href="/"
             actionCall={() => {
               setLocation("/")
             }}>
             <SimpleBox primaryColor="blue" position={[0, 0, 0]} />
           </A11y>
-          <A11y role="content" title="A cube that is like a cube ">
+          <A11y role="content" description="A cube that is like a cube ">
             <SimpleBox primaryColor="black" position={[0, -5, 5]} />
           </A11y>
-          <A11y role="content" title="Another cube how fascinating ">
+          <A11y role="content" description="Another cube how fascinating ">
             <SimpleBox primaryColor="black" position={[0, 3, 5]} />
           </A11y>
-          <A11y role="content" title="And a third cube">
+          <A11y role="content" description="And a third cube">
             <SimpleBox primaryColor="black" position={[0, 5, 5]} />
           </A11y>
         </Route>
@@ -111,23 +136,55 @@ function Shapes({ transition, setLocation }) {
   ))
 }
 
-function Text({ children, opacity, background }) {
+const Dialog = ({ setShowDialog }) => {
+  const dialogRef = useRef(null)
+  const prevFocusRef = useRef(null)
+
+  useEffect(() => {
+    prevFocusRef.current = window.document.activeElement
+    dialogRef.current.focus()
+    return () => {
+      prevFocusRef.current.focus()
+    }
+  })
+
   return (
-    <Box style={{ opacity }}>
-      {React.Children.toArray(children).map((text, index) => (
-        <Line key={index} style={{ transform: opacity.to(t => `translate3d(0,${index * -50 + (1 - t) * ((1 + index) * 40)}px,0)`) }}>
-          <div>{text}</div>
-          <Cover style={{ background, transform: opacity.to(t => `translate3d(0,${t * 100}%,0) rotateZ(-10deg)`) }} />
-        </Line>
-      ))}
-    </Box>
+    <dialog
+      ref={dialogRef}
+      id="maindialog"
+      tabIndex={0}
+      style={{
+        display: "block",
+        position: "fixed",
+        width: "300px",
+        top: "5px",
+        left: "5px",
+        right: "5px",
+        bottom: "5px",
+      }}
+      onBlur={() => setShowDialog(false)}
+      onKeyDown={e => {
+        var key = e.key || e.keyCode
+        if (key == 27 || key == "Escape") {
+          setShowDialog(false)
+        }
+      }}>
+      <h3>Congrats ! You've displayed a dialog !</h3>
+      <p>Your screen reader can read it.</p>
+      <button
+        onClick={() => {
+          setShowDialog(false)
+        }}>
+        Close
+      </button>
+    </dialog>
   )
 }
 
 export default function App() {
   // Current route
   const [location, setLocation] = useLocation()
-  // Animated background color
+  const [showDialog, setShowDialog] = useState(false)
   const props = useSpring({
     background: location === "/" ? "white" : location === "/knot" ? "#272730" : "#ffcc6d",
     color: location === "/" ? "black" : location === "/knot" ? "white" : "white",
@@ -139,42 +196,36 @@ export default function App() {
     leave: { position: [0, 0, -10], rotation: [0, -Math.PI, 0], scale: [0, 0, 0], opacity: 0 },
     config: () => n => n === "opacity" && { friction: 60 },
   })
+  const dialog = (() => {
+    if (showDialog) {
+      return <Dialog setShowDialog={setShowDialog} />
+    } else {
+      return null
+    }
+  })()
   return (
     <>
-      <Container style={{ ...props }}>
-        <Jumbo>
-          {transition((style, location) => (
-            <Text open={true} t={style.t} opacity={style.opacity} background={props.background} children={jumbo[location]} />
-          ))}
-        </Jumbo>
-      </Container>
-      <div
+      <Canvas
+        resize={{ polyfill }}
+        concurrent
+        camera={{ position: [0, 0, 20], fov: 50 }}
+        onCreated={({ gl }) => (gl.toneMappingExposure = 1.5)}>
+        <spotLight position={[0, 30, 40]} />
+        <spotLight position={[-50, 30, 40]} />
+        <Suspense fallback={null}>
+          <Shapes transition={transition} setLocation={setLocation} setShowDialog={setShowDialog} />
+        </Suspense>
+      </Canvas>
+      <A11yAnnouncer />
+      <Nav
         style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-        }}>
-        <ul>
-          <li>Link is blue</li>
-          <li>button is green</li>
-          <li>content is black</li>
-          <li>focus is red</li>
-        </ul>
-      </div>
-      <A11yDom>
-        <Canvas
-          resize={{ polyfill }}
-          concurrent
-          camera={{ position: [0, 0, 20], fov: 50 }}
-          onCreated={({ gl }) => (gl.toneMappingExposure = 1.5)}>
-          <spotLight position={[0, 30, 40]} />
-          <spotLight position={[-50, 30, 40]} />
-          <Suspense fallback={null}>
-            <Shapes transition={transition} setLocation={setLocation} />
-          </Suspense>
-        </Canvas>
-      </A11yDom>
-      <Nav style={{ color: props.color }} />
+          position: "absolute",
+          right: "50px",
+          top: "50px",
+          color: props.color,
+        }}
+      />
+      {dialog}
       <Loader />
     </>
   )

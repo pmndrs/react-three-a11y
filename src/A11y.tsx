@@ -1,20 +1,15 @@
-import React, {
-  MouseEvent,
-  useEffect,
-  useRef,
-  useState,
-  useContext,
-} from 'react';
+import React, { useEffect, useRef, useState, useContext } from 'react';
 import { useThree } from 'react-three-fiber';
-import useAnnounceStore from './announceStore';
 import { Html } from '@react-three/drei';
+import useAnnounceStore from './announceStore';
 
 interface Props {
   children: React.ReactNode;
-  title: string;
+  description: string;
+  pressedDescription: string;
   activationMsg: string;
   desactivationMsg: string;
-  anchorId: string | undefined;
+  tabIndex: number;
   href: string | undefined;
   role: 'button' | 'link' | 'content';
   actionCall: () => void;
@@ -22,18 +17,23 @@ interface Props {
 }
 
 const constHiddenButScreenreadable = {
-  userSelect: 'none',
   opacity: 0,
   borderRadius: '50%',
-  width: '30px',
-  height: '30px',
+  width: '50px',
+  height: '50px',
   overflow: 'hidden',
   transform: 'translateX(-50%) translateY(-50%)',
   display: 'inline-block',
-  margin: '0',
+  margin: 0,
+  pointerEvents: 'none' as const,
 };
 
-const A11yContext = React.createContext({ focus: false, hover: false });
+const A11yContext = React.createContext({
+  focus: false,
+  hover: false,
+  pressed: false,
+});
+
 A11yContext.displayName = 'A11yContext';
 
 const useA11y = () => {
@@ -44,10 +44,11 @@ export { useA11y };
 
 export const A11y: React.FC<Props> = ({
   children,
-  title,
+  description,
+  pressedDescription,
   activationMsg,
   desactivationMsg,
-  anchorId,
+  tabIndex,
   href,
   role,
   actionCall,
@@ -57,13 +58,13 @@ export const A11y: React.FC<Props> = ({
   const [a11yState, setA11yState] = useState({
     hovered: false,
     focused: false,
+    pressed: false,
   });
-  const a11yScreenReader = useAnnounceStore(state => state.a11yScreenReader);
 
   if (a11yState) {
-    // @ts-ignore
-    console.log('rendering ' + a11yState.uuid);
+    console.log('rendering ' + description);
   }
+  const a11yScreenReader = useAnnounceStore(state => state.a11yScreenReader);
 
   const {
     gl: { domElement },
@@ -72,15 +73,15 @@ export const A11y: React.FC<Props> = ({
   // temporary fix to prevent error -> keep track of our component's mounted state
   const componentIsMounted = useRef(true);
   useEffect(() => {
-    console.log('mounting' + title);
+    console.log('mounting' + description);
     return () => {
-      console.log('unmounting' + title);
+      console.log('unmounting' + description);
       domElement.style.cursor = 'default';
       componentIsMounted.current = false;
     };
   }, []); // Using an empty dependency array ensures this on
 
-  if (a11yState.hovered) {
+  if (a11yState.hovered && role != 'content') {
     domElement.style.cursor = 'pointer';
   } else {
     domElement.style.cursor = 'default';
@@ -91,30 +92,25 @@ export const A11y: React.FC<Props> = ({
   function handleBtnClick() {
     //msg is the same need to be clean for it to trigger again in case of multiple press in a row
     a11yScreenReader('');
-    window.setTimeout(() => {
-      // @ts-ignore
-      a11yScreenReader(activationMsg);
-    }, 10);
     // @ts-ignore
+    window.setTimeout(() => {
+      console.log('should say ' + activationMsg);
+      a11yScreenReader(activationMsg);
+    }, 100);
     actionCall();
   }
 
-  function handleToggleBtnClick(
-    e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
-  ) {
-    // @ts-ignore
-    if (e.target.getAttribute('aria-pressed') === 'true') {
-      // @ts-ignore
-      e.target.setAttribute('aria-pressed', 'false');
-      // @ts-ignore
+  function handleToggleBtnClick() {
+    if (a11yState.pressed) {
       a11yScreenReader(desactivationMsg);
     } else {
-      // @ts-ignore
-      e.target.setAttribute('aria-pressed', 'true');
-      // @ts-ignore
       a11yScreenReader(activationMsg);
     }
-    // @ts-ignore
+    setA11yState({
+      hovered: a11yState.hovered,
+      focused: a11yState.focused,
+      pressed: !a11yState.pressed,
+    });
     actionCall();
   }
 
@@ -124,58 +120,59 @@ export const A11y: React.FC<Props> = ({
         //btn has two distinct state
         return (
           <button
-            aria-pressed="false"
-            // @ts-ignore
+            aria-pressed={a11yState.pressed ? 'true' : 'false'}
+            tabIndex={tabIndex ? tabIndex : 0}
             style={constHiddenButScreenreadable}
-            onClick={e => handleToggleBtnClick(e)}
+            onClick={() => handleToggleBtnClick()}
             onFocus={() => {
               setA11yState({
                 hovered: a11yState.hovered,
                 focused: true,
+                pressed: a11yState.pressed,
               });
             }}
             onBlur={() => {
               setA11yState({
                 hovered: a11yState.hovered,
                 focused: false,
+                pressed: a11yState.pressed,
               });
             }}
           >
-            {title}
+            {description}
           </button>
         );
       } else {
         //regular btn
         return (
           <button
-            // @ts-ignore
+            tabIndex={tabIndex ? tabIndex : 0}
             style={constHiddenButScreenreadable}
-            // @ts-ignore
             onClick={() => handleBtnClick()}
             onFocus={() => {
               setA11yState({
                 hovered: a11yState.hovered,
                 focused: true,
+                pressed: a11yState.pressed,
               });
             }}
             onBlur={() => {
               setA11yState({
                 hovered: a11yState.hovered,
                 focused: false,
+                pressed: a11yState.pressed,
               });
             }}
           >
-            {title}
+            {description}
           </button>
         );
       }
     } else if (role === 'link') {
       return (
         <a
-          // @ts-ignore
           style={constHiddenButScreenreadable}
           href={href}
-          // @ts-ignore
           onClick={e => {
             e.preventDefault();
             actionCall();
@@ -184,62 +181,87 @@ export const A11y: React.FC<Props> = ({
             setA11yState({
               hovered: a11yState.hovered,
               focused: true,
+              pressed: a11yState.pressed,
             });
           }}
           onBlur={() => {
             setA11yState({
               hovered: a11yState.hovered,
               focused: false,
+              pressed: a11yState.pressed,
             });
           }}
         >
-          {title}
+          {description}
         </a>
       );
     } else {
       return (
-        <p
-          // @ts-ignore
+        <dialog
+          tabIndex={tabIndex ? tabIndex : 0}
           style={constHiddenButScreenreadable}
-          tabIndex={0}
           onBlur={() => {
             setA11yState({
               hovered: a11yState.hovered,
               focused: false,
+              pressed: a11yState.pressed,
             });
           }}
           onFocus={() => {
             setA11yState({
               hovered: a11yState.hovered,
               focused: true,
+              pressed: a11yState.pressed,
             });
           }}
         >
-          {title}
-        </p>
+          {description}
+        </dialog>
       );
     }
   })();
 
   return (
     <A11yContext.Provider
-      value={{ hover: a11yState.hovered, focus: a11yState.focused }}
+      value={{
+        hover: a11yState.hovered,
+        focus: a11yState.focused,
+        pressed: a11yState.pressed,
+      }}
     >
       <group
         {...props}
-        onClick={actionCall}
-        onPointerOver={() =>
+        onClick={() => {
+          if (role === 'button') {
+            if (desactivationMsg) {
+              handleBtnClick();
+            } else {
+              handleToggleBtnClick();
+            }
+          }
+          actionCall();
+        }}
+        onPointerOver={() => {
+          // @ts-ignore
+          if (a11yState.pressed) {
+            a11yScreenReader(pressedDescription);
+          } else {
+            a11yScreenReader(description);
+          }
           setA11yState({
             hovered: true,
             focused: a11yState.focused,
-          })
-        }
+            pressed: a11yState.pressed,
+          });
+        }}
         onPointerOut={() => {
+          a11yScreenReader('');
           // temporary fix to prevent error -> keep track of our component's mounted state
           if (componentIsMounted.current) {
             setA11yState({
               hovered: false,
               focused: a11yState.focused,
+              pressed: a11yState.pressed,
             });
           }
         }}
