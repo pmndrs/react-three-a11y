@@ -114,7 +114,6 @@ You can for instance use it in order to make sure the currently focused element 
 ```jsx
   import { A11yAnnouncer, A11y } from "@react-three/a11y"
   
-  <A11yDom >
     <Canvas>
       {...}
         <A11y role="content" focusCall={()=>{
@@ -124,7 +123,7 @@ You can for instance use it in order to make sure the currently focused element 
         </A11y>
       {...}
     </Canvas>
-  </A11yDom>
+    <A11yAnnouncer />
 ```
 
 ## Call function on click / keyboard Click
@@ -134,7 +133,6 @@ The A11y attribute actionCall will call the associated function each time this c
 ```jsx
   import { A11yAnnouncer, A11y } from "@react-three/a11y"
   
-  <A11yDom >
     <Canvas>
       {...}
         <A11y role="button" actionCall={()=>{
@@ -144,7 +142,7 @@ The A11y attribute actionCall will call the associated function each time this c
         </A11y>
       {...}
     </Canvas>
-  </A11yDom>
+    <A11yAnnouncer />
 ```
 
 ## Provide a description of the currenlty focused / hovered element
@@ -155,7 +153,6 @@ Optionnaly, you can also show the description to the user when he hover it by se
 ```jsx
   import { A11yAnnouncer, A11y } from "@react-three/a11y"
   
-  <A11yDom >
     <Canvas>
       {...}
         <A11y role="content" description="A rotating red square">
@@ -169,17 +166,17 @@ Optionnaly, you can also show the description to the user when he hover it by se
         </A11y>
       {...}
     </Canvas>
-  </A11yDom>
+    <A11yAnnouncer />
 ```
 
-If your A11y component have the role="button", you can use two more attributes : 
+If your A11y component have the role="button", you can use three more attributes : 
 - activationMsg : When the user will click / activate the "button" the screen reader will read what you wrote in activationMsg
 - desactivationMsg : When set, it turns your button in a togglable button. Which means he now has a on/off state. Screen readers will read the state of the button as well as the desactivation message / activation message that you set when toggling it.
+- pressedDescription : When set, it turns your button in a togglable button. Which means he now has a on/off state. This will be read instead of the usual description when the button is on.
 
 ```jsx
   import { A11yAnnouncer, A11y } from "@react-three/a11y"
   
-  <A11yDom >
     <Canvas>
       {...}
         <A11y role="button" description="This button will send a thank you email to the team" activationMsg="Email is sending">
@@ -189,7 +186,8 @@ If your A11y component have the role="button", you can use two more attributes :
         {...}
         <A11y
           role="button" 
-          description="This button can enable and disable dark theme" 
+          description="This button can enable dark theme. Dark theme is off" 
+          pressedDescription="This button can disable dark theme. Dark theme is on"
           activationMsg="Dark theme enabled"
           desactivationMsg="Dark theme disabled"
          >
@@ -198,16 +196,49 @@ If your A11y component have the role="button", you can use two more attributes :
         </A11y>
       {...}
     </Canvas>
-  </A11yDom>
+    <A11yAnnouncer />
 ```
 
-####content
+## the three role of the A11y component 
+#### content
+cursor: default
+This role is meant to provide information to screen readers or to serve as a step for a user to navigate your site using Tab for instance.
+It's not meant to trigger anything on click or to be activable with the Keyboard.
+Therefore it won't show a pointer cursor on hover.
 
-####button
+#### button
+cursor: pointer
+Special attributes : activationMsg, desactivationMsg, pressedDescription
+This role is meant to emulate the behaviour of a button or a togglable button.
+It will display a cursor pointer when your cursor is over the linked 3D object.
+It will call a function on click but also on any kind of action that would trigger a focused button ( Enter, Double-Tap .. )
+It is also actionnable by user using a screen reader.
+You can turn it into a button with aria-pressed by providing the following properties desactivationMsg, pressedDescription in addition to the usual description and activationMsg  properties.
 
-####link
+#### link
+cursor: pointer
+Special attributes : href
+This role is meant to emulate the behaviour of a regular html link.
+It should be used in combination with something that will trigger navigation on click.
+Just like the button one, it is accessible to all kind of user.
+```diff
+- Don't forget to provide the href attribute as he is required for screen readers to read it correctly !
+- It will have no effect on the navigation, it's just used as information
+```
 
 ## Screen reader support
+
+In order to provide informations to screen reader users and use this package at its full potential, fill the description attribute of all your A11y components and use the appropriate role attribute on each of them.
+
+## Additionals features
+
+Use a custom tabindex with for your A11y components by providing a number to the tabIndex attribute
+```jsx
+    <A11y tabIndex={2} >
+      <My3DSquare />
+    </A11y>
+```
+More about the use of tabIndex on <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex">developer.mozilla.org</a>
 
 ## Next steps
 
