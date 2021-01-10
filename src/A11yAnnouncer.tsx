@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import useAnnounceStore from './announceStore';
 
 const offScreenStyle = {
@@ -15,6 +15,15 @@ const offScreenStyle = {
 
 export const A11yAnnouncer: React.FC = () => {
   const message = useAnnounceStore(state => state.message);
+
+  useEffect(() => {
+    window.addEventListener('cick', () => {
+      if (window.document.activeElement?.getAttribute('r3f-a11y')) {
+        //@ts-ignore
+        window.document.activeElement.blur();
+      }
+    });
+  });
 
   return (
     <div style={offScreenStyle} aria-atomic="true" aria-live="assertive">
