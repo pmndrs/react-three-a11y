@@ -13,8 +13,8 @@ interface Props {
   href: string | undefined;
   role: 'button' | 'link' | 'content';
   showAltText: boolean;
-  actionCall: () => void;
-  focusCall: (children: React.ReactNode) => void;
+  actionCall: () => void | undefined;
+  focusCall: (...args: any[]) => void | undefined;
 }
 
 const constHiddenButScreenreadable = {
@@ -96,7 +96,7 @@ export const A11y: React.FC<Props> = ({
       console.log('should say ' + activationMsg);
       a11yScreenReader(activationMsg);
     }, 100);
-    actionCall();
+    if (typeof actionCall === 'function') actionCall();
   }
 
   function handleToggleBtnClick() {
@@ -110,7 +110,7 @@ export const A11y: React.FC<Props> = ({
       focused: a11yState.focused,
       pressed: !a11yState.pressed,
     });
-    actionCall();
+    if (typeof actionCall === 'function') actionCall();
   }
 
   const HtmlFocusableElement = (() => {
@@ -124,6 +124,7 @@ export const A11y: React.FC<Props> = ({
             style={constHiddenButScreenreadable}
             onClick={() => handleToggleBtnClick()}
             onFocus={() => {
+              if (typeof focusCall === 'function') focusCall();
               setA11yState({
                 hovered: a11yState.hovered,
                 focused: true,
@@ -149,6 +150,7 @@ export const A11y: React.FC<Props> = ({
             style={constHiddenButScreenreadable}
             onClick={() => handleBtnClick()}
             onFocus={() => {
+              if (typeof focusCall === 'function') focusCall();
               setA11yState({
                 hovered: a11yState.hovered,
                 focused: true,
@@ -174,9 +176,10 @@ export const A11y: React.FC<Props> = ({
           href={href}
           onClick={e => {
             e.preventDefault();
-            actionCall();
+            if (typeof actionCall === 'function') actionCall();
           }}
           onFocus={() => {
+            if (typeof focusCall === 'function') focusCall();
             setA11yState({
               hovered: a11yState.hovered,
               focused: true,
@@ -207,6 +210,7 @@ export const A11y: React.FC<Props> = ({
             });
           }}
           onFocus={() => {
+            if (typeof focusCall === 'function') focusCall();
             setA11yState({
               hovered: a11yState.hovered,
               focused: true,
@@ -266,7 +270,7 @@ export const A11y: React.FC<Props> = ({
               handleToggleBtnClick();
             }
           }
-          actionCall();
+          if (typeof actionCall === 'function') actionCall();
         }}
         onPointerOver={() => {
           // @ts-ignore
