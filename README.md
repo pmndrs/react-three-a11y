@@ -1,160 +1,218 @@
-# TSDX React User Guide
+<h1>react-three-a11y👩‍🦯</h1>
 
-Congrats! You just saved yourself hours of work by bootstrapping this project with TSDX. Let’s get you oriented with what’s here and how to use it.
+An easy to use package designed to bring accessibility features to [react-three-fiber](https://github.com/pmndrs/react-three-fiber) such as focus indication, keyboard tab navigation, and screen reader support.
 
-> This TSDX setup is meant for developing React component libraries (not apps!) that can be published to NPM. If you’re looking to build a React-based app, you should use `create-react-app`, `razzle`, `nextjs`, `gatsby`, or `react-static`.
+# How to use
 
-> If you’re new to TypeScript and React, checkout [this handy cheatsheet](https://github.com/sw-yx/react-typescript-cheatsheet/)
+## Initial setup
 
-## Commands
+Install the @react-three/a11y package 
 
-TSDX scaffolds your new library inside `/src`, and also sets up a [Parcel-based](https://parceljs.org) playground for it inside `/example`.
-
-The recommended workflow is to run TSDX in one terminal:
-
+with npm :
 ```bash
-npm start # or yarn start
+npm install @react-three/a11y
 ```
-
-This builds to `/dist` and runs the project in watch mode so any edits you save inside `src` causes a rebuild to `/dist`.
-
-Then run the example inside another:
-
+with yarn
 ```bash
-cd example
-npm i # or yarn to install dependencies
-npm start # or yarn start
+yarn add @react-three/a11y
 ```
 
-The default example imports and live reloads whatever is in `/dist`, so if you are seeing an out of date component, make sure TSDX is running in watch mode like we recommend above. **No symlinking required**, we use [Parcel's aliasing](https://parceljs.org/module_resolution.html#aliases).
+Now, you'll have to import the A11yAnnouncer component. We usually place it next to the R3F Canvas component.
 
-To do a one-off build, use `npm run build` or `yarn build`.
-
-To run tests, use `npm test` or `yarn test`.
-
-## Configuration
-
-Code quality is set up for you with `prettier`, `husky`, and `lint-staged`. Adjust the respective fields in `package.json` accordingly.
-
-### Jest
-
-Jest tests are set up to run with `npm test` or `yarn test`.
-
-### Bundle analysis
-
-Calculates the real cost of your library using [size-limit](https://github.com/ai/size-limit) with `npm run size` and visulize it with `npm run analyze`.
-
-#### Setup Files
-
-This is the folder structure we set up for you:
-
-```txt
-/example
-  index.html
-  index.tsx       # test your component here in a demo app
-  package.json
-  tsconfig.json
-/src
-  index.tsx       # EDIT THIS
-/test
-  blah.test.tsx   # EDIT THIS
-.gitignore
-package.json
-README.md         # EDIT THIS
-tsconfig.json
+```jsx
+    import { A11yAnnouncer } from "@react-three/a11y"
+     {...}
+    <Canvas>
+      {...}
+    </Canvas>
 ```
 
-#### React Testing Library
+This will both help us emulate focus inside the canvas and provide some text to screen readers when nescessary.
 
-We do not set up `react-testing-library` for you yet, we welcome contributions and documentation on this.
+Then to add some accessibility features to your 3D Objects / Groups of 3D object you'll have to import the A11y component too.
+Then you wrap the 3D objects you want to make focusable like so
 
-### Rollup
+```jsx
+  import { A11yAnnouncer, A11y } from "@react-three/a11y"
+  
+  <A11yDom >
+    <Canvas>
+      {...}
+        <A11y>
+          <My3DComponent />
+        </A11y>
+      {...}
+        <A11y>
+          <AGroupOf3DComponent />
+        </A11y>
+      {...}
+    </Canvas>
+  </A11yDom>
+```
 
-TSDX uses [Rollup](https://rollupjs.org) as a bundler and generates multiple rollup configs for various module formats and build settings. See [Optimizations](#optimizations) for details.
+At this point both My3DComponent and AGroupOf3DComponent can receive focus.
+More presciesly, the emulated "focus" will be on the parent A11y that will act as a provider and give the possibility to it's children to access the state.
+But even if they're focusable, nothing will be displayed / read etc without a few more attributes.
 
-### TypeScript
+## accessing the hover / focused / pressed state
 
-`tsconfig.json` is set up to interpret `dom` and `esnext` types, as well as `react` for `jsx`. Adjust according to your needs.
+For each child wrapped in a A11y component, you can access the focus / hover / pressed state like so
 
-## Continuous Integration
+import useA11y from '@react-three/a11y' then
 
-### GitHub Actions
+```jsx
+  import { A11yAnnouncer, A11y, useA11y } from "@react-three/a11y"
+  
+  {...}
 
-Two actions are added by default:
+  const My3DComponent = (props) {
 
-- `main` which installs deps w/ cache, lints, tests, and builds on all pushes against a Node and OS matrix
-- `size` which comments cost comparison of your library on every pull request using [`size-limit`](https://github.com/ai/size-limit)
+  //call useA11yContext to get the A11yContext from the provider
+  const a11yContext = useA11yContext();
+  //now you have access to a11yContext.hover, a11yContext.focus and a11yContext.pressed
 
-## Optimizations
-
-Please see the main `tsdx` [optimizations docs](https://github.com/palmerhq/tsdx#optimizations). In particular, know that you can take advantage of development-only optimizations:
-
-```js
-// ./types/index.d.ts
-declare var __DEV__: boolean;
-
-// inside your code...
-if (__DEV__) {
-  console.log('foo');
+  return (
+    <mesh
+      {...props}
+      <boxBufferGeometry args={[1, 1, 1]} />
+      //here we'll change the material color depending on the a11yContext state
+      <meshStandardMaterial color={a11yContext.hover || a11yContext.focus ? 'hotpink' : 'orange'} />
+    </mesh>
+  )
 }
 ```
 
-You can also choose to install and use [invariant](https://github.com/palmerhq/tsdx#invariant) and [warning](https://github.com/palmerhq/tsdx#warning) functions.
+In this example, the meshStandardMaterial of the component My3DComponent will change color if he is either focused or hovered.
+How you display the focus / hover information to the user is up to you ! Just make sure it's intuitive for your user !
 
-## Module Formats
+## The role attribute 
 
-CJS, ESModules, and UMD module formats are supported.
+Like in HTML, you can focus different kind of element and expect different things depending on what you're focusing.
+That's why the A11y component is divided in 3 categories.
 
-The appropriate paths are configured in `package.json` and `dist/index.js` accordingly. Please report if any issues are found.
+- role="content" ( default )
+This role is meant to provide information to screen readers or to serve as a step for a user to navigate your site using Tab for instance.
+It's not meant to trigger anything on click or to be activable with the Keyboard.
+More on this role <a href="/#content"> below </a>
+- role="button" 
+This role is meant to emulate the behaviour of a button or a togglable button.
+It will display a cursor pointer when your cursor is over the linked 3D object.
+It will call a function on click but also on any kind of action that would trigger a focused button ( Enter, Double-Tap .. )
+It is also actionnable by user using a screen reader.
+More on this role <a href="/#button"> below </a>
+- role="link" 
+This role is meant to emulate the behaviour of a regular html link.
+It should be used in combination with something that will trigger navigation on click.
+Just like the button one, it is accessible to all kind of user.
+More on this role <a href="/#link"> below </a>
 
-## Deploying the Example Playground
+## Call function on focus
 
-The Playground is just a simple [Parcel](https://parceljs.org) app, you can deploy it anywhere you would normally deploy that. Here are some guidelines for **manually** deploying with the Netlify CLI (`npm i -g netlify-cli`):
+The A11y attribute focusCall will be called each time this component receive focus ( Usually through tab navigation )
+You can for instance use it in order to make sure the currently focused element is in view by adjusting it position or the camera position.
 
-```bash
-cd example # if not already in the example folder
-npm run build # builds to dist
-netlify deploy # deploy the dist folder
+```jsx
+  import { A11yAnnouncer, A11y } from "@react-three/a11y"
+  
+  <A11yDom >
+    <Canvas>
+      {...}
+        <A11y role="content" focusCall={()=>{
+          //rotate camera to show the focused element
+        }}>
+          <My3DComponent />
+        </A11y>
+      {...}
+    </Canvas>
+  </A11yDom>
 ```
 
-Alternatively, if you already have a git repo connected, you can set up continuous deployment with Netlify:
+## Call function on click / keyboard Click
 
-```bash
-netlify init
-# build command: yarn build && cd example && yarn && yarn build
-# directory to deploy: example/dist
-# pick yes for netlify.toml
+The A11y attribute actionCall will call the associated function each time this component gets clicked / focused then keyboard activated etc..
+
+```jsx
+  import { A11yAnnouncer, A11y } from "@react-three/a11y"
+  
+  <A11yDom >
+    <Canvas>
+      {...}
+        <A11y role="button" actionCall={()=>{
+          alert('This button have been clicked')
+        }}>
+          <My3DComponent />
+        </A11y>
+      {...}
+    </Canvas>
+  </A11yDom>
 ```
 
-## Named Exports
+## Provide a description of the currenlty focused / hovered element
 
-Per Palmer Group guidelines, [always use named exports.](https://github.com/palmerhq/typescript#exports) Code split inside your React app instead of your React library.
+Your A11y component will provide a description to the screen reader users on focus / hover as long as you provide it to the description attribute.
+Optionnaly, you can also show the description to the user when he hover it by setting showAltText={true}.
 
-## Including Styles
-
-There are many ways to ship styles, including with CSS-in-JS. TSDX has no opinion on this, configure how you like.
-
-For vanilla CSS, you can include it at the root directory and add it to the `files` section in your `package.json`, so that it can be imported separately by your users and run through their bundler's loader.
-
-## Publishing to NPM
-
-We recommend using [np](https://github.com/sindresorhus/np).
-
-## Usage with Lerna
-
-When creating a new package with TSDX within a project set up with Lerna, you might encounter a `Cannot resolve dependency` error when trying to run the `example` project. To fix that you will need to make changes to the `package.json` file _inside the `example` directory_.
-
-The problem is that due to the nature of how dependencies are installed in Lerna projects, the aliases in the example project's `package.json` might not point to the right place, as those dependencies might have been installed in the root of your Lerna project.
-
-Change the `alias` to point to where those packages are actually installed. This depends on the directory structure of your Lerna project, so the actual path might be different from the diff below.
-
-```diff
-   "alias": {
--    "react": "../node_modules/react",
--    "react-dom": "../node_modules/react-dom"
-+    "react": "../../../node_modules/react",
-+    "react-dom": "../../../node_modules/react-dom"
-   },
+```jsx
+  import { A11yAnnouncer, A11y } from "@react-three/a11y"
+  
+  <A11yDom >
+    <Canvas>
+      {...}
+        <A11y role="content" description="A rotating red square">
+        //will read "A rotating red square" to screen readers on focus / hover 
+          <My3DSquare />
+        </A11y>
+        {...}
+        <A11y role="content" description="A bouncing blue sphere" showAltText={true}>
+        //will read "A bouncing blue sphere" to screen readers on focus / hover while also showing it on mouseover
+          <My3DSphere />
+        </A11y>
+      {...}
+    </Canvas>
+  </A11yDom>
 ```
 
-An alternative to fixing this problem would be to remove aliases altogether and define the dependencies referenced as aliases as dev dependencies instead. [However, that might cause other problems.](https://github.com/palmerhq/tsdx/issues/64)
+If your A11y component have the role="button", you can use two more attributes : 
+- activationMsg : When the user will click / activate the "button" the screen reader will read what you wrote in activationMsg
+- desactivationMsg : When set, it turns your button in a togglable button. Which means he now has a on/off state. Screen readers will read the state of the button as well as the desactivation message / activation message that you set when toggling it.
+
+```jsx
+  import { A11yAnnouncer, A11y } from "@react-three/a11y"
+  
+  <A11yDom >
+    <Canvas>
+      {...}
+        <A11y role="button" description="This button will send a thank you email to the team" activationMsg="Email is sending">
+        //will read the description on hover / focus then will read activationMsg if clicked / pressed
+          <My3DSquare />
+        </A11y>
+        {...}
+        <A11y
+          role="button" 
+          description="This button can enable and disable dark theme" 
+          activationMsg="Dark theme enabled"
+          desactivationMsg="Dark theme disabled"
+         >
+        //will read the description on hover / focus then will read activationMsg if turned on or desactivationMsg if tuned off
+          <My3DSphere />
+        </A11y>
+      {...}
+    </Canvas>
+  </A11yDom>
+```
+
+####content
+
+####button
+
+####link
+
+## Screen reader support
+
+## Next steps
+
+- [ ] Improve the accessibility for mobile screen readers such as Voice Over and Talk Back
+
+### Maintainers :
+
+- [`twitter 👋 @AlaricBaraou`](https://twitter.com/AlaricBaraou)
