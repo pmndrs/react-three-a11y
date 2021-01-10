@@ -112,7 +112,7 @@ export const A11y: React.FC<Props> = ({
 
   const HtmlFocusableElement = (() => {
     if (role === 'button') {
-      if (desactivationMsg) {
+      if (desactivationMsg || pressedDescription) {
         //btn has two distinct state
         return (
           <button
