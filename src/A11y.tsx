@@ -72,9 +72,7 @@ export const A11y: React.FC<Props> = ({
   // temporary fix to prevent error -> keep track of our component's mounted state
   const componentIsMounted = useRef(true);
   useEffect(() => {
-    console.log('mounting' + description);
     return () => {
-      console.log('unmounting' + description);
       domElement.style.cursor = 'default';
       componentIsMounted.current = false;
     };
@@ -93,7 +91,6 @@ export const A11y: React.FC<Props> = ({
     a11yScreenReader('');
     // @ts-ignore
     window.setTimeout(() => {
-      console.log('should say ' + activationMsg);
       a11yScreenReader(activationMsg);
     }, 100);
     if (typeof actionCall === 'function') actionCall();
