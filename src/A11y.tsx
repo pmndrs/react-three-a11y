@@ -12,6 +12,7 @@ interface Props {
   tabIndex: number;
   href: string | undefined;
   role: 'button' | 'link' | 'content';
+  showAltText: boolean;
   actionCall: () => void;
   focusCall: (children: React.ReactNode) => void;
 }
@@ -51,6 +52,7 @@ export const A11y: React.FC<Props> = ({
   tabIndex,
   href,
   role,
+  showAltText,
   actionCall,
   focusCall,
   ...props
@@ -218,6 +220,34 @@ export const A11y: React.FC<Props> = ({
     }
   })();
 
+  let AltText = null;
+  if (showAltText && a11yState.hovered) {
+    AltText = (
+      <div
+        style={{
+          width: 'auto',
+          maxWidth: '300px',
+          display: 'block',
+          position: 'absolute',
+          top: '0px',
+          left: '0px',
+          transform: 'translate(-50%,-50%)',
+          background: 'white',
+          borderRadius: '4px',
+          padding: '4px',
+        }}
+      >
+        <p
+          style={{
+            margin: '0px',
+          }}
+        >
+          {description}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <A11yContext.Provider
       value={{
@@ -271,6 +301,7 @@ export const A11y: React.FC<Props> = ({
             children.props.position ? children.props.position : [0, 0, 0]
           }
         >
+          {AltText}
           {HtmlFocusableElement}
         </Html>
       </group>

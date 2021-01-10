@@ -186,6 +186,7 @@ function Shapes({ transition, setLocation, setShowDialog, setDarktheme, darkthem
           <A11y
             role="link"
             href="/knot"
+            showAltText={true}
             description="Link to knot page"
             actionCall={() => {
               setLocation("/knot")
@@ -195,6 +196,7 @@ function Shapes({ transition, setLocation, setShowDialog, setDarktheme, darkthem
           <A11y
             role="link"
             href="/knot"
+            showAltText={true}
             description="Link to bomb page"
             actionCall={() => {
               setLocation("/bomb")
@@ -204,6 +206,7 @@ function Shapes({ transition, setLocation, setShowDialog, setDarktheme, darkthem
           <A11y
             role="button"
             description="Dark mode button theme"
+            showAltText={true}
             pressedDescription="Dark mode button theme, activated"
             actionCall={() => setDarktheme(!darktheme)}
             activationMsg="Theme Dark enabled"
@@ -212,6 +215,7 @@ function Shapes({ transition, setLocation, setShowDialog, setDarktheme, darkthem
           </A11y>
           <A11y
             role="button"
+            showAltText={true}
             description="press this button to show a dialog"
             actionCall={() => setShowDialog(true)}
             activationMsg="Dialog opened">
