@@ -36,7 +36,6 @@ Then you wrap the 3D objects you want to make focusable like so
 ```jsx
   import { A11yAnnouncer, A11y } from "@react-three/a11y"
   
-  <A11yDom >
     <Canvas>
       {...}
         <A11y>
@@ -48,7 +47,7 @@ Then you wrap the 3D objects you want to make focusable like so
         </A11y>
       {...}
     </Canvas>
-  </A11yDom>
+    <A11yAnnouncer />
 ```
 
 At this point both My3DComponent and AGroupOf3DComponent can receive focus.
