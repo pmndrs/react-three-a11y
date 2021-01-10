@@ -25,6 +25,7 @@ Now, you'll have to import the A11yAnnouncer component. We usually place it next
     <Canvas>
       {...}
     </Canvas>
+    <A11yAnnouncer />
 ```
 
 This will both help us emulate focus inside the canvas and provide some text to screen readers when nescessary.
