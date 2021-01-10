@@ -204,9 +204,9 @@ function Shapes({ transition, setLocation, setShowDialog, setDarktheme, darkthem
             <SimpleLink position={[-5, 0, 0]} direction="left" />
           </A11y>
           <A11y
-            role="button"
-            description="Dark mode button theme"
+            role="content"
             showAltText={true}
+            description="Dark mode button theme"
             pressedDescription="Dark mode button theme, activated"
             actionCall={() => setDarktheme(!darktheme)}
             activationMsg="Theme Dark enabled"
@@ -214,7 +214,7 @@ function Shapes({ transition, setLocation, setShowDialog, setDarktheme, darkthem
             <SimpleToggleButton position={[0, 0, 0]} />
           </A11y>
           <A11y
-            role="button"
+            role="content"
             showAltText={true}
             description="press this button to show a dialog"
             actionCall={() => setShowDialog(true)}

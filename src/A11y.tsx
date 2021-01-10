@@ -222,7 +222,7 @@ export const A11y: React.FC<Props> = ({
             });
           }}
         >
-          {description}
+          <p>{description}</p>
         </dialog>
       );
     }
@@ -232,6 +232,7 @@ export const A11y: React.FC<Props> = ({
   if (showAltText && a11yState.hovered) {
     AltText = (
       <div
+        aria-hidden={true}
         style={{
           width: 'auto',
           maxWidth: '300px',
@@ -246,6 +247,7 @@ export const A11y: React.FC<Props> = ({
         }}
       >
         <p
+          aria-hidden={true}
           style={{
             margin: '0px',
           }}
