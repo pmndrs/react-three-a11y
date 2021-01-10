@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "zustand": "^3.2.0",
-    "@react-three/drei": "^2.2.12",
+    "@react-three/drei": "^2.2.12"
   },
   "husky": {
     "hooks": {
