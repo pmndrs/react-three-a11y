@@ -67,8 +67,8 @@ import useA11y from '@react-three/a11y' then
 
   const My3DComponent = (props) {
 
-  //call useA11yContext to get the A11yContext from the provider
-  const a11yContext = useA11yContext();
+  //call useA11y to get the A11yContext from the provider
+  const a11yContext = useA11y();
   //now you have access to a11yContext.hover, a11yContext.focus and a11yContext.pressed
 
   return (
