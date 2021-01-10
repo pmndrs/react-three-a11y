@@ -62,7 +62,7 @@ const SimpleBox = props => {
   )
 }
 
-function Shapes({ transition, setLocation, setShowDialog }) {
+function Shapes({ transition, setLocation, setShowDialog, setDarktheme, darktheme }) {
   return transition(({ opacity, ...props }, location) => (
     <a.group {...props}>
       <Switch location={location}>
@@ -80,7 +80,7 @@ function Shapes({ transition, setLocation, setShowDialog }) {
             role="button"
             description="Dark mode button theme"
             pressedDescription="Dark mode button theme, activated"
-            actionCall={() => console.log("some theme switch function")}
+            actionCall={() => setDarktheme(!darktheme)}
             activationMsg="Theme Dark enabled"
             desactivationMsg="Theme Dark disabled">
             <SimpleBox primaryColor="green" position={[0, 0, 0]} />
@@ -184,7 +184,8 @@ const Dialog = ({ setShowDialog }) => {
 export default function App() {
   // Current route
   const [location, setLocation] = useLocation()
-  const [showDialog, setShowDialog] = useState(false)
+  const [showDialog, setShowDialog] = useState()
+  const [darktheme, setDarktheme] = useState(false)
   const props = useSpring({
     background: location === "/" ? "white" : location === "/knot" ? "#272730" : "#ffcc6d",
     color: location === "/" ? "black" : location === "/knot" ? "white" : "white",
@@ -206,6 +207,7 @@ export default function App() {
   return (
     <>
       <Canvas
+        style={{ background: darktheme ? "#1c1c1c" : "#f4f4f4" }}
         resize={{ polyfill }}
         concurrent
         camera={{ position: [0, 0, 20], fov: 50 }}
@@ -213,7 +215,13 @@ export default function App() {
         <spotLight position={[0, 30, 40]} />
         <spotLight position={[-50, 30, 40]} />
         <Suspense fallback={null}>
-          <Shapes transition={transition} setLocation={setLocation} setShowDialog={setShowDialog} />
+          <Shapes
+            transition={transition}
+            setLocation={setLocation}
+            setShowDialog={setShowDialog}
+            darktheme={darktheme}
+            setDarktheme={setDarktheme}
+          />
         </Suspense>
       </Canvas>
       <A11yAnnouncer />

@@ -61,9 +61,6 @@ export const A11y: React.FC<Props> = ({
     pressed: false,
   });
 
-  if (a11yState) {
-    console.log('rendering ' + description);
-  }
   const a11yScreenReader = useAnnounceStore(state => state.a11yScreenReader);
 
   const {
