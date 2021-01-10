@@ -80,7 +80,7 @@ export const A11y: React.FC<Props> = ({
     };
   }, []); // Using an empty dependency array ensures this on
 
-  if (a11yState.hovered && role != 'content') {
+  if (a11yState.hovered && role !== 'content') {
     domElement.style.cursor = 'pointer';
   } else {
     domElement.style.cursor = 'default';
