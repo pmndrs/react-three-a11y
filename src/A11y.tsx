@@ -119,6 +119,7 @@ export const A11y: React.FC<Props> = ({
         //btn has two distinct state
         return (
           <button
+            r3f-a11y="true"
             aria-pressed={a11yState.pressed ? 'true' : 'false'}
             tabIndex={tabIndex ? tabIndex : 0}
             style={constHiddenButScreenreadable}
@@ -146,6 +147,7 @@ export const A11y: React.FC<Props> = ({
         //regular btn
         return (
           <button
+            r3f-a11y="true"
             tabIndex={tabIndex ? tabIndex : 0}
             style={constHiddenButScreenreadable}
             onClick={() => handleBtnClick()}
@@ -172,6 +174,7 @@ export const A11y: React.FC<Props> = ({
     } else if (role === 'link') {
       return (
         <a
+          r3f-a11y="true"
           style={constHiddenButScreenreadable}
           href={href}
           onClick={e => {
@@ -200,6 +203,7 @@ export const A11y: React.FC<Props> = ({
     } else {
       return (
         <dialog
+          r3f-a11y="true"
           tabIndex={tabIndex ? tabIndex : 0}
           style={constHiddenButScreenreadable}
           onBlur={() => {
