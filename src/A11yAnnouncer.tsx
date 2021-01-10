@@ -17,7 +17,7 @@ export const A11yAnnouncer: React.FC = () => {
   const message = useAnnounceStore(state => state.message);
 
   useEffect(() => {
-    window.addEventListener('cick', () => {
+    window.addEventListener('click', () => {
       if (window.document.activeElement?.getAttribute('r3f-a11y')) {
         //@ts-ignore
         window.document.activeElement.blur();
