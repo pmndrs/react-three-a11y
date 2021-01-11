@@ -82,7 +82,7 @@ The `actionCall` prop of `A11y` will be called each time this component gets cli
 <A11y role="button" actionCall={()=> console.log("clicked")} ... />
 ```
 
-## Provide a description of the currenlty focused / hovered element
+## Provide a description of the currently focused / hovered element
 
 When using the `description` prop, the `A11y` component will provide a description to the screen reader users on focus/hover.
 Optionally, you can also show the description to the user on hover by setting `showAltText={true}`.
