@@ -85,26 +85,11 @@ How you display the focus / hover information to the user is up to you! Just mak
 Like in HTML, you can focus different kind of elements and expect different things depending on what you're focusing.
 That's why the `A11y` component has 3 different use cases:
 
-- `role="content"` ( default )
-This role is meant to **provide information to screen readers** or to **serve as a step for a user to navigate your site using Tab**.
-It's not meant to trigger anything on click or to be activable with the Keyboard.
+- `role="content"` ( default ) <a href="/#content">More below </a>
 
-More on this role <a href="/#content"> below </a>
+- `role="button"` <a href="/#button">More below </a>
 
-- `role="button"`
-This role is meant to **emulate the behaviour of a button or a togglable button**.
-It will display a pointer cursor when your cursor is hovering the linked 3D Object.
-It will call a callback function on click but also on any kind of action that would trigger a focused button ( Enter, Double-Tap .. )
-It is also actionable by a user using a screen reader.
-
-More on this role <a href="/#button"> below </a>
-
-- `role="link"`
-This role is meant to **emulate the behaviour of a regular HTML link**.
-It should be used in combination with something that will trigger navigation on click.
-Just like the button, it is accessible to all kinds of users.
-
-More on this role <a href="/#link"> below </a>
+- `role="link"` <a href="/#link">More below </a>
 
 ## Call function on focus
 
