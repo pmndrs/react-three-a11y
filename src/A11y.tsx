@@ -8,7 +8,7 @@ interface Props {
   description: string;
   pressedDescription: string;
   activationMsg: string;
-  desactivationMsg: string;
+  deactivationMsg: string;
   tabIndex: number;
   href: string | undefined;
   role: 'button' | 'link' | 'content';
@@ -48,7 +48,7 @@ export const A11y: React.FC<Props> = ({
   description,
   pressedDescription,
   activationMsg,
-  desactivationMsg,
+  deactivationMsg,
   tabIndex,
   href,
   role,
@@ -92,7 +92,7 @@ export const A11y: React.FC<Props> = ({
 
   function handleToggleBtnClick() {
     if (a11yState.pressed) {
-      a11yScreenReader(desactivationMsg);
+      a11yScreenReader(deactivationMsg);
     } else {
       a11yScreenReader(activationMsg);
     }
@@ -106,7 +106,7 @@ export const A11y: React.FC<Props> = ({
 
   const HtmlFocusableElement = (() => {
     if (role === 'button') {
-      if (desactivationMsg || pressedDescription) {
+      if (deactivationMsg || pressedDescription) {
         //btn has two distinct state
         return (
           <button
@@ -261,7 +261,7 @@ export const A11y: React.FC<Props> = ({
         {...props}
         onClick={() => {
           if (role === 'button') {
-            if (desactivationMsg || pressedDescription) {
+            if (deactivationMsg || pressedDescription) {
               handleToggleBtnClick();
             } else {
               handleBtnClick();

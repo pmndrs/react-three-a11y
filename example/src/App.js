@@ -195,7 +195,7 @@ const App = () => {
             setDarktheme(!darktheme)
           }}
           activationMsg="Theme Dark enabled"
-          desactivationMsg="Theme Dark disabled">
+          deactivationMsg="Theme Dark disabled">
           <SimpleToggleButton position={[0, -8, 0]} />
         </A11y>
       </Canvas>

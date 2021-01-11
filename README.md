@@ -10,7 +10,7 @@
 
 ## Initial setup
 
-Install the @react-three/a11y package 
+Install the @react-three/a11y package
 
 ```bash
 npm install @react-three/a11y
@@ -33,7 +33,7 @@ To add some accessibility features to your 3D Objects/Groups you'll have to wrap
 
 ```jsx
   import { A11yAnnouncer, A11y } from "@react-three/a11y"
-  
+
     <Canvas>
       {...}
         <A11y>
@@ -48,7 +48,7 @@ To add some accessibility features to your 3D Objects/Groups you'll have to wrap
     <A11yAnnouncer />
 ```
 
-At this point both *My3DComponent* and *AGroupOf3DComponent* can receive focus.
+At this point both _My3DComponent_ and _AGroupOf3DComponent_ can receive focus.
 More accurately, the emulated "focus" will be on the parent `A11y` that will act as a provider and let its children access the state.
 But even if they're focusable, nothing will be displayed / read etc without a few more attributes.
 
@@ -58,7 +58,7 @@ For each child wrapped in a `A11y` component, you can access the `focus` / `hove
 
 ```jsx
   import { A11yAnnouncer, A11y, useA11y } from "@react-three/a11y"
-  
+
   {...}
 
   const My3DComponent = (props) {
@@ -77,10 +77,10 @@ For each child wrapped in a `A11y` component, you can access the `focus` / `hove
 }
 ```
 
-In this example, the *meshStandardMaterial* of the component *My3DComponent* will change color if he is either focused or hovered.
+In this example, the _meshStandardMaterial_ of the component _My3DComponent_ will change color if he is either focused or hovered.
 How you display the focus / hover information to the user is up to you! Just make sure it's intuitive for your user!
 
-## The role attribute 
+## The role attribute
 
 Like in HTML, you can focus different kind of elements and expect different things depending on what you're focusing.
 That's why the `A11y` component has 3 different use cases:
@@ -98,7 +98,7 @@ You can for instance use it in order to make sure the currently focused element 
 
 ```jsx
   import { A11yAnnouncer, A11y } from "@react-three/a11y"
-  
+
     <Canvas>
       {...}
         <A11y role="content" focusCall={()=>{
@@ -117,7 +117,7 @@ The `actionCall` prop of `A11y` will be called each time this component gets cli
 
 ```jsx
   import { A11yAnnouncer, A11y } from "@react-three/a11y"
-  
+
     <Canvas>
       {...}
         <A11y role="button" actionCall={()=>{
@@ -137,11 +137,11 @@ Optionally, you can also show the description to the user on hover by setting `s
 
 ```jsx
   import { A11yAnnouncer, A11y } from "@react-three/a11y"
-  
+
     <Canvas>
       {...}
         <A11y role="content" description="A rotating red square">
-        //will read "A rotating red square" to screen readers on focus / hover 
+        //will read "A rotating red square" to screen readers on focus / hover
           <My3DSquare />
         </A11y>
         {...}
@@ -154,14 +154,15 @@ Optionally, you can also show the description to the user on hover by setting `s
     <A11yAnnouncer />
 ```
 
-If your `A11y` component has the `role="button"`, you can use three more props: 
+If your `A11y` component has the `role="button"`, you can use three more props:
+
 - `activationMsg`: When the user will click/activate the "button" the screen reader will read the passed message
-- `desactivationMsg`: When set, it turns your button in a togglable button. Which means it now has a on/off state. Screen readers will read the state of the button as well as the activation/disactivation messages passsed.
+- `deactivationMsg`: When set, it turns your button in a togglable button. Which means it now has a on/off state. Screen readers will read the state of the button as well as the activation/disactivation messages passsed.
 - `pressedDescription`: When set, it turns your button in a togglable button. Which means it now has a on/off state. This description will replace the one passed via `description` when the toggle is active.
 
 ```jsx
   import { A11yAnnouncer, A11y } from "@react-three/a11y"
-  
+
     <Canvas>
       {...}
         <A11y role="button" description="This button will send a thank you email to the team" activationMsg="Email is sending">
@@ -170,13 +171,13 @@ If your `A11y` component has the `role="button"`, you can use three more props:
         </A11y>
         {...}
         <A11y
-          role="button" 
-          description="This button can enable dark theme. Dark theme is off" 
+          role="button"
+          description="This button can enable dark theme. Dark theme is off"
           pressedDescription="This button can disable dark theme. Dark theme is on"
           activationMsg="Dark theme enabled"
-          desactivationMsg="Dark theme disabled"
+          deactivationMsg="Dark theme disabled"
          >
-        //will read the description on hover / focus then will read activationMsg if turned on or desactivationMsg if tuned off
+        //will read the description on hover / focus then will read activationMsg if turned on or deactivationMsg if tuned off
           <My3DSphere />
         </A11y>
       {...}
@@ -184,29 +185,33 @@ If your `A11y` component has the `role="button"`, you can use three more props:
     <A11yAnnouncer />
 ```
 
-## The three roles of the `A11y` component 
+## The three roles of the `A11y` component
 
 #### `content`
+
 `cursor: default`
 This role is meant to provide information to screen readers or to serve as a step for a user to navigate your site using Tab for instance.
 It's not meant to trigger anything on click or to be activable with the Keyboard.
 Therefore it won't show a pointer cursor on hover.
 
 #### `button`
+
 `cursor: pointer`
-Special attributes : activationMsg, desactivationMsg, pressedDescription
+Special attributes : activationMsg, deactivationMsg, pressedDescription
 This role is meant to emulate the behaviour of a button or a togglable button.
 It will display a cursor pointer when your cursor is over the linked 3D object.
 It will call a function on click but also on any kind of action that would trigger a focused button ( Enter, Double-Tap .. )
 It is also actionnable by user using a screen reader.
-You can turn it into a button with aria-pressed by providing the following properties desactivationMsg, pressedDescription in addition to the usual description and activationMsg  properties.
+You can turn it into a button with aria-pressed by providing the following properties deactivationMsg, pressedDescription in addition to the usual description and activationMsg properties.
 
 #### `link`
+
 `cursor: pointer`
 `special attributes : href`
 This role is meant to emulate the behaviour of a regular html link.
 It should be used in combination with something that will trigger navigation on click.
 Just like the button one, it is accessible to all kind of user.
+
 ```diff
 - Don't forget to provide the href attribute as he is required for screen readers to read it correctly !
 - It will have no effect on the navigation, it's just used as information
@@ -219,11 +224,13 @@ In order to provide informations to screen reader users and use this package at 
 ## Additionals Features
 
 Use a custom tabindex with for your A11y components by providing a number to the tabIndex attribute
+
 ```jsx
-    <A11y tabIndex={2} >
-      <My3DSquare />
-    </A11y>
+<A11y tabIndex={2}>
+  <My3DSquare />
+</A11y>
 ```
+
 More about the use of tabIndex on <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex">developer.mozilla.org</a>
 
 ## Next Steps
