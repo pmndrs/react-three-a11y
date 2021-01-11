@@ -72,17 +72,12 @@ export const A11y: React.FC<Props> = ({
   // temporary fix to prevent error -> keep track of our component's mounted state
   const componentIsMounted = useRef(true);
   useEffect(() => {
+    console.log('use effect ' + description);
     return () => {
       domElement.style.cursor = 'default';
       componentIsMounted.current = false;
     };
   }, []); // Using an empty dependency array ensures this on
-
-  if (a11yState.hovered && role !== 'content') {
-    domElement.style.cursor = 'pointer';
-  } else {
-    domElement.style.cursor = 'default';
-  }
 
   React.Children.only(children);
 
@@ -267,10 +262,10 @@ export const A11y: React.FC<Props> = ({
         {...props}
         onClick={() => {
           if (role === 'button') {
-            if (desactivationMsg) {
-              handleBtnClick();
-            } else {
+            if (desactivationMsg || pressedDescription) {
               handleToggleBtnClick();
+            } else {
+              handleBtnClick();
             }
           }
           if (typeof actionCall === 'function') actionCall();
@@ -282,6 +277,9 @@ export const A11y: React.FC<Props> = ({
           } else {
             a11yScreenReader(description);
           }
+          if (role !== 'content') {
+            domElement.style.cursor = 'pointer';
+          }
           setA11yState({
             hovered: true,
             focused: a11yState.focused,
@@ -292,6 +290,7 @@ export const A11y: React.FC<Props> = ({
           a11yScreenReader('');
           // temporary fix to prevent error -> keep track of our component's mounted state
           if (componentIsMounted.current) {
+            domElement.style.cursor = 'default';
             setA11yState({
               hovered: false,
               focused: a11yState.focused,

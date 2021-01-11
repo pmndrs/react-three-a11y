@@ -17,12 +17,21 @@ export const A11yAnnouncer: React.FC = () => {
   const message = useAnnounceStore(state => state.message);
 
   useEffect(() => {
-    window.addEventListener('click', () => {
-      if (window.document.activeElement?.getAttribute('r3f-a11y')) {
+    const mouseClickListener = (e: MouseEvent) => {
+      console.log('click');
+      console.log('add event listeners');
+      if (
+        window.document.activeElement?.getAttribute('r3f-a11y') &&
+        e.detail !== 0
+      ) {
         //@ts-ignore
         window.document.activeElement.blur();
       }
-    });
+    };
+    window.addEventListener('click', mouseClickListener);
+    return () => {
+      window.removeEventListener('click', mouseClickListener);
+    };
   });
 
   return (
