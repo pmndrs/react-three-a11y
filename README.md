@@ -27,7 +27,7 @@ function App() {
 }
 ```
 
-To add some accessibility features to your scene you'll have to wrap objects you want to make focusable with the `A11y` component:
+To add accessibility features to your scene you'll have to wrap components you want to make focusable with the `A11y` component:
 
 ```jsx
 import { A11y } from '@react-three/a11y'
@@ -37,17 +37,16 @@ import { A11y } from '@react-three/a11y'
 </A11y>
 ```
 
-At this point both `MyComponent` can receive focus. More accurately, the emulated "focus" will be on the parent `A11y` that will act as a provider and let its children access its state. But even if objects are focusable, nothing will be displayed or read without a few more attributes.
+`MyComponent` can now receive focus. More accurately, the emulated "focus" will handled at the `A11y` components which acts as a provider for children to access its state. But even if objects are focusable, nothing will be displayed or shown by default.
 
 ## Accessing the hover, focused & pressed state
 
-For each child wrapped in a `A11y` component, you can access the `focus` / `hover` / `pressed` state like so:
+For each child wrapped in the `A11y` component, you can access the `focus`, `hover` and `pressed` state like so:
 
 ```jsx
 import { useA11y } from '@react-three/a11y'
 
 function Box(props) {
-  //useA11y gives us access to hover, focus and pressed states
   const a11y = useA11y()
   return (
     <mesh {...props}>
@@ -57,14 +56,6 @@ function Box(props) {
   )
 }
 ```
-
-## The role attribute
-
-Like in HTML, you can focus different kind of elements and expect different things depending on what you're focusing:
-
-- `role="content"` ( default ) <a href="/#content">More below </a>
-- `role="button"` <a href="/#button">More below </a>
-- `role="link"` <a href="/#link">More below </a>
 
 ## Call function on focus
 
@@ -109,29 +100,46 @@ If your `A11y` component has the `role="button"`, you can use three more props:
   description="This button can enable dark theme. Dark theme is off"
   pressedDescription="This button can disable dark theme. Dark theme is on"
   activationMsg="Dark theme enabled"
-  deactivationMsg="Dark theme disabled"
-  ... />
+  deactivationMsg="Dark theme disabled" ... />
 ```
 
 ## The three roles of the `A11y` component
 
-#### `content`
+Like in HTML, you can focus different kind of elements and expect different things depending on what you're focusing.
 
-Uses `cursor: default`.
+#### Content
 
-This role is meant to provide information to screen readers or to serve as a step for a user to navigate your site using Tab for instance. It's not meant to trigger anything on click or to be activable with the Keyboard. Therefore it won't show a pointer cursor on hover.
+```jsx
+<A11y role="content" ... />
+```
 
-#### `button`
+Uses the `default` cursor. This role is meant to provide information to screen readers or to serve as a step for a user to navigate your site using Tab for instance. It's not meant to trigger anything on click or to be activable with the Keyboard. Therefore it won't show a pointer cursor on hover.
 
-Uses `cursor: pointer`. Special attributes: activationMsg, deactivationMsg, pressedDescription
+#### Buttons
+
+
+```jsx
+<A11y
+  role="button"
+  activationMsg="Button activated"
+  deactivationMsg="Button deactivated"
+  pressedDescription="Button pressed" ... />
+```
+
+Uses the `pointer` cursor. Special attributes: `activationMsg`, `deactivationMsg` and `pressedDescription`.
 
 This role is meant to emulate the behaviour of a button or a togglable button. It will display a cursor pointer when your cursor is over the linked 3D object. It will call a function on click but also on any kind of action that would trigger a focused button (Enter, Double-Tap, ...). It is also actionnable by user using a screen reader.
 
 You can turn it into a button with aria-pressed by providing the following properties deactivationMsg, pressedDescription in addition to the usual description and activationMsg properties.
 
-#### `link`
+#### Links
 
-Uses `cursor: pointer`. Special attributes: href.
+
+```jsx
+<A11y role="link" href="https://url.com" ... />
+```
+
+Uses this `pointer` cursor. Special attributes: `href`.
 
 This role is meant to emulate the behaviour of a regular html link. It should be used in combination with something that will trigger navigation on click. Just like the button one, it is accessible to all kind of user.
 
