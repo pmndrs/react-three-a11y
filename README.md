@@ -139,9 +139,9 @@ You can turn it into a button with aria-pressed by providing the following prope
 <A11y role="link" href="https://url.com" ... />
 ```
 
-Uses this `pointer` cursor. Special attributes: `href`.
+Uses the `pointer` cursor. Special attributes: `href`.
 
-This role is meant to emulate the behaviour of a regular html link. It should be used in combination with something that will trigger navigation on click. Just like the button one, it is accessible to all kind of user.
+This role is meant to emulate the behaviour of a regular html link. It should be used in combination with something that will trigger navigation on click.
 
 ```diff
 - Don't forget to provide the href attribute as he is required for screen readers to read it correctly !
