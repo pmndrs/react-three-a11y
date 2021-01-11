@@ -1,24 +1,35 @@
 {
-  "name": "example",
+  "name": "main_a11y_features_test",
   "version": "1.0.0",
-  "main": "index.js",
   "license": "MIT",
-  "scripts": {
-    "start": "parcel index.html",
-    "build": "parcel build index.html"
-  },
+  "description": "",
+  "keywords": [],
+  "main": "src/index.js",
   "dependencies": {
-    "react-app-polyfill": "^1.0.0"
+    "@juggle/resize-observer": "^3.2.0",
+    "@pmndrs/branding": "0.0.4",
+    "@react-spring/three": "^9.0.0-rc.3",
+    "@react-spring/web": "^9.0.0-rc.3",
+    "@react-three/drei": "2.2.13",
+    "drei": "^2.2.13",
+    "react": ">=16.13",
+    "react-dom": ">=16.13",
+    "react-scripts": "4.0.1",
+    "react-three-fiber": ">=5.0"
   },
   "alias": {
     "react": "../node_modules/react",
     "react-dom": "../node_modules/react-dom/profiling",
+    "react-three-fiber": "../node_modules/react-three-fiber",
+    "three": "../node_modules/three",
     "scheduler/tracing": "../node_modules/scheduler/tracing-profiling"
   },
   "devDependencies": {
-    "@types/react": "^16.9.11",
-    "@types/react-dom": "^16.8.4",
     "parcel": "^1.12.3",
-    "typescript": "^3.4.5"
+    "typescript": "4.0.3"
+  },
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build index.html"
   }
 }
