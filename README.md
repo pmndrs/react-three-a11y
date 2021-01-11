@@ -1,5 +1,9 @@
 <h1>react-three-a11y👩‍🦯</h1>
 
+[![Version](https://img.shields.io/npm/v/@react-three/a11y?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/@react-three/a11y)
+[![Downloads](https://img.shields.io/npm/dt/@react-three/a11y.svg?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/@react-three/a11y)
+[![Discord Shield](https://img.shields.io/discord/740090768164651008?style=flat&colorA=000000&colorB=000000&label=discord&logo=discord&logoColor=ffffff)](https://discord.gg/ZZjjNvJ)
+
 An easy to use package designed to bring accessibility features to [react-three-fiber](https://github.com/pmndrs/react-three-fiber) such as focus indication, keyboard tab navigation, and screen reader support.
 
 # How to use
@@ -8,16 +12,11 @@ An easy to use package designed to bring accessibility features to [react-three-
 
 Install the @react-three/a11y package 
 
-with npm :
 ```bash
 npm install @react-three/a11y
 ```
-with yarn
-```bash
-yarn add @react-three/a11y
-```
 
-Now, you'll have to import the A11yAnnouncer component. We usually place it next to the R3F Canvas component.
+Now, you'll have to import the `A11yAnnouncer` component. We usually place it next to the R3F Canvas component.
 
 ```jsx
     import { A11yAnnouncer } from "@react-three/a11y"
@@ -28,10 +27,9 @@ Now, you'll have to import the A11yAnnouncer component. We usually place it next
     <A11yAnnouncer />
 ```
 
-This will both help us emulate focus inside the canvas and provide some text to screen readers when nescessary.
+This will both help us emulate focus inside the canvas and provide some text to screen readers when necessary.
 
-Then to add some accessibility features to your 3D Objects / Groups of 3D object you'll have to import the A11y component too.
-Then you wrap the 3D objects you want to make focusable like so
+To add some accessibility features to your 3D Objects/Groups you'll have to wrap the 3D objects you want to make focusable with the `A11y` component:
 
 ```jsx
   import { A11yAnnouncer, A11y } from "@react-three/a11y"
@@ -50,15 +48,13 @@ Then you wrap the 3D objects you want to make focusable like so
     <A11yAnnouncer />
 ```
 
-At this point both My3DComponent and AGroupOf3DComponent can receive focus.
-More presciesly, the emulated "focus" will be on the parent A11y that will act as a provider and give the possibility to it's children to access the state.
+At this point both *My3DComponent* and *AGroupOf3DComponent* can receive focus.
+More accurately, the emulated "focus" will be on the parent `A11y` that will act as a provider and let its children access the state.
 But even if they're focusable, nothing will be displayed / read etc without a few more attributes.
 
-## accessing the hover / focused / pressed state
+## Accessing the hover, focused & pressed state
 
-For each child wrapped in a A11y component, you can access the focus / hover / pressed state like so
-
-import useA11y from '@react-three/a11y' then
+For each child wrapped in a `A11y` component, you can access the `focus` / `hover` / `pressed` state like so:
 
 ```jsx
   import { A11yAnnouncer, A11y, useA11y } from "@react-three/a11y"
@@ -72,18 +68,17 @@ import useA11y from '@react-three/a11y' then
   //now you have access to a11yContext.hover, a11yContext.focus and a11yContext.pressed
 
   return (
-    <mesh
-      {...props}
+    <mesh {...props}>
       <boxBufferGeometry args={[1, 1, 1]} />
-      //here we'll change the material color depending on the a11yContext state
+      {/* here we'll change the material color depending on the a11yContext state */}
       <meshStandardMaterial color={a11yContext.hover || a11yContext.focus ? 'hotpink' : 'orange'} />
     </mesh>
   )
 }
 ```
 
-In this example, the meshStandardMaterial of the component My3DComponent will change color if he is either focused or hovered.
-How you display the focus / hover information to the user is up to you ! Just make sure it's intuitive for your user !
+In this example, the *meshStandardMaterial* of the component *My3DComponent* will change color if he is either focused or hovered.
+How you display the focus / hover information to the user is up to you! Just make sure it's intuitive for your user!
 
 ## The role attribute 
 
