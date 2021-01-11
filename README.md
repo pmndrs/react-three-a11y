@@ -25,6 +25,7 @@ Now, you'll have to import the A11yAnnouncer component. We usually place it next
     <Canvas>
       {...}
     </Canvas>
+    <A11yAnnouncer />
 ```
 
 This will both help us emulate focus inside the canvas and provide some text to screen readers when nescessary.
@@ -35,7 +36,6 @@ Then you wrap the 3D objects you want to make focusable like so
 ```jsx
   import { A11yAnnouncer, A11y } from "@react-three/a11y"
   
-  <A11yDom >
     <Canvas>
       {...}
         <A11y>
@@ -47,7 +47,7 @@ Then you wrap the 3D objects you want to make focusable like so
         </A11y>
       {...}
     </Canvas>
-  </A11yDom>
+    <A11yAnnouncer />
 ```
 
 At this point both My3DComponent and AGroupOf3DComponent can receive focus.
@@ -67,8 +67,8 @@ import useA11y from '@react-three/a11y' then
 
   const My3DComponent = (props) {
 
-  //call useA11yContext to get the A11yContext from the provider
-  const a11yContext = useA11yContext();
+  //call useA11y to get the A11yContext from the provider
+  const a11yContext = useA11y();
   //now you have access to a11yContext.hover, a11yContext.focus and a11yContext.pressed
 
   return (
