@@ -229,7 +229,7 @@ Just like the button one, it is accessible to all kind of user.
 
 ## Screen Reader Support
 
-In order to provide informations to screen reader users and use this package at its full potential, fill the description attribute of all your A11y components and use the appropriate role attribute on each of them.
+In order to provide informations to screen reader users and use this package at its full potential, fill the `description` prop of all your `A11y` components and use the appropriate `role` prop on each of them.
 
 ## Additionals Features
 
