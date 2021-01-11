@@ -1,10 +1,10 @@
-<h1>react-three-a11y👩‍🦯</h1>
+<h1>@react-three/a11y</h1>
 
 [![Version](https://img.shields.io/npm/v/@react-three/a11y?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/@react-three/a11y)
 [![Downloads](https://img.shields.io/npm/dt/@react-three/a11y.svg?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/@react-three/a11y)
 [![Discord Shield](https://img.shields.io/discord/740090768164651008?style=flat&colorA=000000&colorB=000000&label=discord&logo=discord&logoColor=ffffff)](https://discord.gg/ZZjjNvJ)
 
-An easy to use package designed to bring accessibility features to [react-three-fiber](https://github.com/pmndrs/react-three-fiber) such as focus indication, keyboard tab navigation, and screen reader support.
+`@react-three/a11y` brings accessibility to WebGL, with easy to use components [react-three-fiber](https://github.com/pmndrs/react-three-fiber) components to enable focus indication, keyboard tab navigation, and screen reader support.
 
 # How to use
 
