@@ -169,10 +169,10 @@ Optionally, you can also show the description to the user on hover by setting `s
     <A11yAnnouncer />
 ```
 
-If your A11y component have the role="button", you can use three more attributes : 
-- activationMsg : When the user will click / activate the "button" the screen reader will read what you wrote in activationMsg
-- desactivationMsg : When set, it turns your button in a togglable button. Which means he now has a on/off state. Screen readers will read the state of the button as well as the desactivation message / activation message that you set when toggling it.
-- pressedDescription : When set, it turns your button in a togglable button. Which means he now has a on/off state. This will be read instead of the usual description when the button is on.
+If your `A11y` component has the `role="button"`, you can use three more props: 
+- `activationMsg`: When the user will click/activate the "button" the screen reader will read the passed message
+- `desactivationMsg`: When set, it turns your button in a togglable button. Which means it now has a on/off state. Screen readers will read the state of the button as well as the activation/disactivation messages passsed.
+- `pressedDescription`: When set, it turns your button in a togglable button. Which means it now has a on/off state. This description will replace the one passed via `description` when the toggle is active.
 
 ```jsx
   import { A11yAnnouncer, A11y } from "@react-three/a11y"
@@ -199,15 +199,16 @@ If your A11y component have the role="button", you can use three more attributes
     <A11yAnnouncer />
 ```
 
-## the three role of the A11y component 
-#### content
-cursor: default
+## The three roles of the `A11y` component 
+
+#### `content`
+`cursor: default`
 This role is meant to provide information to screen readers or to serve as a step for a user to navigate your site using Tab for instance.
 It's not meant to trigger anything on click or to be activable with the Keyboard.
 Therefore it won't show a pointer cursor on hover.
 
-#### button
-cursor: pointer
+#### `button`
+`cursor: pointer`
 Special attributes : activationMsg, desactivationMsg, pressedDescription
 This role is meant to emulate the behaviour of a button or a togglable button.
 It will display a cursor pointer when your cursor is over the linked 3D object.
@@ -215,9 +216,9 @@ It will call a function on click but also on any kind of action that would trigg
 It is also actionnable by user using a screen reader.
 You can turn it into a button with aria-pressed by providing the following properties desactivationMsg, pressedDescription in addition to the usual description and activationMsg  properties.
 
-#### link
-cursor: pointer
-Special attributes : href
+#### `link`
+`cursor: pointer`
+`special attributes : href`
 This role is meant to emulate the behaviour of a regular html link.
 It should be used in combination with something that will trigger navigation on click.
 Just like the button one, it is accessible to all kind of user.
@@ -226,11 +227,11 @@ Just like the button one, it is accessible to all kind of user.
 - It will have no effect on the navigation, it's just used as information
 ```
 
-## Screen reader support
+## Screen Reader Support
 
 In order to provide informations to screen reader users and use this package at its full potential, fill the description attribute of all your A11y components and use the appropriate role attribute on each of them.
 
-## Additionals features
+## Additionals Features
 
 Use a custom tabindex with for your A11y components by providing a number to the tabIndex attribute
 ```jsx
@@ -240,11 +241,11 @@ Use a custom tabindex with for your A11y components by providing a number to the
 ```
 More about the use of tabIndex on <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex">developer.mozilla.org</a>
 
-## Next steps
+## Next Steps
 
 - [ ] Improve the accessibility for mobile screen readers such as Voice Over and Talk Back
 - [ ] Provide a documentation inside the IDE
 
-### Maintainers :
+### Author:
 
 - [`twitter 👋 @AlaricBaraou`](https://twitter.com/AlaricBaraou)
