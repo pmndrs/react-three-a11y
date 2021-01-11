@@ -18,8 +18,6 @@ export const A11yAnnouncer: React.FC = () => {
 
   useEffect(() => {
     const mouseClickListener = (e: MouseEvent) => {
-      console.log('click');
-      console.log('add event listeners');
       if (
         window.document.activeElement?.getAttribute('r3f-a11y') &&
         e.detail !== 0

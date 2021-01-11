@@ -72,7 +72,6 @@ export const A11y: React.FC<Props> = ({
   // temporary fix to prevent error -> keep track of our component's mounted state
   const componentIsMounted = useRef(true);
   useEffect(() => {
-    console.log('use effect ' + description);
     return () => {
       domElement.style.cursor = 'default';
       componentIsMounted.current = false;
