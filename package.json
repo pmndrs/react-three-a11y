@@ -38,6 +38,7 @@
   },
   "peerDependencies": {
     "react": ">=16",
+    "react-dom": ">=16",
     "react-three-fiber": ">=5.0",
     "three": "^0.124.0"
   },
