@@ -4,130 +4,82 @@
 [![Downloads](https://img.shields.io/npm/dt/@react-three/a11y.svg?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/@react-three/a11y)
 [![Discord Shield](https://img.shields.io/discord/740090768164651008?style=flat&colorA=000000&colorB=000000&label=discord&logo=discord&logoColor=ffffff)](https://discord.gg/ZZjjNvJ)
 
-`@react-three/a11y` brings accessibility to WebGL, with easy to use components [react-three-fiber](https://github.com/pmndrs/react-three-fiber) components to enable focus indication, keyboard tab navigation, and screen reader support.
-
-# How to use
-
-## Initial setup
-
-Install the @react-three/a11y package
-
 ```bash
 npm install @react-three/a11y
 ```
 
-Now, you'll have to import the `A11yAnnouncer` component. We usually place it next to the R3F Canvas component.
+`@react-three/a11y` brings accessibility to WebGL, with easy to use components [react-three-fiber](https://github.com/pmndrs/react-three-fiber) components to enable focus indication, keyboard tab navigation, and screen reader support.
+
+# How to use
+
+First, place the `A11yAnnouncer` component next to the R3F Canvas component. This is critical, because it will manage the screen-reader and help emulate focus!
 
 ```jsx
-    import { A11yAnnouncer } from "@react-three/a11y"
-     {...}
-    <Canvas>
-      {...}
-    </Canvas>
-    <A11yAnnouncer />
+import { A11yAnnouncer } from '@react-three/a11y'
+
+function App() {
+  return (
+    <>
+      <Canvas />
+      <A11yAnnouncer />
+    </>
+  )
+}
 ```
 
-This will both help us emulate focus inside the canvas and provide some text to screen readers when necessary.
-
-To add some accessibility features to your 3D Objects/Groups you'll have to wrap the 3D objects you want to make focusable with the `A11y` component:
+To add some accessibility features to your scene you'll have to wrap objects you want to make focusable with the `A11y` component:
 
 ```jsx
-  import { A11yAnnouncer, A11y } from "@react-three/a11y"
+import { A11y } from '@react-three/a11y'
 
-    <Canvas>
-      {...}
-        <A11y>
-          <My3DComponent />
-        </A11y>
-      {...}
-        <A11y>
-          <AGroupOf3DComponent />
-        </A11y>
-      {...}
-    </Canvas>
-    <A11yAnnouncer />
+<A11y>
+  <MyComponent />
+</A11y>
 ```
 
-At this point both _My3DComponent_ and _AGroupOf3DComponent_ can receive focus.
-More accurately, the emulated "focus" will be on the parent `A11y` that will act as a provider and let its children access the state.
-But even if they're focusable, nothing will be displayed / read etc without a few more attributes.
+At this point both `MyComponent` can receive focus. More accurately, the emulated "focus" will be on the parent `A11y` that will act as a provider and let its children access its state. But even if objects are focusable, nothing will be displayed or read without a few more attributes.
 
 ## Accessing the hover, focused & pressed state
 
 For each child wrapped in a `A11y` component, you can access the `focus` / `hover` / `pressed` state like so:
 
 ```jsx
-  import { A11yAnnouncer, A11y, useA11y } from "@react-three/a11y"
+import { useA11y } from '@react-three/a11y'
 
-  {...}
-
-  const My3DComponent = (props) {
-
-  //call useA11y to get the A11yContext from the provider
-  const a11yContext = useA11y();
-  //now you have access to a11yContext.hover, a11yContext.focus and a11yContext.pressed
-
+function Box(props) {
+  //useA11y gives us access to hover, focus and pressed states
+  const a11y = useA11y()
   return (
     <mesh {...props}>
-      <boxBufferGeometry args={[1, 1, 1]} />
-      {/* here we'll change the material color depending on the a11yContext state */}
-      <meshStandardMaterial color={a11yContext.hover || a11yContext.focus ? 'hotpink' : 'orange'} />
+      <boxBufferGeometry />
+      <meshStandardMaterial color={a11y.hover || a11y.focus ? 'hotpink' : 'orange'} />
     </mesh>
   )
 }
 ```
 
-In this example, the _meshStandardMaterial_ of the component _My3DComponent_ will change color if he is either focused or hovered.
-How you display the focus / hover information to the user is up to you! Just make sure it's intuitive for your user!
-
 ## The role attribute
 
-Like in HTML, you can focus different kind of elements and expect different things depending on what you're focusing.
-That's why the `A11y` component has 3 different use cases:
+Like in HTML, you can focus different kind of elements and expect different things depending on what you're focusing:
 
 - `role="content"` ( default ) <a href="/#content">More below </a>
-
 - `role="button"` <a href="/#button">More below </a>
-
 - `role="link"` <a href="/#link">More below </a>
 
 ## Call function on focus
 
-The `focusCall` prop of `A11y` will be called each time this component receive focus ( Usually through tab navigation ).
-You can for instance use it in order to make sure the currently focused element is in view by adjusting its position or the moving the camera.
+The `focusCall` prop of `A11y` will be called each time this component receives focus (usually through tab navigation).
 
 ```jsx
-  import { A11yAnnouncer, A11y } from "@react-three/a11y"
-
-    <Canvas>
-      {...}
-        <A11y role="content" focusCall={()=>{
-          //rotate camera to show the focused element
-        }}>
-          <My3DComponent />
-        </A11y>
-      {...}
-    </Canvas>
-    <A11yAnnouncer />
+<A11y role="content" focusCall={()=> console.log("in focus")} ... />
 ```
 
 ## Call function on click / keyboard Click
 
-The `actionCall` prop of `A11y` will be called each time this component gets clicked, focused, keyboard activated etc..
+The `actionCall` prop of `A11y` will be called each time this component gets clicked, focused, keyboard activated etc.
 
 ```jsx
-  import { A11yAnnouncer, A11y } from "@react-three/a11y"
-
-    <Canvas>
-      {...}
-        <A11y role="button" actionCall={()=>{
-          alert('This button have been clicked')
-        }}>
-          <My3DComponent />
-        </A11y>
-      {...}
-    </Canvas>
-    <A11yAnnouncer />
+<A11y role="button" actionCall={()=> console.log("clicked")} ... />
 ```
 
 ## Provide a description of the currenlty focused / hovered element
@@ -136,22 +88,10 @@ When using the `description` prop, the `A11y` component will provide a descripti
 Optionally, you can also show the description to the user on hover by setting `showAltText={true}`.
 
 ```jsx
-  import { A11yAnnouncer, A11y } from "@react-three/a11y"
-
-    <Canvas>
-      {...}
-        <A11y role="content" description="A rotating red square">
-        //will read "A rotating red square" to screen readers on focus / hover
-          <My3DSquare />
-        </A11y>
-        {...}
-        <A11y role="content" description="A bouncing blue sphere" showAltText={true}>
-        //will read "A bouncing blue sphere" to screen readers on focus / hover while also showing it on mouseover
-          <My3DSphere />
-        </A11y>
-      {...}
-    </Canvas>
-    <A11yAnnouncer />
+// Reads "A rotating red square" to screen readers on focus / hover
+<A11y role="content" description="A rotating red square" ... />
+// Reads "A bouncing blue sphere" to screen readers on focus / hover while also showing it on mouseover
+<A11y role="content" description="A bouncing blue sphere" showAltText ... />
 ```
 
 If your `A11y` component has the `role="button"`, you can use three more props:
@@ -161,28 +101,16 @@ If your `A11y` component has the `role="button"`, you can use three more props:
 - `pressedDescription`: When set, it turns your button in a togglable button. Which means it now has a on/off state. This description will replace the one passed via `description` when the toggle is active.
 
 ```jsx
-  import { A11yAnnouncer, A11y } from "@react-three/a11y"
-
-    <Canvas>
-      {...}
-        <A11y role="button" description="This button will send a thank you email to the team" activationMsg="Email is sending">
-        //will read the description on hover / focus then will read activationMsg if clicked / pressed
-          <My3DSquare />
-        </A11y>
-        {...}
-        <A11y
-          role="button"
-          description="This button can enable dark theme. Dark theme is off"
-          pressedDescription="This button can disable dark theme. Dark theme is on"
-          activationMsg="Dark theme enabled"
-          deactivationMsg="Dark theme disabled"
-         >
-        //will read the description on hover / focus then will read activationMsg if turned on or deactivationMsg if tuned off
-          <My3DSphere />
-        </A11y>
-      {...}
-    </Canvas>
-    <A11yAnnouncer />
+// Reads the description on hover/focus then will read activationMsg if clicked/pressed
+<A11y role="button" description="Sends a thank you email to the team" activationMsg="Email is sending" ... />
+// Reads the description on hover/focus then will read activationMsg if turned on or deactivationMsg if tuned off
+<A11y
+  role="button"
+  description="This button can enable dark theme. Dark theme is off"
+  pressedDescription="This button can disable dark theme. Dark theme is on"
+  activationMsg="Dark theme enabled"
+  deactivationMsg="Dark theme disabled"
+  ... />
 ```
 
 ## The three roles of the `A11y` component
@@ -226,9 +154,7 @@ In order to provide informations to screen reader users and use this package at 
 Use a custom tabindex with for your A11y components by providing a number to the tabIndex attribute
 
 ```jsx
-<A11y tabIndex={2}>
-  <My3DSquare />
-</A11y>
+<A11y tabIndex={2} ... />
 ```
 
 More about the use of tabIndex on <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex">developer.mozilla.org</a>
