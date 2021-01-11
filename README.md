@@ -82,29 +82,34 @@ How you display the focus / hover information to the user is up to you! Just mak
 
 ## The role attribute 
 
-Like in HTML, you can focus different kind of element and expect different things depending on what you're focusing.
-That's why the A11y component is divided in 3 categories.
+Like in HTML, you can focus different kind of elements and expect different things depending on what you're focusing.
+That's why the `A11y` component has 3 different use cases:
 
-- role="content" ( default )
-This role is meant to provide information to screen readers or to serve as a step for a user to navigate your site using Tab for instance.
+- `role="content"` ( default )
+This role is meant to **provide information to screen readers** or to **serve as a step for a user to navigate your site using Tab**.
 It's not meant to trigger anything on click or to be activable with the Keyboard.
+
 More on this role <a href="/#content"> below </a>
-- role="button" 
-This role is meant to emulate the behaviour of a button or a togglable button.
-It will display a cursor pointer when your cursor is over the linked 3D object.
-It will call a function on click but also on any kind of action that would trigger a focused button ( Enter, Double-Tap .. )
-It is also actionnable by user using a screen reader.
+
+- `role="button"`
+This role is meant to **emulate the behaviour of a button or a togglable button**.
+It will display a pointer cursor when your cursor is hovering the linked 3D Object.
+It will call a callback function on click but also on any kind of action that would trigger a focused button ( Enter, Double-Tap .. )
+It is also actionable by a user using a screen reader.
+
 More on this role <a href="/#button"> below </a>
-- role="link" 
-This role is meant to emulate the behaviour of a regular html link.
+
+- `role="link"`
+This role is meant to **emulate the behaviour of a regular HTML link**.
 It should be used in combination with something that will trigger navigation on click.
-Just like the button one, it is accessible to all kind of user.
+Just like the button, it is accessible to all kinds of users.
+
 More on this role <a href="/#link"> below </a>
 
 ## Call function on focus
 
-The A11y attribute focusCall will be called each time this component receive focus ( Usually through tab navigation )
-You can for instance use it in order to make sure the currently focused element is in view by adjusting it position or the camera position.
+The `focusCall` prop of `A11y` will be called each time this component receive focus ( Usually through tab navigation ).
+You can for instance use it in order to make sure the currently focused element is in view by adjusting its position or the moving the camera.
 
 ```jsx
   import { A11yAnnouncer, A11y } from "@react-three/a11y"
@@ -123,7 +128,7 @@ You can for instance use it in order to make sure the currently focused element 
 
 ## Call function on click / keyboard Click
 
-The A11y attribute actionCall will call the associated function each time this component gets clicked / focused then keyboard activated etc..
+The `actionCall` prop of `A11y` will be called each time this component gets clicked, focused, keyboard activated etc..
 
 ```jsx
   import { A11yAnnouncer, A11y } from "@react-three/a11y"
@@ -142,8 +147,8 @@ The A11y attribute actionCall will call the associated function each time this c
 
 ## Provide a description of the currenlty focused / hovered element
 
-Your A11y component will provide a description to the screen reader users on focus / hover as long as you provide it to the description attribute.
-Optionnaly, you can also show the description to the user when he hover it by setting showAltText={true}.
+When using the `description` prop, the `A11y` component will provide a description to the screen reader users on focus/hover.
+Optionally, you can also show the description to the user on hover by setting `showAltText={true}`.
 
 ```jsx
   import { A11yAnnouncer, A11y } from "@react-three/a11y"
