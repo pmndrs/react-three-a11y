@@ -1,16 +1,22 @@
 {
-  "name": "mr-main-a11y-features-test",
+  "name": "main_a11y_features_test",
   "version": "1.0.0",
   "license": "MIT",
-  "description": "This sandbox has been generated!",
+  "description": "",
   "keywords": [],
   "main": "src/index.js",
   "dependencies": {
-    "@juggle/resize-observer": "3.2.0",
+    "@juggle/resize-observer": "^3.2.0",
     "@pmndrs/branding": "0.0.4",
-    "@react-three/drei": "2.2.15",
+    "@react-spring/three": "^9.0.0-rc.3",
+    "@react-spring/web": "^9.0.0-rc.3",
+    "@react-three/drei": "2.2.13",
     "@react-three/postprocessing": "1.5.1",
+    "drei": "^2.2.13",
+    "react": ">=16.13",
+    "react-dom": ">=16.13",
     "react-scripts": "4.0.1",
+    "react-three-fiber": ">=5.0",
     "valtio": "0.6.0"
   },
   "alias": {

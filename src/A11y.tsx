@@ -15,6 +15,7 @@ interface Props {
   showAltText: boolean;
   actionCall: () => void | undefined;
   focusCall: (...args: any[]) => void | undefined;
+  disabled: boolean;
 }
 
 const constHiddenButScreenreadable = {
@@ -55,6 +56,7 @@ export const A11y: React.FC<Props> = ({
   showAltText,
   actionCall,
   focusCall,
+  disabled,
   ...props
 }) => {
   const [a11yState, setA11yState] = useState({
@@ -68,6 +70,19 @@ export const A11y: React.FC<Props> = ({
   const {
     gl: { domElement },
   } = useThree();
+
+  const incomingSetState = useRef();
+  // @ts-ignore
+  const delaySetState = newState => {
+    if (incomingSetState.current) {
+      window.clearTimeout(incomingSetState.current);
+    }
+    return window.setTimeout(() => {
+      setA11yState(newState);
+      // @ts-ignore
+      incomingSetState.current = null;
+    }, 100);
+  };
 
   // temporary fix to prevent error -> keep track of our component's mounted state
   const componentIsMounted = useRef(true);
@@ -96,7 +111,8 @@ export const A11y: React.FC<Props> = ({
     } else {
       a11yScreenReader(activationMsg);
     }
-    setA11yState({
+    //@ts-ignore
+    incomingSetState.current = delaySetState({
       hovered: a11yState.hovered,
       focused: a11yState.focused,
       pressed: !a11yState.pressed,
@@ -111,20 +127,29 @@ export const A11y: React.FC<Props> = ({
         return (
           <button
             r3f-a11y="true"
+            aria-disabled={disabled ? 'true' : 'false'}
             aria-pressed={a11yState.pressed ? 'true' : 'false'}
             tabIndex={tabIndex ? tabIndex : 0}
             style={constHiddenButScreenreadable}
-            onClick={() => handleToggleBtnClick()}
+            onClick={e => {
+              if (disabled) {
+                e.stopPropagation();
+                return;
+              }
+              handleToggleBtnClick();
+            }}
             onFocus={() => {
               if (typeof focusCall === 'function') focusCall();
-              setA11yState({
+              //@ts-ignore
+              incomingSetState.current = delaySetState({
                 hovered: a11yState.hovered,
                 focused: true,
                 pressed: a11yState.pressed,
               });
             }}
             onBlur={() => {
-              setA11yState({
+              //@ts-ignore
+              incomingSetState.current = delaySetState({
                 hovered: a11yState.hovered,
                 focused: false,
                 pressed: a11yState.pressed,
@@ -139,19 +164,28 @@ export const A11y: React.FC<Props> = ({
         return (
           <button
             r3f-a11y="true"
+            aria-disabled={disabled ? 'true' : 'false'}
             tabIndex={tabIndex ? tabIndex : 0}
             style={constHiddenButScreenreadable}
-            onClick={() => handleBtnClick()}
+            onClick={e => {
+              if (disabled) {
+                e.stopPropagation();
+                return;
+              }
+              handleBtnClick();
+            }}
             onFocus={() => {
               if (typeof focusCall === 'function') focusCall();
-              setA11yState({
+              //@ts-ignore
+              incomingSetState.current = delaySetState({
                 hovered: a11yState.hovered,
                 focused: true,
                 pressed: a11yState.pressed,
               });
             }}
             onBlur={() => {
-              setA11yState({
+              //@ts-ignore
+              incomingSetState.current = delaySetState({
                 hovered: a11yState.hovered,
                 focused: false,
                 pressed: a11yState.pressed,
@@ -174,14 +208,16 @@ export const A11y: React.FC<Props> = ({
           }}
           onFocus={() => {
             if (typeof focusCall === 'function') focusCall();
-            setA11yState({
+            //@ts-ignore
+            incomingSetState.current = delaySetState({
               hovered: a11yState.hovered,
               focused: true,
               pressed: a11yState.pressed,
             });
           }}
           onBlur={() => {
-            setA11yState({
+            //@ts-ignore
+            incomingSetState.current = delaySetState({
               hovered: a11yState.hovered,
               focused: false,
               pressed: a11yState.pressed,
@@ -198,7 +234,8 @@ export const A11y: React.FC<Props> = ({
           tabIndex={tabIndex ? tabIndex : 0}
           style={constHiddenButScreenreadable}
           onBlur={() => {
-            setA11yState({
+            //@ts-ignore
+            incomingSetState.current = delaySetState({
               hovered: a11yState.hovered,
               focused: false,
               pressed: a11yState.pressed,
@@ -206,7 +243,8 @@ export const A11y: React.FC<Props> = ({
           }}
           onFocus={() => {
             if (typeof focusCall === 'function') focusCall();
-            setA11yState({
+            //@ts-ignore
+            incomingSetState.current = delaySetState({
               hovered: a11yState.hovered,
               focused: true,
               pressed: a11yState.pressed,
@@ -259,7 +297,11 @@ export const A11y: React.FC<Props> = ({
     >
       <group
         {...props}
-        onClick={() => {
+        onClick={e => {
+          if (disabled) {
+            e.stopPropagation();
+            return;
+          }
           if (role === 'button') {
             if (deactivationMsg || pressedDescription) {
               handleToggleBtnClick();
@@ -276,10 +318,11 @@ export const A11y: React.FC<Props> = ({
           } else {
             a11yScreenReader(description);
           }
-          if (role !== 'content') {
+          if (role !== 'content' && !disabled) {
             domElement.style.cursor = 'pointer';
           }
-          setA11yState({
+          //@ts-ignore
+          incomingSetState.current = delaySetState({
             hovered: true,
             focused: a11yState.focused,
             pressed: a11yState.pressed,
@@ -290,7 +333,8 @@ export const A11y: React.FC<Props> = ({
           // temporary fix to prevent error -> keep track of our component's mounted state
           if (componentIsMounted.current) {
             domElement.style.cursor = 'default';
-            setA11yState({
+            //@ts-ignore
+            incomingSetState.current = delaySetState({
               hovered: false,
               focused: a11yState.focused,
               pressed: a11yState.pressed,
