@@ -27,7 +27,6 @@ const constHiddenButScreenreadable = {
   transform: 'translateX(-50%) translateY(-50%)',
   display: 'inline-block',
   margin: 0,
-  pointerEvents: 'none' as const,
 };
 
 const A11yContext = React.createContext({
