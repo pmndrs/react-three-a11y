@@ -146,7 +146,9 @@ export default function App() {
             actionCall={() => (state.dark = !snap.dark)}
             activationMsg="Lower light enabled"
             deactivationMsg="Lower light disabled"
-            disabled={snap.disabled}>
+            disabled={snap.disabled}
+            debug={true}
+            a11yElStyle={{ marginLeft: "-40px" }}>
             <ToggleButton position={[0, -3, 9]} />
           </A11y>
           <A11y
@@ -157,7 +159,7 @@ export default function App() {
             actionCall={() => (state.disabled = !snap.disabled)}
             activationMsg="Scene activated"
             deactivationMsg="Scene disabled">
-            <SwitchButton position={[-5, -5, 7]} />
+            <SwitchButton position={[-3, -5, 7]} />
           </A11y>
         </group>
         {/* <Suspense fallback={null}>
