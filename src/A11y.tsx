@@ -61,6 +61,8 @@ export const A11y: React.FC<Props> = ({
       transform: 'translateX(-50%) translateY(-50%)',
       display: 'inline-block',
       userSelect: 'none' as const,
+      WebkitUserSelect: 'none' as const,
+      WebkitTouchCallout: 'none' as const,
       margin: 0,
     },
     a11yElStyle
