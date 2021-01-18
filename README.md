@@ -8,7 +8,13 @@
 npm install @react-three/a11y
 ```
 
-`@react-three/a11y` brings accessibility to WebGL, with easy to use [react-three-fiber](https://github.com/pmndrs/react-three-fiber) components to enable focus indication, keyboard tab navigation, and screen reader support.
+`@react-three/a11y` brings accessibility to webGL with easy-to-use [react-three-fiber](https://github.com/pmndrs/react-three-fiber) components:
+
+- Focus and focus indication
+- Tab index and keyboard navigation
+- Screen reader support and alt-text
+- Roles and cursor shapes
+- Descriptive links
 
 Live demo: https://n4rzi.csb.app
 
