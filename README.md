@@ -17,6 +17,7 @@ Live demo: https://n4rzi.csb.app
 First, place the `A11yAnnouncer` component next to the R3F Canvas component. This is critical, because it will manage the screen-reader and help emulate focus!
 
 ```jsx
+import { Canvas } from 'react-three-fiber'
 import { A11yAnnouncer } from '@react-three/a11y'
 
 function App() {
