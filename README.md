@@ -175,8 +175,8 @@ More about the use of tabIndex on <a href="https://developer.mozilla.org/en-US/d
 
 ## Next Steps
 
-- [ ] Improve the accessibility for mobile screen readers such as Voice Over and Talk Back
 - [ ] Provide a documentation inside the IDE
+- [ ] Provide more examples showing how to use it
 
 ### Author:
 
