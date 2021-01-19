@@ -1,207 +1,176 @@
-import "./styles.css"
-import { Canvas, useFrame } from "react-three-fiber"
-import React, { Suspense, useRef, useEffect, useState } from "react"
-import { useGLTF, OrbitControls, ContactShadows } from "drei"
+import * as THREE from "three"
+import { Canvas, useFrame, useThree } from "react-three-fiber"
+import React, { Suspense, useRef } from "react"
+import { ContactShadows } from "@react-three/drei"
 import { A11y, useA11y, A11yAnnouncer } from "../../"
 import { ResizeObserver } from "@juggle/resize-observer"
-import { a as animated } from "@react-spring/web"
-import { useTransition, useSpring } from "@react-spring/core"
-import diamond from "../public/diamond.glb"
-import rupee from "../public/rupee.glb"
-import { a } from "@react-spring/three"
+import { proxy, useProxy } from "valtio"
+import { EffectComposer, SSAO, SMAA } from "@react-three/postprocessing"
+import { Badge } from "@pmndrs/branding"
 
-const SimpleToggleButton = props => {
-  const mesh = useRef()
-  const a11yContext = useA11y()
-  const [prevA11yContextValue, saveA11yContextValue] = useState(a11yContext)
+const state = proxy({ dark: false, active: 0, rotation: 0, disabled: true })
+const geometries = [
+  new THREE.SphereBufferGeometry(1, 32, 32),
+  new THREE.TetrahedronBufferGeometry(1.5),
+  new THREE.TorusBufferGeometry(1, 0.35, 16, 32),
+  new THREE.OctahedronGeometry(1.5),
+  new THREE.IcosahedronBufferGeometry(1.5),
+]
 
-  const { color } = useSpring({ color: a11yContext.focus ? "#5dc8dc" : a11yContext.hover ? "#239db4" : "lightblue" })
-  const [scale, setScale] = useSpring(() => ({
-    scale: [1, 1, 1],
-  }))
-  useEffect(() => {
-    if (!prevA11yContextValue.focus && a11yContext.focus) {
-      setScale({
-        to: [{ scale: [1.2, 1.2, 1.2] }, { scale: [1, 1, 1] }],
-        config: { duration: 200 },
-      })
-    }
-    saveA11yContextValue(a11yContext)
-  }, [a11yContext])
-
-  return (
-    <a.mesh {...props} ref={mesh} scale={scale.scale}>
-      <a.torusGeometry args={a11yContext.pressed ? [0.5, 1, 10, 20] : [1, 0.5, 10, 20]} />
-      <a.meshStandardMaterial color={color} />
-    </a.mesh>
-  )
-}
-
-function Diamonds({ targetRotation, setTargetRotation, setActiveRupee, activeRupee }) {
-  const group = useRef()
-  const { nodes, materials } = useGLTF(diamond)
-  const a11yContext = useA11y()
-
-  return (
-    <group ref={group} dispose={null}>
-      <A11y
-        role="button"
-        description="Press to show the left rupee"
-        activationMsg="rupee showing"
-        actionCall={() => {
-          setActiveRupee(activeRupee === 1 ? 5 : activeRupee - 1)
-          setTargetRotation(targetRotation - Math.PI / 2)
-        }}>
-        <Diamond geometry={nodes.Cylinder.geometry} position={[-10, 0, 0]} rotation={[0, Math.PI / 4, -Math.PI / 2]} />
-      </A11y>
-      <A11y
-        role="button"
-        description="Press to show the right rupee"
-        activationMsg="rupee showing"
-        actionCall={() => {
-          setActiveRupee(activeRupee === 5 ? 1 : activeRupee + 1)
-          setTargetRotation(targetRotation + Math.PI / 2)
-        }}>
-        <Diamond geometry={nodes.Cylinder.geometry} position={[10, 0, 0]} rotation={[0, -Math.PI / 4, Math.PI / 2]} />
-      </A11y>
-    </group>
-  )
-}
-
-const Diamond = props => {
-  const a11yContext = useA11y()
-
+function ToggleButton(props) {
+  const a11y = useA11y()
   return (
     <mesh {...props}>
-      <meshStandardMaterial color={a11yContext.focus ? "#0fffcc" : a11yContext.hover ? "#71f8db" : "#87d4f7"} />
+      <torusGeometry args={[0.5, a11y.pressed ? 0.28 : 0.25, 16, 32]} />
+      <meshStandardMaterial color={a11y.focus ? "lightsalmon" : a11y.hover ? "lightpink" : "lightblue"} />
     </mesh>
   )
 }
 
-const Rupee = props => {
-  const rupeeRef = useRef()
-  const a11yContext = useA11y()
-
-  useFrame(() => {
-    if (rupeeRef.current) {
-      rupeeRef.current.rotation.y += 0.01
-    }
-  })
-
+function SwitchButton(props) {
+  const a11y = useA11y()
   return (
-    <mesh ref={rupeeRef} {...props} scale={a11yContext.focus ? [1.2, 1.2, 1.2] : [1, 1, 1]}>
-      <meshStandardMaterial color={props.color} />
+    <>
+      <mesh {...props} rotation={[0, 0, a11y.pressed ? Math.PI / 4 : -Math.PI / 4]}>
+        <boxBufferGeometry args={[0.3, 2, 0.3]} />
+        <meshStandardMaterial color={a11y.focus ? "lightsalmon" : a11y.hover ? "lightpink" : "lightblue"} />
+      </mesh>
+      <mesh {...props}>
+        <torusGeometry args={[0.3, 0.2, 16, 20]} />
+        <meshStandardMaterial color={a11y.focus ? "lightsalmon" : a11y.hover ? "lightpink" : "lightblue"} />
+      </mesh>
+    </>
+  )
+}
+
+function Floor(props) {
+  return (
+    <>
+      <ContactShadows rotation-x={Math.PI / 2} position={[0, -5, 0]} opacity={0.4} width={30} height={30} blur={1} far={15} />
+      <mesh {...props} position={[0, -5.1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeBufferGeometry args={[30, 30, 1]} />
+        <meshStandardMaterial color={"#eef5f7"} />
+      </mesh>
+    </>
+  )
+}
+
+function Nav({ left }) {
+  const snap = useProxy(state)
+  const { viewport } = useThree()
+  const radius = Math.min(12, viewport.width / 2.5)
+  return (
+    <A11y
+      role="button"
+      description={`Press to show the ${left ? "left" : "right"} shape`}
+      activationMsg="shape showing"
+      actionCall={() => {
+        state.rotation = snap.rotation + ((Math.PI * 2) / 5) * (left ? -1 : 1)
+        state.active = left ? (snap.active === 0 ? 4 : snap.active - 1) : snap.active === 4 ? 0 : snap.active + 1
+      }}
+      disabled={snap.disabled}>
+      <Diamond position={[left ? -radius : radius, 0, 0]} rotation={[0, 0, -Math.PI / 4]} />
+    </A11y>
+  )
+}
+
+function Diamond({ position, rotation }) {
+  const a11y = useA11y()
+  return (
+    <mesh position={position} rotation={rotation}>
+      <tetrahedronBufferGeometry />
+      <meshPhongMaterial color={a11y.focus ? "lightsalmon" : a11y.hover ? "lightpink" : "lightblue"} />
     </mesh>
   )
 }
 
-function Rupees({ targetRotation, activeRupee }) {
+function Shape({ index, active, ...props }) {
+  const snap = useProxy(state)
+  const vec = new THREE.Vector3()
+  const ref = useRef()
+  useFrame((state, delta) => {
+    if (snap.disabled) {
+      return
+    }
+    const s = active ? 2 : 1
+    ref.current.scale.lerp(vec.set(s, s, s), 0.1)
+    ref.current.rotation.y = ref.current.rotation.x += delta / (active ? 1.5 : 4)
+    ref.current.position.y = active ? Math.sin(state.clock.elapsedTime) / 2 : 0
+  })
+  return (
+    <mesh rotation-y={index * 2000} ref={ref} {...props} geometry={geometries[index]}>
+      <meshPhongMaterial />
+    </mesh>
+  )
+}
+
+function Carroussel() {
+  const { viewport } = useThree()
+  const snap = useProxy(state)
   const group = useRef()
-  const { nodes, materials } = useGLTF(rupee)
-
-  useFrame(() => {
-    if (group.current) {
-      group.current.rotation.y = (1 - 0.1) * group.current.rotation.y + 0.1 * targetRotation
-    }
-  })
-
+  const radius = Math.min(6, viewport.width / 5)
+  useFrame(() => (group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, snap.rotation - Math.PI / 2, 0.1)))
   return (
-    <group ref={group} dispose={null}>
-      <A11y role="content" description="a red rupee" tabIndex={activeRupee === 1 ? 0 : -1}>
-        <Rupee
-          position={[Math.round(5 * Math.cos(0)), 0, Math.round(5 * Math.sin(0))]}
-          material={materials.Material}
-          color="red"
-          geometry={nodes.Cube.geometry}
-        />
-      </A11y>
-      <A11y role="content" description="a green rupee" tabIndex={activeRupee === 2 ? 0 : -1}>
-        <Rupee
-          position={[Math.round(5 * Math.cos((1 * 2 * Math.PI) / 5)), 0, Math.round(5 * Math.sin((1 * 2 * Math.PI) / 5))]}
-          material={materials.Material}
-          color="green"
-          geometry={nodes.Cube.geometry}
-        />
-      </A11y>
-      <A11y role="content" description="a silver rupee" tabIndex={activeRupee === 3 ? 0 : -1}>
-        <Rupee
-          position={[Math.round(5 * Math.cos((2 * 2 * Math.PI) / 5)), 0, Math.round(5 * Math.sin((2 * 2 * Math.PI) / 5))]}
-          material={materials.Material}
-          color="silver"
-          geometry={nodes.Cube.geometry}
-        />
-      </A11y>
-      <A11y role="content" description="a purple rupee" tabIndex={activeRupee === 4 ? 0 : -1}>
-        <Rupee
-          position={[Math.round(5 * Math.cos((3 * 2 * Math.PI) / 5)), 0, Math.round(5 * Math.sin((3 * 2 * Math.PI) / 5))]}
-          material={materials.Material}
-          color="purple"
-          geometry={nodes.Cube.geometry}
-        />
-      </A11y>
-      <A11y role="content" description="a yellow rupee" tabIndex={activeRupee === 5 ? 0 : -1}>
-        <Rupee
-          position={[Math.round(5 * Math.cos((4 * 2 * Math.PI) / 5)), 0, Math.round(5 * Math.sin((4 * 2 * Math.PI) / 5))]}
-          material={materials.Material}
-          color="yellow"
-          geometry={nodes.Cube.geometry}
-        />
-      </A11y>
+    <group ref={group}>
+      {["sphere", "pyramid", "donut", "octahedron", "icosahedron"].map((name, i) => (
+        <A11y key={name} role="content" description={`a ${name}`} tabIndex={-1}>
+          <Shape
+            index={i}
+            position={[radius * Math.cos(i * ((Math.PI * 2) / 5)), 0, radius * Math.sin(i * ((Math.PI * 2) / 5))]}
+            active={snap.active === i}
+            color={name}
+          />
+        </A11y>
+      ))}
     </group>
   )
 }
 
-const Carroussel = () => {
-  const [targetRotation, setTargetRotation] = useState(0)
-  const [activeRupee, setActiveRupee] = useState(1)
-
+export default function App() {
+  const snap = useProxy(state)
   return (
-    <Suspense fallback={null}>
-      <group position={[0, 0, 0]}>
-        <Diamonds
-          targetRotation={targetRotation}
-          setTargetRotation={setTargetRotation}
-          activeRupee={activeRupee}
-          setActiveRupee={setActiveRupee}
-        />
-        <Rupees targetRotation={targetRotation} activeRupee={activeRupee} />
-
-        <ContactShadows rotation-x={Math.PI / 2} position={[0, -10, 0]} opacity={0.25} width={100} height={100} blur={2} far={50} />
-      </group>
-    </Suspense>
-  )
-}
-
-useGLTF.preload(diamond)
-useGLTF.preload(rupee)
-
-const App = () => {
-  const [darktheme, setDarktheme] = useState(false)
-  const mainStyle = useSpring({
-    background: darktheme ? "#1c1c1c" : "#f4f4f4",
-  })
-
-  return (
-    <animated.main style={mainStyle}>
-      <Canvas resize={{ polyfill: ResizeObserver }} camera={{ position: [0, 0, 15] }} pixelRatio={[1, 2]}>
-        <pointLight position={[100, 100, 100]} intensity={0.5} />
-        <hemisphereLight color="#ffffff" groundColor="#b9b9b9" position={[2, -25, 10]} intensity={0.85} />
-        <Carroussel />
-        <A11y
-          role="button"
-          description="Dark mode button theme"
-          pressedDescription="Dark mode button theme, activated"
-          actionCall={() => {
-            setDarktheme(!darktheme)
-          }}
-          activationMsg="Theme Dark enabled"
-          deactivationMsg="Theme Dark disabled">
-          <SimpleToggleButton position={[0, -8, 0]} />
-        </A11y>
+    <main className={snap.dark ? "dark" : "bright"}>
+      <Canvas resize={{ polyfill: ResizeObserver }} camera={{ position: [0, 0, 15], near: 4, far: 30 }} pixelRatio={[1, 1.5]}>
+        <pointLight position={[100, 100, 100]} intensity={snap.disabled ? 0.2 : 0.5} />
+        <pointLight position={[-100, -100, -100]} intensity={1.5} color="red" />
+        <ambientLight intensity={snap.disabled ? 0.2 : 0.8} />
+        <group position-y={2}>
+          <Nav left />
+          <Nav />
+          <Carroussel />
+          <Floor />
+          <A11y
+            role="button"
+            description="Light lowering button"
+            pressedDescription="Light lowering button, activated"
+            actionCall={() => (state.dark = !snap.dark)}
+            activationMsg="Lower light enabled"
+            deactivationMsg="Lower light disabled"
+            disabled={snap.disabled}
+            debug={true}
+            a11yElStyle={{ marginLeft: "-40px" }}>
+            <ToggleButton position={[0, -3, 9]} />
+          </A11y>
+          <A11y
+            role="button"
+            pressed={true}
+            description="Power button, click to disable the scene"
+            pressedDescription="Power button, click to turn on the scene"
+            actionCall={() => (state.disabled = !snap.disabled)}
+            activationMsg="Scene activated"
+            deactivationMsg="Scene disabled">
+            <SwitchButton position={[-3, -5, 7]} />
+          </A11y>
+        </group>
+        {/* <Suspense fallback={null}>
+          <EffectComposer multisampling={0}>
+            <SSAO radius={20} intensity={50} luminanceInfluence={0.1} color="#154073" />
+            <SMAA />
+          </EffectComposer>
+        </Suspense> */}
       </Canvas>
+      <Badge />
       <A11yAnnouncer />
-    </animated.main>
+    </main>
   )
 }
-
-export default App

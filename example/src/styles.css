@@ -13,5 +13,18 @@ main {
   left: 0;
   height: 100vh;
   width: 100%;
-  background: linear-gradient(155deg, #ffffff 20%, #a5a3a3);
+  background: #f0f0f0;
+  transition: background 0.25s ease-in-out;
+}
+
+main.dark {
+  background: lightgrey;
+}
+
+a {
+  cursor: pointer;
+  position: absolute;
+  bottom: 25px;
+  left: 50%;
+  transform: translate3d(-50%, 0, 0);
 }
