@@ -2,7 +2,7 @@ import * as THREE from "three"
 import { Canvas, useFrame, useThree } from "react-three-fiber"
 import React, { Suspense, useRef } from "react"
 import { ContactShadows } from "@react-three/drei"
-import { A11y, useA11y, A11yAnnouncer } from "../../"
+import { A11y, useA11y, A11yDom, A11yAnnouncer } from "../../"
 import { ResizeObserver } from "@juggle/resize-observer"
 import { proxy, useProxy } from "valtio"
 import { EffectComposer, SSAO, SMAA } from "@react-three/postprocessing"
@@ -134,6 +134,15 @@ export default function App() {
         <pointLight position={[100, 100, 100]} intensity={snap.disabled ? 0.2 : 0.5} />
         <pointLight position={[-100, -100, -100]} intensity={1.5} color="red" />
         <ambientLight intensity={snap.disabled ? 0.2 : 0.8} />
+        <A11yDom>
+          <div>
+            <form>
+              <label htmlFor="color-field"></label>
+              <input type="text" aria-label="Type a color" name="color-field" id="color-field" spellCheck="false" />
+              <button type="button"></button>
+            </form>
+          </div>
+        </A11yDom>
         <group position-y={2}>
           <Nav left />
           <Nav />
