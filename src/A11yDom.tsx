@@ -1,5 +1,10 @@
-import React, { useState, useMemo, useRef } from 'react';
+//@ts-ignore
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Html } from '@react-three/drei/Html';
+//@ts-ignore
+import { useLoader, Texture } from 'react-three-fiber';
+//@ts-ignore
+import { TextureLoader } from 'three/src/loaders/TextureLoader.js';
 
 interface Props {
   children: React.ReactNode;
@@ -74,6 +79,7 @@ const injectPropsToAllChildren = (children, newProps, clone, hooks) => {
         };
       } else {
         newProps = {
+          defaultValue: hooks.text,
           onChange: hooks.handleChange,
         };
       }
@@ -94,9 +100,10 @@ const injectPropsToAllChildren = (children, newProps, clone, hooks) => {
 
 export const A11yDom: React.FC<Props> = ({ children }) => {
   const [text, setText] = useState<string>('orange');
+  const [domImg, setDomImg] = useState<string>(
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAK0AAAAlCAYAAAAwTGn2AAADCklEQVR4Xu2bz4txYRTHjyWW7JQmGxtvyhaz5A+w0JusFaVIysJMWGiklLKwRm829rZkq/TOwmzkH7CZwvJ9O0/d2zU/8NzRjCffW0Kec+853/PpdJ5zXQsRUbFY/MfvOKCACgpYGNinpycVfIWPUEAoAGgBgnIKAFrlUgaHAS0YUE6Bd9C+vLxQNpuldrtNXq9XKqDZbEa1Wo0GgwE5HI5vs5W6EBYrrwCgVT6FtxcAoL29nCsf8afQxmIxSqVSIsBqtUrlclkPlluAh4cH/TduC7glWC6Xoj2IRqOUz+fF7/1+nxKJhPi83+8pl8tRt9slv99PkUiEXl9fqdVq0Xw+P2qrvNII4GIKfAhtPB4nhpZB5R6Xv3c6HQoGg2TsW202m4BwvV7r0IZCIR1UXpvJZGg4HIr+mMGeTqcC0t1uJ2C+u7vToT1me7GIcSLlFTjZHmw2GwEXA8zQciXlQ6u8Roi1SqttxIybOrfbLQAPh8N65TVCrFXaj2xlN4TKZwUBHFVACtpAIPAOvHOhdTqdB/CzV4AWdJpRQApaVFozEsPm0gpIQ3uqpzXOad/OfE/1tMdsLx04zqeuAtLQcqja9IAnAOl0mkaj0cH04LO+1Dg94AkDvxhs4/QAPa26MH2X51++jcuVt9frCfCsVquU3wzoarU6GKdJnQCLb1IBaWiNoGmV0+VynQUeV2iPxyM2ZNpUIplM6tOEm8wAgpZWQBpaDbbxeCwuxjcgzq2y2sx3sVgI27c3LaS9h8FNKiAN7U2qhKCvSgFAe1XpgDPnKGDhRXhG7BypsOZaFBDQ4oACKikAaFXKFnwVCgBagKCcAoBWuZTBYUALBpRTANAqlzI4DGjBgHIKAFrlUgaHAS0YUE4BQKtcyuAwoAUDyilgKRQKPrvd/me/3/tkvLdarc/b7fZ3s9l8lrHDWijwVQUsj4+Pf+/v7338pK3MwY98TyaT50ql8kvGDmuhwFcVEH9NLJVKps5Tr9ep0WigxTClHozMKgBozSoHux9TAO3Bj0mPC5tV4D9lo2y6ICd2oAAAAABJRU5ErkJggg=='
+  );
   const sourceElementRef = useRef(null);
-  console.log(text);
-  console.log(typeof text);
   const handleChange = (
     event: React.MouseEvent<HTMLInputElement, globalThis.MouseEvent>
   ) => {
@@ -119,14 +126,28 @@ export const A11yDom: React.FC<Props> = ({ children }) => {
     true,
     { handleChange: handleChange, text: text }
   );
-  console.log(myPopulatedChildren);
 
-  //@ts-ignore
-  rasterizeElement(sourceElementRef.current, true);
+  const updateDomImg = async () => {
+    //@ts-ignore
+    const res = await rasterizeElement(sourceElementRef.current, true);
+    //@ts-ignore
+    setDomImg(res.DOMImage);
+  };
+
+  useEffect(() => {
+    if (sourceElementRef.current) {
+      updateDomImg();
+    }
+  }, [text]);
+
+  const texture = useLoader(TextureLoader, domImg);
 
   return (
     <group>
-      <planeBufferGeometry args={[1, 1, 1, 1]} />
+      <mesh>
+        <planeBufferGeometry args={[4, 4, 4, 4]} />
+        <meshStandardMaterial map={texture} attach="material" />
+      </mesh>
       <Html>
         <div className={'transparent-interactive-ui'}>
           {myPopulatedChildren}

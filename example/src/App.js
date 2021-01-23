@@ -134,15 +134,17 @@ export default function App() {
         <pointLight position={[100, 100, 100]} intensity={snap.disabled ? 0.2 : 0.5} />
         <pointLight position={[-100, -100, -100]} intensity={1.5} color="red" />
         <ambientLight intensity={snap.disabled ? 0.2 : 0.8} />
-        <A11yDom>
-          <div>
-            <form>
-              <label htmlFor="color-field"></label>
-              <input type="text" aria-label="Type a color" name="color-field" id="color-field" spellCheck="false" />
-              <button type="button"></button>
-            </form>
-          </div>
-        </A11yDom>
+        <Suspense fallback={null}>
+          <A11yDom>
+            <div>
+              <form>
+                <label htmlFor="color-field"></label>
+                <input type="text" aria-label="Type a color" name="color-field" id="color-field" spellCheck="false" />
+                <button type="button"></button>
+              </form>
+            </div>
+          </A11yDom>
+        </Suspense>
         <group position-y={2}>
           <Nav left />
           <Nav />
