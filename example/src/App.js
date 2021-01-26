@@ -5,7 +5,6 @@ import { ContactShadows } from "@react-three/drei"
 import { A11y, useA11y, A11yDom, A11yAnnouncer } from "../../"
 import { ResizeObserver } from "@juggle/resize-observer"
 import { proxy, useProxy } from "valtio"
-import { EffectComposer, SSAO, SMAA } from "@react-three/postprocessing"
 import { Badge } from "@pmndrs/branding"
 
 const state = proxy({ dark: false, active: 0, rotation: 0, disabled: true })
@@ -134,17 +133,15 @@ export default function App() {
         <pointLight position={[100, 100, 100]} intensity={snap.disabled ? 0.2 : 0.5} />
         <pointLight position={[-100, -100, -100]} intensity={1.5} color="red" />
         <ambientLight intensity={snap.disabled ? 0.2 : 0.8} />
-        <Suspense fallback={null}>
-          <A11yDom>
-            <div>
-              <form>
-                <label htmlFor="color-field"></label>
-                <input type="text" aria-label="Type a color" name="color-field" id="color-field" spellCheck="false" />
-                <button type="button"></button>
-              </form>
-            </div>
-          </A11yDom>
-        </Suspense>
+        <A11yDom>
+          <div>
+            <form>
+              <label htmlFor="color-field"></label>
+              <input type="text" aria-label="Type a color" name="color-field" id="color-field" spellCheck="false" />
+              <button type="button"></button>
+            </form>
+          </div>
+        </A11yDom>
         <group position-y={2}>
           <Nav left />
           <Nav />
@@ -173,12 +170,6 @@ export default function App() {
             <SwitchButton position={[-3, -5, 7]} />
           </A11y>
         </group>
-        {/* <Suspense fallback={null}>
-          <EffectComposer multisampling={0}>
-            <SSAO radius={20} intensity={50} luminanceInfluence={0.1} color="#154073" />
-            <SMAA />
-          </EffectComposer>
-        </Suspense> */}
       </Canvas>
       <Badge />
       <A11yAnnouncer />

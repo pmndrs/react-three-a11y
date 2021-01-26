@@ -162,7 +162,11 @@ export const A11yDom: React.FC<Props> = ({ children }) => {
   };
 
   const rasterizedHtml = useMemo(() => {
-    return <RasterisedHtml domImg={domImg} textures={textureRef.current} />;
+    if (textureRef.current) {
+      return <RasterisedHtml domImg={domImg} textures={textureRef.current} />;
+    } else {
+      return null;
+    }
   }, [domImg]);
 
   useEffect(() => {
