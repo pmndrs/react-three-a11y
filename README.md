@@ -168,9 +168,11 @@ In order to provide informations to screen reader users and use this package at 
 Use a custom tabindex with for your A11y components by providing a number to the tabIndex attribute
 
 ```jsx
-<A11y tabIndex={2} ... />
+<A11y tabIndex={-1} ... />
 ```
-
+⚠⚠⚠<br>
+Avoid using tabindex values greater than 0. Doing so makes it difficult for people who rely on assistive technology to navigate and operate page content.
+Instead, write the document with the elements in a logical sequence.<br>
 More about the use of tabIndex on <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex">developer.mozilla.org</a>
 
 ## Next Steps
