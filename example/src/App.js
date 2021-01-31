@@ -6,7 +6,7 @@ import { A11y, useA11y, A11yAnnouncer } from "../../"
 import { ResizeObserver } from "@juggle/resize-observer"
 import { proxy, useProxy } from "valtio"
 import { EffectComposer, SSAO, SMAA } from "@react-three/postprocessing"
-import { Badge } from "@pmndrs/branding"
+import { Badge, Logo, LogoFull } from "@pmndrs/branding"
 
 const state = proxy({ dark: false, active: 0, rotation: 0, disabled: true })
 const geometries = [
@@ -62,7 +62,7 @@ function Nav({ left }) {
   return (
     <A11y
       role="button"
-      description={`Press to show the ${left ? "left" : "right"} shape`}
+      description={`Spin ${left ? "left" : "right"} shape`}
       activationMsg="shape showing"
       actionCall={() => {
         state.rotation = snap.rotation + ((Math.PI * 2) / 5) * (left ? -1 : 1)
@@ -170,6 +170,8 @@ export default function App() {
         </Suspense> */}
       </Canvas>
       <Badge />
+      <Logo />
+      <LogoFull />
       <A11yAnnouncer />
     </main>
   )

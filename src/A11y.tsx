@@ -173,11 +173,17 @@ export const A11y: React.FC<Props> = ({
 
   const HtmlFocusableElement = (() => {
     if (role === 'button') {
+      let disabledBtnAttr = disabled
+        ? {
+            disabled: true,
+          }
+        : null;
       if (deactivationMsg || pressedDescription) {
         //btn has two distinct state
         return (
           <button
             r3f-a11y="true"
+            {...disabledBtnAttr}
             aria-disabled={disabled ? 'true' : 'false'}
             aria-pressed={a11yState.pressed ? 'true' : 'false'}
             tabIndex={tabIndex ? tabIndex : 0}
@@ -220,6 +226,7 @@ export const A11y: React.FC<Props> = ({
         return (
           <button
             r3f-a11y="true"
+            {...disabledBtnAttr}
             aria-disabled={disabled ? 'true' : 'false'}
             tabIndex={tabIndex ? tabIndex : 0}
             style={Object.assign(
@@ -292,10 +299,15 @@ export const A11y: React.FC<Props> = ({
         </a>
       );
     } else {
+      let tabIndexP = tabIndex
+        ? {
+            tabIndexP: tabIndex,
+          }
+        : null;
       return (
         <p
           r3f-a11y="true"
-          tabIndex={tabIndex ? tabIndex : 0}
+          {...tabIndexP}
           style={constHiddenButScreenreadable}
           onPointerOver={handleOnPointerOver}
           onPointerOut={handleOnPointerOut}
