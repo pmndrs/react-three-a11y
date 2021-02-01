@@ -6,7 +6,6 @@ import useAnnounceStore from './announceStore';
 interface Props {
   children: React.ReactNode;
   description: string;
-  pressedDescription: string;
   activationMsg: string;
   deactivationMsg: string;
   tabIndex: number;
@@ -18,6 +17,7 @@ interface Props {
   disabled: boolean;
   debug: boolean;
   a11yElStyle: Object;
+  pressed: boolean;
 }
 
 const A11yContext = React.createContext({
@@ -37,7 +37,6 @@ export { useA11y };
 export const A11y: React.FC<Props> = ({
   children,
   description,
-  pressedDescription,
   activationMsg,
   deactivationMsg,
   tabIndex,
@@ -49,6 +48,7 @@ export const A11y: React.FC<Props> = ({
   disabled,
   debug,
   a11yElStyle,
+  pressed,
   ...props
 }) => {
   let constHiddenButScreenreadable = Object.assign(
@@ -71,14 +71,13 @@ export const A11y: React.FC<Props> = ({
   const [a11yState, setA11yState] = useState({
     hovered: false,
     focused: false,
-    pressed: false,
+    pressed: pressed ? pressed : false,
   });
 
   const a11yScreenReader = useAnnounceStore(state => state.a11yScreenReader);
 
   const overHtml = useRef(false);
   const overMesh = useRef(false);
-  const didMouseOverAnnounce = useRef(false);
 
   const {
     gl: { domElement },
@@ -102,17 +101,6 @@ export const A11y: React.FC<Props> = ({
       overHtml.current = true;
     }
     if (overHtml.current || overMesh.current) {
-      // @ts-ignore
-      if (didMouseOverAnnounce.current) {
-        return;
-      }
-      if (a11yState.pressed) {
-        didMouseOverAnnounce.current = true;
-        a11yScreenReader(pressedDescription);
-      } else {
-        didMouseOverAnnounce.current = true;
-        a11yScreenReader(description);
-      }
       if (role !== 'content' && !disabled) {
         domElement.style.cursor = 'pointer';
       }
@@ -132,7 +120,6 @@ export const A11y: React.FC<Props> = ({
       overHtml.current = false;
     }
     if (!overHtml.current && !overMesh.current) {
-      didMouseOverAnnounce.current = false;
       if (componentIsMounted.current) {
         domElement.style.cursor = 'default';
         //@ts-ignore
@@ -178,13 +165,12 @@ export const A11y: React.FC<Props> = ({
             disabled: true,
           }
         : null;
-      if (deactivationMsg || pressedDescription) {
-        //btn has two distinct state
+      if (pressed === true || pressed === false) {
+        //is a toggle button
         return (
           <button
             r3f-a11y="true"
             {...disabledBtnAttr}
-            aria-disabled={disabled ? 'true' : 'false'}
             aria-pressed={a11yState.pressed ? 'true' : 'false'}
             tabIndex={tabIndex ? tabIndex : 0}
             style={Object.assign(
@@ -218,7 +204,7 @@ export const A11y: React.FC<Props> = ({
               });
             }}
           >
-            {didMouseOverAnnounce.current ? '' : description}
+            {description}
           </button>
         );
       } else {
@@ -227,7 +213,6 @@ export const A11y: React.FC<Props> = ({
           <button
             r3f-a11y="true"
             {...disabledBtnAttr}
-            aria-disabled={disabled ? 'true' : 'false'}
             tabIndex={tabIndex ? tabIndex : 0}
             style={Object.assign(
               constHiddenButScreenreadable,
@@ -260,7 +245,7 @@ export const A11y: React.FC<Props> = ({
               });
             }}
           >
-            {didMouseOverAnnounce.current ? '' : description}
+            {description}
           </button>
         );
       }
@@ -295,7 +280,7 @@ export const A11y: React.FC<Props> = ({
             });
           }}
         >
-          {didMouseOverAnnounce.current ? '' : description}
+          {description}
         </a>
       );
     } else {
@@ -329,7 +314,7 @@ export const A11y: React.FC<Props> = ({
             });
           }}
         >
-          {didMouseOverAnnounce.current ? '' : description}
+          {description}
         </p>
       );
     }
@@ -359,7 +344,7 @@ export const A11y: React.FC<Props> = ({
             margin: '0px',
           }}
         >
-          {didMouseOverAnnounce.current ? '' : description}
+          {description}
         </p>
       </div>
     );
@@ -381,7 +366,7 @@ export const A11y: React.FC<Props> = ({
             return;
           }
           if (role === 'button') {
-            if (deactivationMsg || pressedDescription) {
+            if (pressed === true || pressed === false) {
               handleToggleBtnClick();
             } else {
               handleBtnClick();

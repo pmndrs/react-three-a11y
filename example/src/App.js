@@ -141,8 +141,8 @@ export default function App() {
           <Floor />
           <A11y
             role="button"
-            description="Light lowering button"
-            pressedDescription="Light lowering button, activated"
+            pressed={false}
+            description="Light control"
             actionCall={() => (state.dark = !snap.dark)}
             activationMsg="Lower light enabled"
             deactivationMsg="Lower light disabled"
@@ -153,9 +153,8 @@ export default function App() {
           </A11y>
           <A11y
             role="button"
-            pressed={true}
-            description="Power button, click to disable the scene"
-            pressedDescription="Power button, click to turn on the scene"
+            pressed={false}
+            description="Power"
             actionCall={() => (state.disabled = !snap.disabled)}
             activationMsg="Scene activated"
             deactivationMsg="Scene disabled">
