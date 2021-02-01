@@ -130,7 +130,6 @@ export const A11y: React.FC<Props> = ({
         });
       }
     }
-    a11yScreenReader('');
   };
 
   function handleBtnClick() {
