@@ -18,6 +18,7 @@ interface Props {
   debug: boolean;
   a11yElStyle: Object;
   pressed: boolean;
+  hidden: boolean;
 }
 
 const A11yContext = React.createContext({
@@ -49,6 +50,7 @@ export const A11y: React.FC<Props> = ({
   debug,
   a11yElStyle,
   pressed,
+  hidden,
   ...props
 }) => {
   let constHiddenButScreenreadable = Object.assign(
@@ -157,7 +159,7 @@ export const A11y: React.FC<Props> = ({
     if (typeof actionCall === 'function') actionCall();
   }
 
-  const HtmlFocusableElement = (() => {
+  const HtmlAccessibleElement = (() => {
     if (role === 'button') {
       let disabledBtnAttr = disabled
         ? {
@@ -172,9 +174,11 @@ export const A11y: React.FC<Props> = ({
             {...disabledBtnAttr}
             aria-pressed={a11yState.pressed ? 'true' : 'false'}
             tabIndex={tabIndex ? tabIndex : 0}
+            //@ts-ignore
             style={Object.assign(
               constHiddenButScreenreadable,
-              disabled ? { cursor: 'default' } : { cursor: 'pointer' }
+              disabled ? { cursor: 'default' } : { cursor: 'pointer' },
+              hidden ? { visibility: 'hidden' } : { visibility: 'visible' }
             )}
             onPointerOver={handleOnPointerOver}
             onPointerOut={handleOnPointerOut}
@@ -213,9 +217,11 @@ export const A11y: React.FC<Props> = ({
             r3f-a11y="true"
             {...disabledBtnAttr}
             tabIndex={tabIndex ? tabIndex : 0}
+            //@ts-ignore
             style={Object.assign(
               constHiddenButScreenreadable,
-              disabled ? { cursor: 'default' } : { cursor: 'pointer' }
+              disabled ? { cursor: 'default' } : { cursor: 'pointer' },
+              hidden ? { visibility: 'hidden' } : { visibility: 'visible' }
             )}
             onPointerOver={handleOnPointerOver}
             onPointerOut={handleOnPointerOut}
@@ -252,7 +258,11 @@ export const A11y: React.FC<Props> = ({
       return (
         <a
           r3f-a11y="true"
-          style={constHiddenButScreenreadable}
+          //@ts-ignore
+          style={Object.assign(
+            constHiddenButScreenreadable,
+            hidden ? { visibility: 'hidden' } : { visibility: 'visible' }
+          )}
           href={href}
           onPointerOver={handleOnPointerOver}
           onPointerOut={handleOnPointerOut}
@@ -292,7 +302,11 @@ export const A11y: React.FC<Props> = ({
         <p
           r3f-a11y="true"
           {...tabIndexP}
-          style={constHiddenButScreenreadable}
+          //@ts-ignore
+          style={Object.assign(
+            constHiddenButScreenreadable,
+            hidden ? { visibility: 'hidden' } : { visibility: 'visible' }
+          )}
           onPointerOver={handleOnPointerOver}
           onPointerOut={handleOnPointerOut}
           onBlur={() => {
@@ -385,7 +399,7 @@ export const A11y: React.FC<Props> = ({
           }
         >
           {AltText}
-          {HtmlFocusableElement}
+          {HtmlAccessibleElement}
         </Html>
       </group>
     </A11yContext.Provider>

@@ -113,7 +113,7 @@ function Carroussel() {
   return (
     <group ref={group}>
       {["sphere", "pyramid", "donut", "octahedron", "icosahedron"].map((name, i) => (
-        <A11y key={name} role="content" description={`a ${name}`} tabIndex={-1}>
+        <A11y key={name} role="content" description={`a ${name}`} tabIndex={-1} hidden={snap.active !== i}>
           <Shape
             index={i}
             position={[radius * Math.cos(i * ((Math.PI * 2) / 5)), 0, radius * Math.sin(i * ((Math.PI * 2) / 5))]}
