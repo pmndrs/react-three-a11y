@@ -2,13 +2,13 @@ import * as THREE from "three"
 import { Canvas, useFrame, useThree } from "react-three-fiber"
 import React, { Suspense, useRef } from "react"
 import { ContactShadows } from "@react-three/drei"
-import { A11y, useA11y, A11yAnnouncer } from "../../"
+import { A11y, useA11y, A11yAnnouncer, A11yUserPreferences, useUserPreferences } from "../../"
 import { ResizeObserver } from "@juggle/resize-observer"
 import { proxy, useProxy } from "valtio"
 import { EffectComposer, SSAO, SMAA } from "@react-three/postprocessing"
 import { Badge, Logo, LogoFull } from "@pmndrs/branding"
 
-const state = proxy({ dark: false, active: 0, rotation: 0, disabled: true })
+const state = proxy({ dark: false, active: 0, rotation: 0, disabled: false })
 const geometries = [
   new THREE.SphereBufferGeometry(1, 32, 32),
   new THREE.TetrahedronBufferGeometry(1.5),
@@ -88,18 +88,26 @@ function Shape({ index, active, ...props }) {
   const snap = useProxy(state)
   const vec = new THREE.Vector3()
   const ref = useRef()
+  const userPref = useUserPreferences()
   useFrame((state, delta) => {
     if (snap.disabled) {
       return
     }
-    const s = active ? 2 : 1
-    ref.current.scale.lerp(vec.set(s, s, s), 0.1)
-    ref.current.rotation.y = ref.current.rotation.x += delta / (active ? 1.5 : 4)
-    ref.current.position.y = active ? Math.sin(state.clock.elapsedTime) / 2 : 0
+    if (userPref.prefersReducedMotion) {
+      const s = active ? 2 : 1
+      ref.current.scale.set(s, s, s)
+      ref.current.rotation.y = ref.current.rotation.x = active ? 1.5 : 4
+      ref.current.position.y = 0
+    } else {
+      const s = active ? 2 : 1
+      ref.current.scale.lerp(vec.set(s, s, s), 0.1)
+      ref.current.rotation.y = ref.current.rotation.x += delta / (active ? 1.5 : 4)
+      ref.current.position.y = active ? Math.sin(state.clock.elapsedTime) / 2 : 0
+    }
   })
   return (
     <mesh rotation-y={index * 2000} ref={ref} {...props} geometry={geometries[index]}>
-      <meshPhongMaterial />
+      <meshPhongMaterial color={userPref.prefersDarkScheme ? "#000000" : "#ffffff"} />
     </mesh>
   )
 }
@@ -109,7 +117,14 @@ function Carroussel() {
   const snap = useProxy(state)
   const group = useRef()
   const radius = Math.min(6, viewport.width / 5)
-  useFrame(() => (group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, snap.rotation - Math.PI / 2, 0.1)))
+  const userPref = useUserPreferences()
+  useFrame(() => {
+    if (userPref.prefersReducedMotion) {
+      group.current.rotation.y = snap.rotation - Math.PI / 2
+    } else {
+      group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, snap.rotation - Math.PI / 2, 0.1)
+    }
+  })
   return (
     <group ref={group}>
       {["sphere", "pyramid", "donut", "octahedron", "icosahedron"].map((name, i) => (
@@ -131,42 +146,45 @@ export default function App() {
   return (
     <main className={snap.dark ? "dark" : "bright"}>
       <Canvas resize={{ polyfill: ResizeObserver }} camera={{ position: [0, 0, 15], near: 4, far: 30 }} pixelRatio={[1, 1.5]}>
-        <pointLight position={[100, 100, 100]} intensity={snap.disabled ? 0.2 : 0.5} />
-        <pointLight position={[-100, -100, -100]} intensity={1.5} color="red" />
-        <ambientLight intensity={snap.disabled ? 0.2 : 0.8} />
-        <group position-y={2}>
-          <Nav left />
-          <Nav />
-          <Carroussel />
-          <Floor />
-          <A11y
-            role="button"
-            pressed={false}
-            description="Light control"
-            actionCall={() => (state.dark = !snap.dark)}
-            activationMsg="Lower light enabled"
-            deactivationMsg="Lower light disabled"
-            disabled={snap.disabled}
-            debug={true}
-            a11yElStyle={{ marginLeft: "-40px" }}>
-            <ToggleButton position={[0, -3, 9]} />
-          </A11y>
-          <A11y
-            role="button"
-            pressed={false}
-            description="Power"
-            actionCall={() => (state.disabled = !snap.disabled)}
-            activationMsg="Scene activated"
-            deactivationMsg="Scene disabled">
-            <SwitchButton position={[-3, -5, 7]} />
-          </A11y>
-        </group>
-        {/* <Suspense fallback={null}>
+        <A11yUserPreferences>
+          <pointLight position={[100, 100, 100]} intensity={snap.disabled ? 0.2 : 0.5} />
+          <pointLight position={[-100, -100, -100]} intensity={1.5} color="red" />
+          <ambientLight intensity={snap.disabled ? 0.2 : 0.8} />
+          <group position-y={2}>
+            <Nav left />
+            <Nav />
+            <Carroussel />
+            <Floor />
+            <A11y
+              role="button"
+              description="Light lowering button"
+              pressedDescription="Light lowering button, activated"
+              actionCall={() => (state.dark = !snap.dark)}
+              activationMsg="Lower light enabled"
+              deactivationMsg="Lower light disabled"
+              disabled={snap.disabled}
+              debug={true}
+              a11yElStyle={{ marginLeft: "-40px" }}>
+              <ToggleButton position={[0, -3, 9]} />
+            </A11y>
+            <A11y
+              role="button"
+              pressed={false}
+              description="Power button, click to disable the scene"
+              pressedDescription="Power button, click to turn on the scene"
+              actionCall={() => (state.disabled = !snap.disabled)}
+              activationMsg="Scene activated"
+              deactivationMsg="Scene disabled">
+              <SwitchButton position={[-3, -5, 7]} />
+            </A11y>
+          </group>
+          {/* <Suspense fallback={null}>
           <EffectComposer multisampling={0}>
             <SSAO radius={20} intensity={50} luminanceInfluence={0.1} color="#154073" />
             <SMAA />
           </EffectComposer>
         </Suspense> */}
+        </A11yUserPreferences>
       </Canvas>
       <Badge />
       <Logo />
