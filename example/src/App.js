@@ -1,14 +1,15 @@
 import * as THREE from "three"
 import { Canvas, useFrame, useThree } from "react-three-fiber"
-import React, { Suspense, useRef } from "react"
-import { ContactShadows } from "@react-three/drei"
-import { A11y, useA11y, A11yAnnouncer, A11yUserPreferences, useUserPreferences } from "../../"
+import React, { Suspense, useCallback, useEffect, useRef, useContext } from "react"
+import { ContactShadows, Text, Html } from "@react-three/drei"
+import { A11y, useA11y, A11yAnnouncer, A11yUserPreferences, useUserPreferences, A11ySection } from "../../"
 import { ResizeObserver } from "@juggle/resize-observer"
 import { proxy, useProxy } from "valtio"
+import { Controls, useControl } from "react-three-gui"
 import { EffectComposer, SSAO, SMAA } from "@react-three/postprocessing"
 import { Badge, Logo, LogoFull } from "@pmndrs/branding"
 
-const state = proxy({ dark: false, active: 0, rotation: 0, disabled: false })
+const state = proxy({ dark: false, active: 0, rotation: 0, disabled: false, section: undefined })
 const geometries = [
   new THREE.SphereBufferGeometry(1, 32, 32),
   new THREE.TetrahedronBufferGeometry(1.5),
@@ -112,6 +113,38 @@ function Shape({ index, active, ...props }) {
   )
 }
 
+// const ResponsiveText = () => {
+//   const { viewport } = useThree()
+//   const posX = useControl("posX", { type: "number", value: 0, min: -20, max: 20 })
+//   const posY = useControl("posY", { type: "number", value: 0, min: -20, max: 20 })
+//   const posZ = useControl("posZ", { type: "number", value: 0, min: -20, max: 20 })
+//   const color = useControl("color", { type: "color", value: "#EC2D2D" })
+//   const fontSize = useControl("fontSize", { type: "number", value: 16.5, min: 1, max: 100 })
+//   const maxWidth = useControl("maxWidth", { type: "number", value: 90, min: 1, max: 100 })
+//   const lineHeight = useControl("lineHeight", { type: "number", value: 0.75, min: 0.1, max: 10 })
+//   const letterSpacing = useControl("spacing", { type: "number", value: -0.08, min: -0.5, max: 1 })
+//   const textAlign = useControl("textAlign", {
+//     type: "select",
+//     items: ["left", "right", "center", "justify"],
+//     value: "justify",
+//   })
+//   return (
+//     <Text
+//       position={[posX, posY, posZ]}
+//       color={color}
+//       fontSize={fontSize}
+//       maxWidth={(viewport.width / 100) * maxWidth}
+//       lineHeight={lineHeight}
+//       letterSpacing={letterSpacing}
+//       textAlign={textAlign}
+//       font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
+//       anchorX="center"
+//       anchorY="middle">
+//       LOREM IPSUM DOLOR SIT AMET, CONSECTETUR ADIPISCING ELIT
+//     </Text>
+//   )
+// }
+
 function Carroussel() {
   const { viewport } = useThree()
   const snap = useProxy(state)
@@ -141,55 +174,76 @@ function Carroussel() {
   )
 }
 
-export default function App() {
+const CarrousselAll = () => {
   const snap = useProxy(state)
+
+  return (
+    <>
+      <A11ySection
+        label="Shape carousel"
+        description="This carousel contains 5 shapes. Use the Previous and Next buttons to cycle through all the shapes.">
+        <Nav left />
+        <Carroussel />
+        <Nav />
+        <Floor />
+        <A11y
+          role="button"
+          description="Light lowering button"
+          pressedDescription="Light lowering button, activated"
+          actionCall={() => (state.dark = !snap.dark)}
+          activationMsg="Lower light enabled"
+          deactivationMsg="Lower light disabled"
+          disabled={snap.disabled}
+          debug={true}
+          a11yElStyle={{ marginLeft: "-40px" }}>
+          <ToggleButton position={[0, -3, 9]} />
+        </A11y>
+      </A11ySection>
+    </>
+  )
+}
+
+export default function App() {
+  // const sectionRef = useCallback(node => {
+  //   console.log(node)
+  //   sectionRefref.current = node
+  // }, [])
+  const snap = useProxy(state)
+
   return (
     <main className={snap.dark ? "dark" : "bright"}>
-      <Canvas resize={{ polyfill: ResizeObserver }} camera={{ position: [0, 0, 15], near: 4, far: 30 }} pixelRatio={[1, 1.5]}>
-        <A11yUserPreferences>
-          <pointLight position={[100, 100, 100]} intensity={snap.disabled ? 0.2 : 0.5} />
-          <pointLight position={[-100, -100, -100]} intensity={1.5} color="red" />
-          <ambientLight intensity={snap.disabled ? 0.2 : 0.8} />
-          <group position-y={2}>
-            <Nav left />
-            <Nav />
-            <Carroussel />
-            <Floor />
-            <A11y
-              role="button"
-              description="Light lowering button"
-              pressedDescription="Light lowering button, activated"
-              actionCall={() => (state.dark = !snap.dark)}
-              activationMsg="Lower light enabled"
-              deactivationMsg="Lower light disabled"
-              disabled={snap.disabled}
-              debug={true}
-              a11yElStyle={{ marginLeft: "-40px" }}>
-              <ToggleButton position={[0, -3, 9]} />
-            </A11y>
-            <A11y
-              role="button"
-              pressed={false}
-              description="Power button, click to disable the scene"
-              pressedDescription="Power button, click to turn on the scene"
-              actionCall={() => (state.disabled = !snap.disabled)}
-              activationMsg="Scene activated"
-              deactivationMsg="Scene disabled">
-              <SwitchButton position={[-3, -5, 7]} />
-            </A11y>
-          </group>
-          {/* <Suspense fallback={null}>
+      <Controls.Provider>
+        <Controls.Canvas resize={{ polyfill: ResizeObserver }} camera={{ position: [0, 0, 15], near: 4, far: 30 }} pixelRatio={[1, 1.5]}>
+          <A11yUserPreferences>
+            {/* <ResponsiveText /> */}
+            <pointLight position={[100, 100, 100]} intensity={snap.disabled ? 0.2 : 0.5} />
+            <pointLight position={[-100, -100, -100]} intensity={1.5} color="red" />
+            <ambientLight intensity={snap.disabled ? 0.2 : 0.8} />
+            <group position-y={2}>
+              <CarrousselAll />
+              <A11y
+                role="button"
+                pressed={false}
+                description="Power button, click to disable the scene"
+                pressedDescription="Power button, click to turn on the scene"
+                actionCall={() => (state.disabled = !snap.disabled)}
+                activationMsg="Scene activated"
+                deactivationMsg="Scene disabled">
+                <SwitchButton position={[-3, -5, 7]} />
+              </A11y>
+            </group>
+            {/* <Suspense fallback={null}>
           <EffectComposer multisampling={0}>
             <SSAO radius={20} intensity={50} luminanceInfluence={0.1} color="#154073" />
             <SMAA />
           </EffectComposer>
         </Suspense> */}
-        </A11yUserPreferences>
-      </Canvas>
-      <Badge />
-      <Logo />
-      <LogoFull />
-      <A11yAnnouncer />
+          </A11yUserPreferences>
+        </Controls.Canvas>
+        <Controls />
+        <Badge />
+        <A11yAnnouncer />
+      </Controls.Provider>
     </main>
   )
 }

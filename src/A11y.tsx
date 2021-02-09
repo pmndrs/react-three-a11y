@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useContext } from 'react';
 import { useThree } from 'react-three-fiber';
 import { Html } from '@react-three/drei/Html';
 import useAnnounceStore from './announceStore';
+import { useA11ySectionContext } from './A11ySection';
 
 interface Props {
   children: React.ReactNode;
@@ -159,7 +160,7 @@ export const A11y: React.FC<Props> = ({
     if (typeof actionCall === 'function') actionCall();
   }
 
-  const HtmlAccessibleElement = (() => {
+  const returnHtmlA11yEl = () => {
     if (role === 'button') {
       let disabledBtnAttr = disabled
         ? {
@@ -295,7 +296,7 @@ export const A11y: React.FC<Props> = ({
     } else {
       let tabIndexP = tabIndex
         ? {
-            tabIndexP: tabIndex,
+            tabIndex: tabIndex,
           }
         : null;
       return (
@@ -331,7 +332,19 @@ export const A11y: React.FC<Props> = ({
         </p>
       );
     }
-  })();
+  };
+
+  const HtmlAccessibleElement = React.useMemo(returnHtmlA11yEl, [
+    description,
+    a11yState,
+    hidden,
+    tabIndex,
+    href,
+    disabled,
+    pressed,
+    actionCall,
+    focusCall,
+  ]);
 
   let AltText = null;
   if (showAltText && a11yState.hovered) {
@@ -362,6 +375,8 @@ export const A11y: React.FC<Props> = ({
       </div>
     );
   }
+
+  const section = useA11ySectionContext();
 
   return (
     <A11yContext.Provider
@@ -397,6 +412,7 @@ export const A11y: React.FC<Props> = ({
             // @ts-ignore
             children.props.position ? children.props.position : [0, 0, 0]
           }
+          portal={section}
         >
           {AltText}
           {HtmlAccessibleElement}
