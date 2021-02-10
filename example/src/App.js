@@ -187,7 +187,7 @@ const CarrousselAll = () => {
         <Nav />
         <Floor />
         <A11y
-          role="button"
+          role="togglebutton"
           description="Light lowering button"
           pressedDescription="Light lowering button, activated"
           actionCall={() => (state.dark = !snap.dark)}
@@ -222,8 +222,8 @@ export default function App() {
             <group position-y={2}>
               <CarrousselAll />
               <A11y
-                role="button"
-                pressed={false}
+                role="togglebutton"
+                startPressed={false}
                 description="Power button, click to disable the scene"
                 pressedDescription="Power button, click to turn on the scene"
                 actionCall={() => (state.disabled = !snap.disabled)}

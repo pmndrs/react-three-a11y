@@ -11,14 +11,14 @@ interface Props {
   deactivationMsg: string;
   tabIndex: number;
   href: string | undefined;
-  role: 'button' | 'link' | 'content';
+  role: 'button' | 'togglebutton' | 'link' | 'content';
   showAltText: boolean;
   actionCall: () => void | undefined;
   focusCall: (...args: any[]) => void | undefined;
   disabled: boolean;
   debug: boolean;
   a11yElStyle: Object;
-  pressed: boolean;
+  startPressed: boolean;
   hidden: boolean;
 }
 
@@ -50,7 +50,7 @@ export const A11y: React.FC<Props> = ({
   disabled,
   debug,
   a11yElStyle,
-  pressed,
+  startPressed,
   hidden,
   ...props
 }) => {
@@ -74,7 +74,7 @@ export const A11y: React.FC<Props> = ({
   const [a11yState, setA11yState] = useState({
     hovered: false,
     focused: false,
-    pressed: pressed ? pressed : false,
+    pressed: startPressed ? startPressed : false,
   });
 
   const a11yScreenReader = useAnnounceStore(state => state.a11yScreenReader);
@@ -161,14 +161,13 @@ export const A11y: React.FC<Props> = ({
   }
 
   const returnHtmlA11yEl = () => {
-    if (role === 'button') {
+    if (role === 'button' || role === 'togglebutton') {
       let disabledBtnAttr = disabled
         ? {
             disabled: true,
           }
         : null;
-      if (pressed === true || pressed === false) {
-        //is a toggle button
+      if (role === 'togglebutton') {
         return (
           <button
             r3f-a11y="true"
@@ -341,7 +340,7 @@ export const A11y: React.FC<Props> = ({
     tabIndex,
     href,
     disabled,
-    pressed,
+    startPressed,
     actionCall,
     focusCall,
   ]);
@@ -394,11 +393,9 @@ export const A11y: React.FC<Props> = ({
             return;
           }
           if (role === 'button') {
-            if (pressed === true || pressed === false) {
-              handleToggleBtnClick();
-            } else {
-              handleBtnClick();
-            }
+            handleBtnClick();
+          } else if (role === 'togglebutton') {
+            handleToggleBtnClick();
           }
           if (typeof actionCall === 'function') actionCall();
         }}
