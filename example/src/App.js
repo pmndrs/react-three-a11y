@@ -2,7 +2,7 @@ import * as THREE from "three"
 import { Canvas, useFrame, useThree } from "react-three-fiber"
 import React, { Suspense, useCallback, useEffect, useRef, useContext } from "react"
 import { ContactShadows, Text, Html } from "@react-three/drei"
-import { A11y, useA11y, A11yAnnouncer, A11yUserPreferences, useUserPreferences, A11ySection } from "../../"
+import { A11y, useA11y, A11yAnnouncer, A11yUserPreferences, useUserPreferences, A11ySection, A11yDebuger } from "../../"
 import { ResizeObserver } from "@juggle/resize-observer"
 import { proxy, useProxy } from "valtio"
 import { Controls, useControl } from "react-three-gui"
@@ -89,12 +89,12 @@ function Shape({ index, active, ...props }) {
   const snap = useProxy(state)
   const vec = new THREE.Vector3()
   const ref = useRef()
-  const userPref = useUserPreferences()
+  const { a11yPrefersState } = useUserPreferences()
   useFrame((state, delta) => {
     if (snap.disabled) {
       return
     }
-    if (userPref.prefersReducedMotion) {
+    if (a11yPrefersState.prefersReducedMotion) {
       const s = active ? 2 : 1
       ref.current.scale.set(s, s, s)
       ref.current.rotation.y = ref.current.rotation.x = active ? 1.5 : 4
@@ -108,7 +108,7 @@ function Shape({ index, active, ...props }) {
   })
   return (
     <mesh rotation-y={index * 2000} ref={ref} {...props} geometry={geometries[index]}>
-      <meshPhongMaterial color={userPref.prefersDarkScheme ? "#000000" : "#ffffff"} />
+      <meshPhongMaterial color={a11yPrefersState.prefersDarkScheme ? "#000000" : "#ffffff"} />
     </mesh>
   )
 }
@@ -150,9 +150,9 @@ function Carroussel() {
   const snap = useProxy(state)
   const group = useRef()
   const radius = Math.min(6, viewport.width / 5)
-  const userPref = useUserPreferences()
+  const { a11yPrefersState } = useUserPreferences()
   useFrame(() => {
-    if (userPref.prefersReducedMotion) {
+    if (a11yPrefersState.prefersReducedMotion) {
       group.current.rotation.y = snap.rotation - Math.PI / 2
     } else {
       group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, snap.rotation - Math.PI / 2, 0.1)
@@ -214,7 +214,8 @@ export default function App() {
     <main className={snap.dark ? "dark" : "bright"}>
       <Controls.Provider>
         <Controls.Canvas resize={{ polyfill: ResizeObserver }} camera={{ position: [0, 0, 15], near: 4, far: 30 }} pixelRatio={[1, 1.5]}>
-          <A11yUserPreferences>
+          <A11yUserPreferences debug={true}>
+            <A11yDebuger />
             {/* <ResponsiveText /> */}
             <pointLight position={[100, 100, 100]} intensity={snap.disabled ? 0.2 : 0.5} />
             <pointLight position={[-100, -100, -100]} intensity={1.5} color="red" />
