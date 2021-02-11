@@ -4,7 +4,7 @@
 [![Downloads](https://img.shields.io/npm/dt/@react-three/a11y.svg?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/@react-three/a11y)
 [![Discord Shield](https://img.shields.io/discord/740090768164651008?style=flat&colorA=000000&colorB=000000&label=discord&logo=discord&logoColor=ffffff)](https://discord.gg/ZZjjNvJ)
 
-![Imgur](https://imgur.com/FdZ3jmW.jpg)
+![Imgur](https://i.imgur.com/sSAD7m7.png)
 
 ```bash
 npm install @react-three/a11y
@@ -162,6 +162,24 @@ This role is meant to emulate the behaviour of a regular html link. It should be
 ## Screen Reader Support
 
 In order to provide informations to screen reader users and use this package at its full potential, fill the `description` prop of all your `A11y` components and use the appropriate `role` prop on each of them.
+
+### Use of section 
+
+For screen readears, it might be useful to provide additionnal information on how to use some unconventional UI.
+You can do it by wrapping the concerned part of your code relative to this UI in the A11ySection like so.
+```jsx
+<A11ySection
+            label="Shape carousel"
+            description="This carousel contains 5 shapes. Use the Previous and Next buttons to cycle through all the shapes.">
+           [...]
+</A11ySection>
+```
+## Access user preferences
+
+The A11yUserPreferences component i available in order to access user preferences such as 
+- prefers-reduced-motion
+- prefers-color-scheme
+Take a look at the [demo](https://n4rzi.csb.app) to see it in action and how to use it. The demo will adapt to your system preferences.
 
 ## Additionals Features
 
