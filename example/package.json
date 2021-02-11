@@ -10,7 +10,11 @@
     "@pmndrs/branding": "0.0.4",
     "@react-three/drei": "2.2.15",
     "@react-three/postprocessing": "1.5.1",
+    "react": ">=16",
     "react-scripts": "4.0.1",
+    "react-three-fiber": "*",
+    "react-three-gui": "^0.4.2",
+    "three": "*",
     "valtio": "0.6.0"
   },
   "alias": {

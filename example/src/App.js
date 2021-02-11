@@ -1,14 +1,15 @@
 import * as THREE from "three"
 import { Canvas, useFrame, useThree } from "react-three-fiber"
-import React, { Suspense, useRef } from "react"
-import { ContactShadows } from "@react-three/drei"
-import { A11y, useA11y, A11yAnnouncer, A11yUserPreferences, useUserPreferences } from "../../"
+import React, { Suspense, useCallback, useEffect, useRef, useContext } from "react"
+import { ContactShadows, Text, Html } from "@react-three/drei"
+import { A11y, useA11y, A11yAnnouncer, A11yUserPreferences, useUserPreferences, A11ySection, A11yDebuger } from "../../"
 import { ResizeObserver } from "@juggle/resize-observer"
 import { proxy, useProxy } from "valtio"
+import { Controls, useControl } from "react-three-gui"
 import { EffectComposer, SSAO, SMAA } from "@react-three/postprocessing"
-import { Badge } from "@pmndrs/branding"
+import { Badge, Logo, LogoFull } from "@pmndrs/branding"
 
-const state = proxy({ dark: false, active: 0, rotation: 0, disabled: false })
+const state = proxy({ dark: false, active: 0, rotation: 0, disabled: false, section: undefined })
 const geometries = [
   new THREE.SphereBufferGeometry(1, 32, 32),
   new THREE.TetrahedronBufferGeometry(1.5),
@@ -62,7 +63,7 @@ function Nav({ left }) {
   return (
     <A11y
       role="button"
-      description={`Press to show the ${left ? "left" : "right"} shape`}
+      description={`Spin ${left ? "left" : "right"} shape`}
       activationMsg="shape showing"
       actionCall={() => {
         state.rotation = snap.rotation + ((Math.PI * 2) / 5) * (left ? -1 : 1)
@@ -88,12 +89,12 @@ function Shape({ index, active, ...props }) {
   const snap = useProxy(state)
   const vec = new THREE.Vector3()
   const ref = useRef()
-  const userPref = useUserPreferences()
+  const { a11yPrefersState } = useUserPreferences()
   useFrame((state, delta) => {
     if (snap.disabled) {
       return
     }
-    if (userPref.prefersReducedMotion) {
+    if (a11yPrefersState.prefersReducedMotion) {
       const s = active ? 2 : 1
       ref.current.scale.set(s, s, s)
       ref.current.rotation.y = ref.current.rotation.x = active ? 1.5 : 4
@@ -107,19 +108,51 @@ function Shape({ index, active, ...props }) {
   })
   return (
     <mesh rotation-y={index * 2000} ref={ref} {...props} geometry={geometries[index]}>
-      <meshPhongMaterial color={userPref.prefersDarkScheme ? "#000000" : "#ffffff"} />
+      <meshPhongMaterial color={a11yPrefersState.prefersDarkScheme ? "#000000" : "#ffffff"} />
     </mesh>
   )
 }
+
+// const ResponsiveText = () => {
+//   const { viewport } = useThree()
+//   const posX = useControl("posX", { type: "number", value: 0, min: -20, max: 20 })
+//   const posY = useControl("posY", { type: "number", value: 0, min: -20, max: 20 })
+//   const posZ = useControl("posZ", { type: "number", value: 0, min: -20, max: 20 })
+//   const color = useControl("color", { type: "color", value: "#EC2D2D" })
+//   const fontSize = useControl("fontSize", { type: "number", value: 16.5, min: 1, max: 100 })
+//   const maxWidth = useControl("maxWidth", { type: "number", value: 90, min: 1, max: 100 })
+//   const lineHeight = useControl("lineHeight", { type: "number", value: 0.75, min: 0.1, max: 10 })
+//   const letterSpacing = useControl("spacing", { type: "number", value: -0.08, min: -0.5, max: 1 })
+//   const textAlign = useControl("textAlign", {
+//     type: "select",
+//     items: ["left", "right", "center", "justify"],
+//     value: "justify",
+//   })
+//   return (
+//     <Text
+//       position={[posX, posY, posZ]}
+//       color={color}
+//       fontSize={fontSize}
+//       maxWidth={(viewport.width / 100) * maxWidth}
+//       lineHeight={lineHeight}
+//       letterSpacing={letterSpacing}
+//       textAlign={textAlign}
+//       font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
+//       anchorX="center"
+//       anchorY="middle">
+//       LOREM IPSUM DOLOR SIT AMET, CONSECTETUR ADIPISCING ELIT
+//     </Text>
+//   )
+// }
 
 function Carroussel() {
   const { viewport } = useThree()
   const snap = useProxy(state)
   const group = useRef()
   const radius = Math.min(6, viewport.width / 5)
-  const userPref = useUserPreferences()
+  const { a11yPrefersState } = useUserPreferences()
   useFrame(() => {
-    if (userPref.prefersReducedMotion) {
+    if (a11yPrefersState.prefersReducedMotion) {
       group.current.rotation.y = snap.rotation - Math.PI / 2
     } else {
       group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, snap.rotation - Math.PI / 2, 0.1)
@@ -128,7 +161,7 @@ function Carroussel() {
   return (
     <group ref={group}>
       {["sphere", "pyramid", "donut", "octahedron", "icosahedron"].map((name, i) => (
-        <A11y key={name} role="content" description={`a ${name}`} tabIndex={-1}>
+        <A11y key={name} role="content" description={`a ${name}`} tabIndex={-1} hidden={snap.active !== i}>
           <Shape
             index={i}
             position={[radius * Math.cos(i * ((Math.PI * 2) / 5)), 0, radius * Math.sin(i * ((Math.PI * 2) / 5))]}
@@ -141,53 +174,77 @@ function Carroussel() {
   )
 }
 
-export default function App() {
+const CarrousselAll = () => {
   const snap = useProxy(state)
+
+  return (
+    <>
+      <A11ySection
+        label="Shape carousel"
+        description="This carousel contains 5 shapes. Use the Previous and Next buttons to cycle through all the shapes.">
+        <Nav left />
+        <Carroussel />
+        <Nav />
+        <Floor />
+        <A11y
+          role="togglebutton"
+          description="Light lowering button"
+          pressedDescription="Light lowering button, activated"
+          actionCall={() => (state.dark = !snap.dark)}
+          activationMsg="Lower light enabled"
+          deactivationMsg="Lower light disabled"
+          disabled={snap.disabled}
+          debug={true}
+          a11yElStyle={{ marginLeft: "-40px" }}>
+          <ToggleButton position={[0, -3, 9]} />
+        </A11y>
+      </A11ySection>
+    </>
+  )
+}
+
+export default function App() {
+  // const sectionRef = useCallback(node => {
+  //   console.log(node)
+  //   sectionRefref.current = node
+  // }, [])
+  const snap = useProxy(state)
+
   return (
     <main className={snap.dark ? "dark" : "bright"}>
-      <Canvas resize={{ polyfill: ResizeObserver }} camera={{ position: [0, 0, 15], near: 4, far: 30 }} pixelRatio={[1, 1.5]}>
-        <A11yUserPreferences>
-          <pointLight position={[100, 100, 100]} intensity={snap.disabled ? 0.2 : 0.5} />
-          <pointLight position={[-100, -100, -100]} intensity={1.5} color="red" />
-          <ambientLight intensity={snap.disabled ? 0.2 : 0.8} />
-          <group position-y={2}>
-            <Nav left />
-            <Nav />
-            <Carroussel />
-            <Floor />
-            <A11y
-              role="button"
-              description="Light lowering button"
-              pressedDescription="Light lowering button, activated"
-              actionCall={() => (state.dark = !snap.dark)}
-              activationMsg="Lower light enabled"
-              deactivationMsg="Lower light disabled"
-              disabled={snap.disabled}
-              debug={true}
-              a11yElStyle={{ marginLeft: "-40px" }}>
-              <ToggleButton position={[0, -3, 9]} />
-            </A11y>
-            <A11y
-              role="button"
-              pressed={false}
-              description="Power button, click to disable the scene"
-              pressedDescription="Power button, click to turn on the scene"
-              actionCall={() => (state.disabled = !snap.disabled)}
-              activationMsg="Scene activated"
-              deactivationMsg="Scene disabled">
-              <SwitchButton position={[-3, -5, 7]} />
-            </A11y>
-          </group>
-          {/* <Suspense fallback={null}>
+      <Controls.Provider>
+        <Controls.Canvas resize={{ polyfill: ResizeObserver }} camera={{ position: [0, 0, 15], near: 4, far: 30 }} pixelRatio={[1, 1.5]}>
+          <A11yUserPreferences debug={true}>
+            <A11yDebuger />
+            {/* <ResponsiveText /> */}
+            <pointLight position={[100, 100, 100]} intensity={snap.disabled ? 0.2 : 0.5} />
+            <pointLight position={[-100, -100, -100]} intensity={1.5} color="red" />
+            <ambientLight intensity={snap.disabled ? 0.2 : 0.8} />
+            <group position-y={2}>
+              <CarrousselAll />
+              <A11y
+                role="togglebutton"
+                startPressed={false}
+                description="Power button, click to disable the scene"
+                pressedDescription="Power button, click to turn on the scene"
+                actionCall={() => (state.disabled = !snap.disabled)}
+                activationMsg="Scene activated"
+                deactivationMsg="Scene disabled">
+                <SwitchButton position={[-3, -5, 7]} />
+              </A11y>
+            </group>
+            {/* <Suspense fallback={null}>
           <EffectComposer multisampling={0}>
             <SSAO radius={20} intensity={50} luminanceInfluence={0.1} color="#154073" />
             <SMAA />
           </EffectComposer>
         </Suspense> */}
-        </A11yUserPreferences>
-      </Canvas>
-      <Badge />
-      <A11yAnnouncer />
+          </A11yUserPreferences>
+        </Controls.Canvas>
+        <Controls />
+        <Badge />
+        <A11yAnnouncer />
+      </Controls.Provider>
     </main>
   )
 }

@@ -33,7 +33,7 @@ export const A11yAnnouncer: React.FC = () => {
   });
 
   return (
-    <div style={offScreenStyle} aria-atomic="true" aria-live="assertive">
+    <div style={offScreenStyle} aria-atomic="true" aria-live="polite">
       {message}
     </div>
   );

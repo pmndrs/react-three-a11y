@@ -2,22 +2,24 @@ import React, { useEffect, useRef, useState, useContext } from 'react';
 import { useThree } from 'react-three-fiber';
 import { Html } from '@react-three/drei/Html';
 import useAnnounceStore from './announceStore';
+import { useA11ySectionContext } from './A11ySection';
 
 interface Props {
   children: React.ReactNode;
   description: string;
-  pressedDescription: string;
   activationMsg: string;
   deactivationMsg: string;
   tabIndex: number;
   href: string | undefined;
-  role: 'button' | 'link' | 'content';
+  role: 'button' | 'togglebutton' | 'link' | 'content';
   showAltText: boolean;
   actionCall: () => void | undefined;
   focusCall: (...args: any[]) => void | undefined;
   disabled: boolean;
   debug: boolean;
   a11yElStyle: Object;
+  startPressed: boolean;
+  hidden: boolean;
 }
 
 const A11yContext = React.createContext({
@@ -37,7 +39,6 @@ export { useA11y };
 export const A11y: React.FC<Props> = ({
   children,
   description,
-  pressedDescription,
   activationMsg,
   deactivationMsg,
   tabIndex,
@@ -49,6 +50,8 @@ export const A11y: React.FC<Props> = ({
   disabled,
   debug,
   a11yElStyle,
+  startPressed,
+  hidden,
   ...props
 }) => {
   let constHiddenButScreenreadable = Object.assign(
@@ -71,14 +74,13 @@ export const A11y: React.FC<Props> = ({
   const [a11yState, setA11yState] = useState({
     hovered: false,
     focused: false,
-    pressed: false,
+    pressed: startPressed ? startPressed : false,
   });
 
   const a11yScreenReader = useAnnounceStore(state => state.a11yScreenReader);
 
   const overHtml = useRef(false);
   const overMesh = useRef(false);
-  const didMouseOverAnnounce = useRef(false);
 
   const {
     gl: { domElement },
@@ -102,17 +104,6 @@ export const A11y: React.FC<Props> = ({
       overHtml.current = true;
     }
     if (overHtml.current || overMesh.current) {
-      // @ts-ignore
-      if (didMouseOverAnnounce.current) {
-        return;
-      }
-      if (a11yState.pressed) {
-        didMouseOverAnnounce.current = true;
-        a11yScreenReader(pressedDescription);
-      } else {
-        didMouseOverAnnounce.current = true;
-        a11yScreenReader(description);
-      }
       if (role !== 'content' && !disabled) {
         domElement.style.cursor = 'pointer';
       }
@@ -132,7 +123,6 @@ export const A11y: React.FC<Props> = ({
       overHtml.current = false;
     }
     if (!overHtml.current && !overMesh.current) {
-      didMouseOverAnnounce.current = false;
       if (componentIsMounted.current) {
         domElement.style.cursor = 'default';
         //@ts-ignore
@@ -143,7 +133,6 @@ export const A11y: React.FC<Props> = ({
         });
       }
     }
-    a11yScreenReader('');
   };
 
   function handleBtnClick() {
@@ -171,19 +160,25 @@ export const A11y: React.FC<Props> = ({
     if (typeof actionCall === 'function') actionCall();
   }
 
-  const HtmlFocusableElement = (() => {
-    if (role === 'button') {
-      if (deactivationMsg || pressedDescription) {
-        //btn has two distinct state
+  const returnHtmlA11yEl = () => {
+    if (role === 'button' || role === 'togglebutton') {
+      let disabledBtnAttr = disabled
+        ? {
+            disabled: true,
+          }
+        : null;
+      if (role === 'togglebutton') {
         return (
           <button
             r3f-a11y="true"
-            aria-disabled={disabled ? 'true' : 'false'}
+            {...disabledBtnAttr}
             aria-pressed={a11yState.pressed ? 'true' : 'false'}
             tabIndex={tabIndex ? tabIndex : 0}
+            //@ts-ignore
             style={Object.assign(
               constHiddenButScreenreadable,
-              disabled ? { cursor: 'default' } : { cursor: 'pointer' }
+              disabled ? { cursor: 'default' } : { cursor: 'pointer' },
+              hidden ? { visibility: 'hidden' } : { visibility: 'visible' }
             )}
             onPointerOver={handleOnPointerOver}
             onPointerOut={handleOnPointerOut}
@@ -212,7 +207,7 @@ export const A11y: React.FC<Props> = ({
               });
             }}
           >
-            {didMouseOverAnnounce.current ? '' : description}
+            {description}
           </button>
         );
       } else {
@@ -220,11 +215,13 @@ export const A11y: React.FC<Props> = ({
         return (
           <button
             r3f-a11y="true"
-            aria-disabled={disabled ? 'true' : 'false'}
+            {...disabledBtnAttr}
             tabIndex={tabIndex ? tabIndex : 0}
+            //@ts-ignore
             style={Object.assign(
               constHiddenButScreenreadable,
-              disabled ? { cursor: 'default' } : { cursor: 'pointer' }
+              disabled ? { cursor: 'default' } : { cursor: 'pointer' },
+              hidden ? { visibility: 'hidden' } : { visibility: 'visible' }
             )}
             onPointerOver={handleOnPointerOver}
             onPointerOut={handleOnPointerOut}
@@ -253,7 +250,7 @@ export const A11y: React.FC<Props> = ({
               });
             }}
           >
-            {didMouseOverAnnounce.current ? '' : description}
+            {description}
           </button>
         );
       }
@@ -261,7 +258,11 @@ export const A11y: React.FC<Props> = ({
       return (
         <a
           r3f-a11y="true"
-          style={constHiddenButScreenreadable}
+          //@ts-ignore
+          style={Object.assign(
+            constHiddenButScreenreadable,
+            hidden ? { visibility: 'hidden' } : { visibility: 'visible' }
+          )}
           href={href}
           onPointerOver={handleOnPointerOver}
           onPointerOut={handleOnPointerOut}
@@ -288,15 +289,24 @@ export const A11y: React.FC<Props> = ({
             });
           }}
         >
-          {didMouseOverAnnounce.current ? '' : description}
+          {description}
         </a>
       );
     } else {
+      let tabIndexP = tabIndex
+        ? {
+            tabIndex: tabIndex,
+          }
+        : null;
       return (
         <p
           r3f-a11y="true"
-          tabIndex={tabIndex ? tabIndex : 0}
-          style={constHiddenButScreenreadable}
+          {...tabIndexP}
+          //@ts-ignore
+          style={Object.assign(
+            constHiddenButScreenreadable,
+            hidden ? { visibility: 'hidden' } : { visibility: 'visible' }
+          )}
           onPointerOver={handleOnPointerOver}
           onPointerOut={handleOnPointerOut}
           onBlur={() => {
@@ -317,11 +327,23 @@ export const A11y: React.FC<Props> = ({
             });
           }}
         >
-          {didMouseOverAnnounce.current ? '' : description}
+          {description}
         </p>
       );
     }
-  })();
+  };
+
+  const HtmlAccessibleElement = React.useMemo(returnHtmlA11yEl, [
+    description,
+    a11yState,
+    hidden,
+    tabIndex,
+    href,
+    disabled,
+    startPressed,
+    actionCall,
+    focusCall,
+  ]);
 
   let AltText = null;
   if (showAltText && a11yState.hovered) {
@@ -347,11 +369,13 @@ export const A11y: React.FC<Props> = ({
             margin: '0px',
           }}
         >
-          {didMouseOverAnnounce.current ? '' : description}
+          {description}
         </p>
       </div>
     );
   }
+
+  const section = useA11ySectionContext();
 
   return (
     <A11yContext.Provider
@@ -369,11 +393,9 @@ export const A11y: React.FC<Props> = ({
             return;
           }
           if (role === 'button') {
-            if (deactivationMsg || pressedDescription) {
-              handleToggleBtnClick();
-            } else {
-              handleBtnClick();
-            }
+            handleBtnClick();
+          } else if (role === 'togglebutton') {
+            handleToggleBtnClick();
           }
           if (typeof actionCall === 'function') actionCall();
         }}
@@ -387,9 +409,10 @@ export const A11y: React.FC<Props> = ({
             // @ts-ignore
             children.props.position ? children.props.position : [0, 0, 0]
           }
+          portal={section}
         >
           {AltText}
-          {HtmlFocusableElement}
+          {HtmlAccessibleElement}
         </Html>
       </group>
     </A11yContext.Provider>
