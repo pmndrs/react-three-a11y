@@ -141,7 +141,7 @@ Uses the `pointer` cursor. Special attributes: `activationMsg`, `deactivationMsg
 
 This role is meant to emulate the behaviour of a button or a togglable button. It will display a cursor pointer when your cursor is over the linked 3D object. It will call a function on click but also on any kind of action that would trigger a focused button (Enter, Double-Tap, ...). It is also actionnable by user using a screen reader.
 
-You can turn it into a button with aria-pressed by providing the following properties deactivationMsg, pressedDescription in addition to the usual description and activationMsg properties.
+You can turn it into a button with aria-pressed by using the role togglebutton, you'll then be able to use the following propertie deactivationMsg in addition to the usual description and activationMsg properties.
 
 #### Links
 
