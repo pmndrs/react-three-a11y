@@ -179,7 +179,8 @@ You can do it by wrapping the concerned part of your code relative to this UI in
 The A11yUserPreferences component i available in order to access user preferences such as 
 - prefers-reduced-motion
 - prefers-color-scheme
-Take a look at the [demo](https://n4rzi.csb.app) to see it in action and how to use it. The demo will adapt to your system preferences.
+
+Take a look at the [wiki section](https://github.com/pmndrs/react-three-a11y/wiki/Access-user-preferences) or the [demo](https://n4rzi.csb.app) to see it in action and how to use it. The demo will adapt to your system preferences.
 
 ## Additionals Features
 
