@@ -19,7 +19,7 @@ const useUserPreferences = () => {
   return useContext(A11yUserPreferencesContext);
 };
 
-export { useUserPreferences };
+export { useUserPreferences, A11yUserPreferencesContext };
 
 export const A11yUserPreferences: React.FC<Props> = ({ children, debug }) => {
   const [a11yPrefersState, setA11yPrefersState] = useState({
