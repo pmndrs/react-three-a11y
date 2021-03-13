@@ -40,7 +40,8 @@
     "react": ">=16",
     "react-dom": ">=16",
     "react-three-fiber": ">=5.0",
-    "three": "^0.124.0"
+    "three": "^0.124.0",
+    "three-stdlib": ">=1.0.0"
   },
   "dependencies": {
     "@react-three/drei": "4.0.0-beta.3",
