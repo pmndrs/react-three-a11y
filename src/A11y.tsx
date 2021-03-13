@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
 import { useThree } from 'react-three-fiber';
-import { Html } from '@react-three/drei/Html';
+import { Html } from '@react-three/drei/web/Html';
 import useAnnounceStore from './announceStore';
 import { useA11ySectionContext } from './A11ySection';
 
