@@ -18,7 +18,7 @@
   },
   "author": "Alaric Baraou",
   "license": "MIT",
-  "main": "index.cjs.js",
+  "main": "dist/index.js",
   "module": "index.js",
   "sideEffects": false,
   "files": [
