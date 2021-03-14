@@ -1,8 +1,6 @@
-import React, { useLayoutEffect, useEffect, useState, useContext } from 'react';
-import * as ReactDOM from 'react-dom';
+import React, { useEffect, useState, useContext } from 'react';
 interface Props {
   children: React.ReactNode;
-  debug: boolean;
 }
 
 const A11yUserPreferencesContext = React.createContext({
@@ -21,15 +19,13 @@ const useUserPreferences = () => {
 
 export { useUserPreferences, A11yUserPreferencesContext };
 
-export const A11yUserPreferences: React.FC<Props> = ({ children, debug }) => {
+export const A11yUserPreferences: React.FC<Props> = ({ children }) => {
   const [a11yPrefersState, setA11yPrefersState] = useState({
     prefersReducedMotion: false,
     prefersDarkScheme: false,
   });
-  const [el] = React.useState(() => document.createElement('div'));
 
   useEffect(() => {
-    document.body.appendChild(el);
     const prefersReducedMotionMediaQuery = window.matchMedia(
       '(prefers-reduced-motion: reduce)'
     );
@@ -74,24 +70,6 @@ export const A11yUserPreferences: React.FC<Props> = ({ children, debug }) => {
       );
     };
   }, []);
-
-  //@ts-ignore
-  let debugWindow = null;
-  if (debug) {
-    debugWindow = (
-      <input
-        type="checkbox"
-        id="subscribeNews"
-        name="subscribe"
-        value="newsletter"
-      />
-    );
-  }
-
-  useLayoutEffect(
-    //@ts-ignore
-    () => void ReactDOM.render(<></>, el)
-  );
 
   return (
     <A11yUserPreferencesContext.Provider
