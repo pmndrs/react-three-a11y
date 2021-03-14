@@ -18,8 +18,9 @@
   },
   "author": "Alaric Baraou",
   "license": "MIT",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "main": "index.cjs.js",
+  "module": "index.js",
+  "sideEffects": false,
   "files": [
     "dist",
     "src"
@@ -34,7 +35,7 @@
     "lint": "tsdx lint",
     "prepare": "tsdx build",
     "size": "size-limit",
-    "analyze": "size-limit --why"
+    "analyze": "tsdx build && size-limit --why"
   },
   "peerDependencies": {
     "react": ">=16",
@@ -58,7 +59,6 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "module": "dist/a11y.esm.js",
   "size-limit": [
     {
       "path": "dist/a11y.cjs.production.min.js",
