@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useContext } from 'react';
 import { useThree } from 'react-three-fiber';
 import useAnnounceStore from './announceStore';
 import { useA11ySectionContext } from './A11ySection';
-import { Html } from '@react-three/drei';
+import { Html } from '@react-three/drei/web/Html';
 
 interface Props {
   children: React.ReactNode;
