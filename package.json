@@ -43,13 +43,11 @@
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-three-fiber": ">=5.0",
-    "three": "^0.124.0",
-    "three-stdlib": ">=1.0.0"
+    "three": "^0.124.0"
   },
   "dependencies": {
-    "@react-three/drei": "4.0.0-beta.3",
-    "three-stdlib": ">=1.0.0",
-    "zustand": "^3.2.0"
+    "zustand": "^3.2.0",
+    "utility-types": "^3.10.0"
   },
   "husky": {
     "hooks": {
