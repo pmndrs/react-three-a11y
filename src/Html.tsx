@@ -65,7 +65,6 @@ export interface HtmlProps
     >,
     'ref'
   > {
-  center?: boolean;
   eps?: number;
   portal?: React.MutableRefObject<HTMLElement>;
   zIndexRange?: Array<number>;
@@ -78,7 +77,6 @@ export const Html = React.forwardRef(
       eps = 0.001,
       style,
       className,
-      center,
       portal,
       zIndexRange = [16777271, 0],
       ...props
@@ -90,8 +88,6 @@ export const Html = React.forwardRef(
     const group = React.useRef<Group>(null);
     const oldZoom = React.useRef(0);
     const oldPosition = React.useRef([0, 0]);
-    const transformOuterRef = React.useRef<HTMLDivElement>(null);
-    const transformInnerRef = React.useRef<HTMLDivElement>(null);
     const target = portal?.current ?? gl.domElement.parentNode;
 
     React.useEffect(() => {
@@ -113,29 +109,19 @@ export const Html = React.forwardRef(
     const styles: React.CSSProperties = React.useMemo(() => {
       return {
         position: 'absolute',
-        transform: center ? 'translate3d(-50%,-50%,0)' : 'none',
-        ...{
-          top: -size.height / 2,
-          left: -size.width / 2,
-          width: size.width,
-          height: size.height,
-        },
+        transform: 'none',
         ...style,
       };
-    }, [style, center, size]);
-
-    const transformInnerStyles: React.CSSProperties = React.useMemo(
-      () => ({ position: 'absolute', pointerEvents: 'auto', ...style }),
-      [style]
-    );
+    }, [style, size]);
 
     React.useLayoutEffect(() => {
       ReactDOM.render(
-        <div ref={transformOuterRef} style={styles}>
-          <div ref={transformInnerRef} style={transformInnerStyles}>
-            <div ref={ref} className={className} children={children} />
-          </div>
-        </div>,
+        <div
+          ref={ref}
+          style={styles}
+          className={className}
+          children={children}
+        />,
         el
       );
     });
@@ -144,6 +130,7 @@ export const Html = React.forwardRef(
       if (group.current) {
         camera.updateMatrixWorld();
         const vec = calculatePosition(group.current, camera, size);
+
         if (
           Math.abs(oldZoom.current - camera.zoom) > eps ||
           Math.abs(oldPosition.current[0] - vec[0]) > eps ||
@@ -157,8 +144,7 @@ export const Html = React.forwardRef(
             camera,
             zIndexRange
           )}`;
-          const scale = 1;
-          el.style.transform = `translate3d(${vec[0]}px,${vec[1]}px,0) scale(${scale})`;
+          el.style.transform = `translate3d(${vec[0]}px,${vec[1]}px,0) scale(1)`;
           oldPosition.current = vec;
           oldZoom.current = camera.zoom;
         }
