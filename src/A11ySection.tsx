@@ -50,16 +50,13 @@ export const A11ySection: React.FC<Props> = ({
       }
     }
     return () => {
-      console.log('unmount ta mere');
       if (target) target.removeChild(el);
     };
   }, [description, label]);
 
   if (ref.current === null) {
-    console.log('appendChild');
     //@ts-ignore
     target.appendChild(el);
-    debugger;
     //@ts-ignore
     ref.current = el;
   }
