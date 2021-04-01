@@ -27,15 +27,15 @@ export const A11ySection: React.FC<Props> = ({
   const gl = useThree(state => state.gl);
   const target = gl.domElement.parentNode;
 
-  useEffect(() => {
-    if (ref.current === null) {
-      const el = document.createElement('section');
-      //@ts-ignore
-      target.appendChild(el);
-      //@ts-ignore
-      ref.current = el;
-    }
+  if (ref.current === null) {
+    const el = document.createElement('section');
+    //@ts-ignore
+    target.appendChild(el);
+    //@ts-ignore
+    ref.current = el;
+  }
 
+  useEffect(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     if (label) {
       //@ts-ignore
