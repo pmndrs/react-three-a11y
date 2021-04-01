@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
-import { useThree } from 'react-three-fiber';
+import { useThree } from '@react-three/fiber';
 import useAnnounceStore from './announceStore';
 import { useA11ySectionContext } from './A11ySection';
 import { Html } from './Html';
@@ -82,9 +82,7 @@ export const A11y: React.FC<Props> = ({
   const overHtml = useRef(false);
   const overMesh = useRef(false);
 
-  const {
-    gl: { domElement },
-  } = useThree();
+  const domElement = useThree(state => state.gl.domElement);
 
   // temporary fix to prevent error -> keep track of our component's mounted state
   const componentIsMounted = useRef(true);
@@ -407,7 +405,7 @@ export const A11y: React.FC<Props> = ({
           style={{ width: '0px' }}
           position={
             // @ts-ignore
-            children.props.position ? children.props.position : [0, 0, 0]
+            children.props.position ? children.props.position : 0
           }
           portal={section}
         >

@@ -10,7 +10,7 @@ import {
   OrthographicCamera,
 } from 'three';
 import { Assign } from 'utility-types';
-import { ReactThreeFiber, useFrame, useThree } from 'react-three-fiber';
+import { ReactThreeFiber, useFrame, useThree } from '@react-three/fiber';
 
 const v1 = new Vector3();
 const v2 = new Vector3();
@@ -84,7 +84,10 @@ export const Html = React.forwardRef(
     }: HtmlProps,
     ref: React.Ref<HTMLDivElement>
   ) => {
-    const { gl, scene, camera, size } = useThree();
+    const gl = useThree(({ gl }) => gl);
+    const camera = useThree(({ camera }) => camera);
+    const scene = useThree(({ scene }) => scene);
+    const size = useThree(({ size }) => size);
     const [el] = React.useState(() => document.createElement('div'));
     const group = React.useRef<Group>(null);
     const oldZoom = React.useRef(0);
