@@ -1,11 +1,10 @@
 import * as THREE from "three"
-import { Canvas, useFrame, useThree } from "react-three-fiber"
+import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import React, { Suspense, useCallback, useEffect, useRef, useContext } from "react"
 import { ContactShadows, Text, Html } from "@react-three/drei"
 import { A11y, useA11y, A11yAnnouncer, A11yUserPreferences, useUserPreferences, A11ySection, A11yDebuger } from "../../"
 import { ResizeObserver } from "@juggle/resize-observer"
 import { proxy, useProxy } from "valtio"
-import { Controls, useControl } from "react-three-gui"
 import { EffectComposer, SSAO, SMAA } from "@react-three/postprocessing"
 import { Badge, Logo, LogoFull } from "@pmndrs/branding"
 
@@ -58,7 +57,7 @@ function Floor(props) {
 
 function Nav({ left }) {
   const snap = useProxy(state)
-  const { viewport } = useThree()
+  const viewport = useThree(state => state.viewport)
   const radius = Math.min(12, viewport.width / 2.5)
   return (
     <A11y
@@ -146,7 +145,7 @@ function Shape({ index, active, ...props }) {
 // }
 
 function Carroussel() {
-  const { viewport } = useThree()
+  const viewport = useThree(state => state.viewport)
   const snap = useProxy(state)
   const group = useRef()
   const radius = Math.min(6, viewport.width / 5)
@@ -212,39 +211,36 @@ export default function App() {
 
   return (
     <main className={snap.dark ? "dark" : "bright"}>
-      <Controls.Provider>
-        <Controls.Canvas resize={{ polyfill: ResizeObserver }} camera={{ position: [0, 0, 15], near: 4, far: 30 }} pixelRatio={[1, 1.5]}>
-          <A11yUserPreferences debug={true}>
-            <A11yDebuger />
-            {/* <ResponsiveText /> */}
-            <pointLight position={[100, 100, 100]} intensity={snap.disabled ? 0.2 : 0.5} />
-            <pointLight position={[-100, -100, -100]} intensity={1.5} color="red" />
-            <ambientLight intensity={snap.disabled ? 0.2 : 0.8} />
-            <group position-y={2}>
-              <CarrousselAll />
-              <A11y
-                role="togglebutton"
-                startPressed={false}
-                description="Power button, click to disable the scene"
-                pressedDescription="Power button, click to turn on the scene"
-                actionCall={() => (state.disabled = !snap.disabled)}
-                activationMsg="Scene activated"
-                deactivationMsg="Scene disabled">
-                <SwitchButton position={[-3, -5, 7]} />
-              </A11y>
-            </group>
-            {/* <Suspense fallback={null}>
+      <Canvas resize={{ polyfill: ResizeObserver }} camera={{ position: [0, 0, 15], near: 4, far: 30 }} pixelRatio={[1, 1.5]}>
+        <A11yUserPreferences debug={true}>
+          <A11yDebuger />
+          {/* <ResponsiveText /> */}
+          <pointLight position={[100, 100, 100]} intensity={snap.disabled ? 0.2 : 0.5} />
+          <pointLight position={[-100, -100, -100]} intensity={1.5} color="red" />
+          <ambientLight intensity={snap.disabled ? 0.2 : 0.8} />
+          <group position-y={2}>
+            <CarrousselAll />
+            <A11y
+              role="togglebutton"
+              startPressed={false}
+              description="Power button, click to disable the scene"
+              pressedDescription="Power button, click to turn on the scene"
+              actionCall={() => (state.disabled = !snap.disabled)}
+              activationMsg="Scene activated"
+              deactivationMsg="Scene disabled">
+              <SwitchButton position={[-3, -5, 7]} />
+            </A11y>
+          </group>
+          {/* <Suspense fallback={null}>
           <EffectComposer multisampling={0}>
             <SSAO radius={20} intensity={50} luminanceInfluence={0.1} color="#154073" />
             <SMAA />
           </EffectComposer>
         </Suspense> */}
-          </A11yUserPreferences>
-        </Controls.Canvas>
-        <Controls />
-        <Badge />
-        <A11yAnnouncer />
-      </Controls.Provider>
+        </A11yUserPreferences>
+      </Canvas>
+      <Badge />
+      <A11yAnnouncer />
     </main>
   )
 }

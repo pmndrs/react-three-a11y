@@ -40,14 +40,13 @@
     "build-storybook": "build-storybook"
   },
   "peerDependencies": {
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "react-three-fiber": ">=5.0",
-    "three": "^0.124.0"
+    "react": "^17.0",
+    "three": "^0.126.0"
   },
   "dependencies": {
-    "zustand": "^3.2.0",
-    "utility-types": "^3.10.0"
+    "@react-three/fiber": "^6.0.1",
+    "utility-types": "^3.10.0",
+    "zustand": "^3.2.0"
   },
   "husky": {
     "hooks": {
@@ -85,7 +84,6 @@
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-is": "^17.0.1",
-    "react-three-fiber": "5.3.11",
     "size-limit": "^4.10.1",
     "three": "^0.124.0",
     "tsdx": "^0.14.1",

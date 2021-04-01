@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef } from 'react';
-import { useThree } from 'react-three-fiber';
+import { useThree } from '@react-three/fiber';
 
 interface Props {
   children: React.ReactNode;
@@ -24,7 +24,7 @@ export const A11ySection: React.FC<Props> = ({
 }) => {
   const ref = useRef(null);
   const refpDesc = useRef(null);
-  const { gl } = useThree();
+  const gl = useThree(state => state.gl);
   const [el] = React.useState(() => document.createElement('section'));
   const target = gl.domElement.parentNode;
 
