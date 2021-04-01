@@ -40,11 +40,11 @@
     "build-storybook": "build-storybook"
   },
   "peerDependencies": {
+    "@react-three/fiber": "^6.0.1",
     "react": "^17.0",
     "three": "^0.126.0"
   },
   "dependencies": {
-    "@react-three/fiber": "^6.0.1",
     "utility-types": "^3.10.0",
     "zustand": "^3.2.0"
   },
