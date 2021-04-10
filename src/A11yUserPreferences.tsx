@@ -13,7 +13,7 @@ const A11yUserPreferencesContext = React.createContext({
     prefersReducedMotion: false,
     prefersDarkScheme: false,
   },
-  setA11yPrefersState: (state: aasetA11yPrefersState) => {}, // disable-eslint-line
+  setA11yPrefersState: (_state: aasetA11yPrefersState) => {},
 });
 
 A11yUserPreferencesContext.displayName = 'A11yUserPreferencesContext';
