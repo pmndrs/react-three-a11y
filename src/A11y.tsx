@@ -401,6 +401,10 @@ export const A11y: React.FC<Props> = ({
   }
 
   const section = useA11ySectionContext();
+  let portal = {};
+  if (section instanceof HTMLElement) {
+    portal = { portal: section };
+  }
 
   return (
     <A11yContext.Provider
@@ -434,7 +438,7 @@ export const A11y: React.FC<Props> = ({
             // @ts-ignore
             children.props.position ? children.props.position : 0
           }
-          portal={section}
+          {...portal}
         >
           {AltText}
           {HtmlAccessibleElement}
