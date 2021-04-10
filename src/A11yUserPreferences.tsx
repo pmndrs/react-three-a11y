@@ -3,12 +3,19 @@ interface Props {
   children: React.ReactNode;
 }
 
+type aasetA11yPrefersState = {
+  prefersReducedMotion: boolean;
+  prefersDarkScheme: boolean;
+};
+
 const A11yUserPreferencesContext = React.createContext({
   a11yPrefersState: {
     prefersReducedMotion: false,
     prefersDarkScheme: false,
   },
-  setA11yPrefersState: () => {},
+  // tslint:disable:no-unused-variable
+  setA11yPrefersState: (_state: aasetA11yPrefersState) => {},
+  // tslint:enable:no-unused-variable
 });
 
 A11yUserPreferencesContext.displayName = 'A11yUserPreferencesContext';
@@ -78,7 +85,6 @@ export const A11yUserPreferences: React.FC<Props> = ({ children }) => {
           prefersReducedMotion: a11yPrefersState.prefersReducedMotion,
           prefersDarkScheme: a11yPrefersState.prefersDarkScheme,
         },
-        //@ts-ignore
         setA11yPrefersState: setA11yPrefersState,
       }}
     >

@@ -4,23 +4,57 @@ import useAnnounceStore from './announceStore';
 import { useA11ySectionContext } from './A11ySection';
 import { Html } from './Html';
 
-interface Props {
+interface A11yCommonProps {
+  role: 'button' | 'togglebutton' | 'link' | 'content';
   children: React.ReactNode;
   description: string;
-  activationMsg: string;
-  deactivationMsg: string;
-  tabIndex: number;
-  href: string | undefined;
-  role: 'button' | 'togglebutton' | 'link' | 'content';
-  showAltText: boolean;
-  actionCall: () => void | undefined;
-  focusCall: (...args: any[]) => void | undefined;
-  disabled: boolean;
-  debug: boolean;
-  a11yElStyle: Object;
-  startPressed: boolean;
-  hidden: boolean;
+  tabIndex?: number;
+  showAltText?: boolean;
+  focusCall?: (...args: any[]) => any;
+  debug?: boolean;
+  a11yElStyle?: Object;
+  hidden?: boolean;
 }
+
+type RoleProps =
+  | {
+      role: 'content';
+      activationMsg?: never;
+      deactivationMsg?: never;
+      actionCall?: never;
+      href?: never;
+      disabled?: never;
+      startPressed?: never;
+    }
+  | {
+      role: 'button';
+      activationMsg?: string;
+      deactivationMsg?: never;
+      actionCall?: () => any;
+      href?: never;
+      disabled?: boolean;
+      startPressed?: never;
+    }
+  | {
+      role: 'togglebutton';
+      activationMsg?: string;
+      deactivationMsg?: string;
+      actionCall?: () => any;
+      href?: never;
+      disabled?: boolean;
+      startPressed?: boolean;
+    }
+  | {
+      role: 'link';
+      activationMsg?: never;
+      deactivationMsg?: never;
+      actionCall: () => any;
+      href: string;
+      disabled?: never;
+      startPressed?: never;
+    };
+
+type Props = A11yCommonProps & RoleProps;
 
 const A11yContext = React.createContext({
   focus: false,
@@ -44,14 +78,14 @@ export const A11y: React.FC<Props> = ({
   tabIndex,
   href,
   role,
-  showAltText,
+  showAltText = false,
   actionCall,
   focusCall,
   disabled,
-  debug,
+  debug = false,
   a11yElStyle,
-  startPressed,
-  hidden,
+  startPressed = false,
+  hidden = false,
   ...props
 }) => {
   let constHiddenButScreenreadable = Object.assign(
@@ -105,7 +139,6 @@ export const A11y: React.FC<Props> = ({
       if (role !== 'content' && !disabled) {
         domElement.style.cursor = 'pointer';
       }
-      //@ts-ignore
       setA11yState({
         hovered: true,
         focused: a11yState.focused,
@@ -123,7 +156,6 @@ export const A11y: React.FC<Props> = ({
     if (!overHtml.current && !overMesh.current) {
       if (componentIsMounted.current) {
         domElement.style.cursor = 'default';
-        //@ts-ignore
         setA11yState({
           hovered: false,
           focused: a11yState.focused,
@@ -136,20 +168,19 @@ export const A11y: React.FC<Props> = ({
   function handleBtnClick() {
     //msg is the same need to be clean for it to trigger again in case of multiple press in a row
     a11yScreenReader('');
-    // @ts-ignore
     window.setTimeout(() => {
-      a11yScreenReader(activationMsg);
+      if (typeof activationMsg === 'string') a11yScreenReader(activationMsg);
     }, 100);
     if (typeof actionCall === 'function') actionCall();
   }
 
   function handleToggleBtnClick() {
     if (a11yState.pressed) {
-      a11yScreenReader(deactivationMsg);
+      if (typeof deactivationMsg === 'string')
+        a11yScreenReader(deactivationMsg);
     } else {
-      a11yScreenReader(activationMsg);
+      if (typeof activationMsg === 'string') a11yScreenReader(activationMsg);
     }
-    //@ts-ignore
     setA11yState({
       hovered: a11yState.hovered,
       focused: a11yState.focused,
@@ -172,11 +203,12 @@ export const A11y: React.FC<Props> = ({
             {...disabledBtnAttr}
             aria-pressed={a11yState.pressed ? 'true' : 'false'}
             tabIndex={tabIndex ? tabIndex : 0}
-            //@ts-ignore
             style={Object.assign(
               constHiddenButScreenreadable,
               disabled ? { cursor: 'default' } : { cursor: 'pointer' },
-              hidden ? { visibility: 'hidden' } : { visibility: 'visible' }
+              hidden
+                ? { visibility: 'hidden' as const }
+                : { visibility: 'visible' as const }
             )}
             onPointerOver={handleOnPointerOver}
             onPointerOut={handleOnPointerOut}
@@ -189,7 +221,6 @@ export const A11y: React.FC<Props> = ({
             }}
             onFocus={() => {
               if (typeof focusCall === 'function') focusCall();
-              //@ts-ignore
               setA11yState({
                 hovered: a11yState.hovered,
                 focused: true,
@@ -197,7 +228,6 @@ export const A11y: React.FC<Props> = ({
               });
             }}
             onBlur={() => {
-              //@ts-ignore
               setA11yState({
                 hovered: a11yState.hovered,
                 focused: false,
@@ -215,11 +245,12 @@ export const A11y: React.FC<Props> = ({
             r3f-a11y="true"
             {...disabledBtnAttr}
             tabIndex={tabIndex ? tabIndex : 0}
-            //@ts-ignore
             style={Object.assign(
               constHiddenButScreenreadable,
               disabled ? { cursor: 'default' } : { cursor: 'pointer' },
-              hidden ? { visibility: 'hidden' } : { visibility: 'visible' }
+              hidden
+                ? { visibility: 'hidden' as const }
+                : { visibility: 'visible' as const }
             )}
             onPointerOver={handleOnPointerOver}
             onPointerOut={handleOnPointerOut}
@@ -232,7 +263,6 @@ export const A11y: React.FC<Props> = ({
             }}
             onFocus={() => {
               if (typeof focusCall === 'function') focusCall();
-              //@ts-ignore
               setA11yState({
                 hovered: a11yState.hovered,
                 focused: true,
@@ -240,7 +270,6 @@ export const A11y: React.FC<Props> = ({
               });
             }}
             onBlur={() => {
-              //@ts-ignore
               setA11yState({
                 hovered: a11yState.hovered,
                 focused: false,
@@ -256,10 +285,11 @@ export const A11y: React.FC<Props> = ({
       return (
         <a
           r3f-a11y="true"
-          //@ts-ignore
           style={Object.assign(
             constHiddenButScreenreadable,
-            hidden ? { visibility: 'hidden' } : { visibility: 'visible' }
+            hidden
+              ? { visibility: 'hidden' as const }
+              : { visibility: 'visible' as const }
           )}
           href={href}
           onPointerOver={handleOnPointerOver}
@@ -271,7 +301,6 @@ export const A11y: React.FC<Props> = ({
           }}
           onFocus={() => {
             if (typeof focusCall === 'function') focusCall();
-            //@ts-ignore
             setA11yState({
               hovered: a11yState.hovered,
               focused: true,
@@ -279,7 +308,6 @@ export const A11y: React.FC<Props> = ({
             });
           }}
           onBlur={() => {
-            //@ts-ignore
             setA11yState({
               hovered: a11yState.hovered,
               focused: false,
@@ -300,15 +328,15 @@ export const A11y: React.FC<Props> = ({
         <p
           r3f-a11y="true"
           {...tabIndexP}
-          //@ts-ignore
           style={Object.assign(
             constHiddenButScreenreadable,
-            hidden ? { visibility: 'hidden' } : { visibility: 'visible' }
+            hidden
+              ? { visibility: 'hidden' as const }
+              : { visibility: 'visible' as const }
           )}
           onPointerOver={handleOnPointerOver}
           onPointerOut={handleOnPointerOut}
           onBlur={() => {
-            //@ts-ignore
             setA11yState({
               hovered: a11yState.hovered,
               focused: false,
@@ -317,7 +345,6 @@ export const A11y: React.FC<Props> = ({
           }}
           onFocus={() => {
             if (typeof focusCall === 'function') focusCall();
-            //@ts-ignore
             setA11yState({
               hovered: a11yState.hovered,
               focused: true,
@@ -374,6 +401,10 @@ export const A11y: React.FC<Props> = ({
   }
 
   const section = useA11ySectionContext();
+  let portal = {};
+  if (section instanceof HTMLElement) {
+    portal = { portal: section };
+  }
 
   return (
     <A11yContext.Provider
@@ -407,7 +438,7 @@ export const A11y: React.FC<Props> = ({
             // @ts-ignore
             children.props.position ? children.props.position : 0
           }
-          portal={section}
+          {...portal}
         >
           {AltText}
           {HtmlAccessibleElement}
