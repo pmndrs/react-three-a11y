@@ -22,8 +22,9 @@ export const A11yAnnouncer: React.FC = () => {
         window.document.activeElement?.getAttribute('r3f-a11y') &&
         e.detail !== 0
       ) {
-        //@ts-ignore
-        window.document.activeElement.blur();
+        if (window.document.activeElement instanceof HTMLElement) {
+          window.document.activeElement.blur();
+        }
       }
     };
     window.addEventListener('click', mouseClickListener);

@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useRef } from 'react';
+import React, {
+  useContext,
+  useEffect,
+  useRef,
+  MutableRefObject,
+  createRef,
+} from 'react';
 import { useThree } from '@react-three/fiber';
 
 interface Props {
@@ -7,7 +13,9 @@ interface Props {
   description: string;
 }
 
-const A11ySectionContext = React.createContext(undefined);
+const A11ySectionContext = React.createContext<
+  MutableRefObject<HTMLElement | null>
+>(createRef());
 
 A11ySectionContext.displayName = 'A11ySectionContext';
 
@@ -22,8 +30,8 @@ export const A11ySection: React.FC<Props> = ({
   label,
   description,
 }) => {
-  const ref = useRef(null);
-  const refpDesc = useRef(null);
+  const ref = useRef<HTMLElement | null>(null);
+  const refpDesc = useRef<HTMLParagraphElement | null>(null);
   const gl = useThree(state => state.gl);
   const [el] = React.useState(() => document.createElement('section'));
   const target = gl.domElement.parentNode;
@@ -38,14 +46,11 @@ export const A11ySection: React.FC<Props> = ({
       if (refpDesc.current === null) {
         const pDesc = document.createElement('p');
         pDesc.innerHTML = description;
-        //sr-only
         pDesc.style.cssText =
           'border: 0!important;clip: rect(1px,1px,1px,1px)!important;-webkit-clip-path: inset(50%)!important;clip-path: inset(50%)!important;height: 1px!important;margin: -1px!important;overflow: hidden!important;padding: 0!important;position: absolute!important;width: 1px!important;white-space: nowrap!important;';
         el.prepend(pDesc);
-        //@ts-ignore
         refpDesc.current = pDesc;
       } else {
-        //@ts-ignore
         refpDesc.current.innerHTML = description;
       }
     }
@@ -55,18 +60,15 @@ export const A11ySection: React.FC<Props> = ({
   }, [description, label]);
 
   if (ref.current === null) {
-    //@ts-ignore
-    target.appendChild(el);
-    //@ts-ignore
+    if (target) {
+      target.appendChild(el);
+    }
     ref.current = el;
   }
 
   return (
     <>
-      <A11ySectionContext.Provider
-        //@ts-ignore
-        value={ref}
-      >
+      <A11ySectionContext.Provider value={ref}>
         {children}
       </A11ySectionContext.Provider>
     </>
