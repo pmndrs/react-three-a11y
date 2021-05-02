@@ -40,10 +40,10 @@
     "build-storybook": "build-storybook"
   },
   "peerDependencies": {
-    "@react-three/fiber": "^6.0.1",
-    "react": "^17.0",
-    "react-dom": "^17.0",
-    "three": "^0.126.0"
+    "@react-three/fiber": ">=6.0",
+    "react": ">=17.0",
+    "react-dom": ">=17.0",
+    "three": ">=0.126.0"
   },
   "dependencies": {
     "utility-types": "^3.10.0",
