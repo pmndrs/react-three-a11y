@@ -425,8 +425,9 @@ export const A11y: React.FC<Props> = ({
             handleBtnClick();
           } else if (role === 'togglebutton') {
             handleToggleBtnClick();
+          } else {
+            if (typeof actionCall === 'function') actionCall();
           }
-          if (typeof actionCall === 'function') actionCall();
         }}
         onPointerOver={handleOnPointerOver}
         onPointerOut={handleOnPointerOut}
