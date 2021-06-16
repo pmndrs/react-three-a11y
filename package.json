@@ -1,6 +1,6 @@
 {
   "name": "@react-three/a11y",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "👩‍🦯 Provide accessibility support to R3F such as focus indication, keyboard tab index, and screen reader support",
   "keywords": [
     "a11y",
