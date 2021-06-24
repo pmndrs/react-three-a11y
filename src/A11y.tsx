@@ -5,7 +5,7 @@ import { useA11ySectionContext } from './A11ySection';
 import { Html } from './Html';
 
 interface A11yCommonProps {
-  role: 'button' | 'togglebutton' | 'link' | 'content';
+  role: 'button' | 'togglebutton' | 'link' | 'content' | 'image';
   children: React.ReactNode;
   description: string;
   tabIndex?: number;
@@ -52,7 +52,16 @@ type RoleProps =
       href: string;
       disabled?: never;
       startPressed?: never;
-    };
+    }
+  | {
+      role: 'image';
+      activationMsg?: never;
+      deactivationMsg?: never;
+      actionCall?: never;
+      href?: never;
+      disabled?: never;
+      startPressed?: never;
+  };
 
 type Props = A11yCommonProps & RoleProps;
 
@@ -136,7 +145,7 @@ export const A11y: React.FC<Props> = ({
       overHtml.current = true;
     }
     if (overHtml.current || overMesh.current) {
-      if (role !== 'content' && !disabled) {
+      if (role !== 'content' && role !== 'image' && !disabled) {
         domElement.style.cursor = 'pointer';
       }
       setA11yState({
@@ -324,37 +333,71 @@ export const A11y: React.FC<Props> = ({
             tabIndex: tabIndex,
           }
         : null;
-      return (
-        <p
-          r3f-a11y="true"
-          {...tabIndexP}
-          style={Object.assign(
-            constHiddenButScreenreadable,
-            hidden
-              ? { visibility: 'hidden' as const }
-              : { visibility: 'visible' as const }
-          )}
-          onPointerOver={handleOnPointerOver}
-          onPointerOut={handleOnPointerOut}
-          onBlur={() => {
-            setA11yState({
-              hovered: a11yState.hovered,
-              focused: false,
-              pressed: a11yState.pressed,
-            });
-          }}
-          onFocus={() => {
-            if (typeof focusCall === 'function') focusCall();
-            setA11yState({
-              hovered: a11yState.hovered,
-              focused: true,
-              pressed: a11yState.pressed,
-            });
-          }}
-        >
-          {description}
-        </p>
-      );
+      if ( role === "image" ) {
+        return (
+          <img
+            r3f-a11y="true"
+            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E"
+            alt={description}
+            {...tabIndexP}
+            style={Object.assign(
+              constHiddenButScreenreadable,
+              hidden
+                ? { visibility: 'hidden' as const }
+                : { visibility: 'visible' as const }
+            )}
+            onPointerOver={handleOnPointerOver}
+            onPointerOut={handleOnPointerOut}
+            onBlur={() => {
+              setA11yState({
+                hovered: a11yState.hovered,
+                focused: false,
+                pressed: a11yState.pressed,
+              });
+            }}
+            onFocus={() => {
+              if (typeof focusCall === 'function') focusCall();
+              setA11yState({
+                hovered: a11yState.hovered,
+                focused: true,
+                pressed: a11yState.pressed,
+              });
+            }}
+          />
+        );
+      }else{
+        return (
+          <p
+            r3f-a11y="true"
+            {...tabIndexP}
+            style={Object.assign(
+              constHiddenButScreenreadable,
+              hidden
+                ? { visibility: 'hidden' as const }
+                : { visibility: 'visible' as const }
+            )}
+            onPointerOver={handleOnPointerOver}
+            onPointerOut={handleOnPointerOut}
+            onBlur={() => {
+              setA11yState({
+                hovered: a11yState.hovered,
+                focused: false,
+                pressed: a11yState.pressed,
+              });
+            }}
+            onFocus={() => {
+              if (typeof focusCall === 'function') focusCall();
+              setA11yState({
+                hovered: a11yState.hovered,
+                focused: true,
+                pressed: a11yState.pressed,
+              });
+            }}
+          >
+            {description}
+          </p>
+        );
+      }
     }
   };
 

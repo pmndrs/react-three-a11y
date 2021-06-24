@@ -221,6 +221,12 @@ export default function App() {
           <group position-y={2}>
             <CarrousselAll />
             <A11y
+              role="image"
+              description="Je suis un test"
+            >
+              <SwitchButton position={[-3, 3, 7]} />
+            </A11y>
+            <A11y
               role="togglebutton"
               startPressed={false}
               description="Power button, click to disable the scene"
