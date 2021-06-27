@@ -25,6 +25,7 @@ type RoleProps =
       href?: never;
       disabled?: never;
       startPressed?: never;
+      tag?: 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
     }
   | {
       role: 'button';
@@ -34,6 +35,7 @@ type RoleProps =
       href?: never;
       disabled?: boolean;
       startPressed?: never;
+      tag?: never;
     }
   | {
       role: 'togglebutton';
@@ -43,6 +45,7 @@ type RoleProps =
       href?: never;
       disabled?: boolean;
       startPressed?: boolean;
+      tag?: never;
     }
   | {
       role: 'link';
@@ -52,6 +55,7 @@ type RoleProps =
       href: string;
       disabled?: never;
       startPressed?: never;
+      tag?: never;
     }
   | {
       role: 'image';
@@ -61,7 +65,8 @@ type RoleProps =
       href?: never;
       disabled?: never;
       startPressed?: never;
-  };
+      tag?: never;
+    };
 
 type Props = A11yCommonProps & RoleProps;
 
@@ -94,6 +99,7 @@ export const A11y: React.FC<Props> = ({
   debug = false,
   a11yElStyle,
   startPressed = false,
+  tag = 'p',
   hidden = false,
   ...props
 }) => {
@@ -333,7 +339,7 @@ export const A11y: React.FC<Props> = ({
             tabIndex: tabIndex,
           }
         : null;
-      if ( role === "image" ) {
+      if (role === 'image') {
         return (
           <img
             r3f-a11y="true"
@@ -365,9 +371,10 @@ export const A11y: React.FC<Props> = ({
             }}
           />
         );
-      }else{
+      } else {
+        const Tag = tag;
         return (
-          <p
+          <Tag
             r3f-a11y="true"
             {...tabIndexP}
             style={Object.assign(
@@ -395,7 +402,7 @@ export const A11y: React.FC<Props> = ({
             }}
           >
             {description}
-          </p>
+          </Tag>
         );
       }
     }
@@ -409,6 +416,7 @@ export const A11y: React.FC<Props> = ({
     href,
     disabled,
     startPressed,
+    tag,
     actionCall,
     focusCall,
   ]);

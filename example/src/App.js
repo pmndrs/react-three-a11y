@@ -220,10 +220,7 @@ export default function App() {
           <ambientLight intensity={snap.disabled ? 0.2 : 0.8} />
           <group position-y={2}>
             <CarrousselAll />
-            <A11y
-              role="image"
-              description="Je suis un test"
-            >
+            <A11y role="image" description="Je suis un test">
               <SwitchButton position={[-3, 3, 7]} />
             </A11y>
             <A11y
