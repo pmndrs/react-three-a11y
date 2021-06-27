@@ -6,6 +6,7 @@ import React, {
   createRef,
 } from 'react';
 import { useThree } from '@react-three/fiber';
+import { stylesHiddenButScreenreadable } from './A11yConsts';
 
 interface Props {
   children: React.ReactNode;
@@ -42,6 +43,23 @@ export const A11ySection: React.FC<Props> = ({
       el.setAttribute('aria-label', label);
     }
     el.setAttribute('r3f-a11y', 'true');
+    el.setAttribute(
+      'style',
+      (styles => {
+        return Object.keys(styles).reduce(
+          (acc, key) =>
+            acc +
+            key
+              .split(/(?=[A-Z])/)
+              .join('-')
+              .toLowerCase() +
+            ':' +
+            (styles as any)[key] +
+            ';',
+          ''
+        );
+      })(stylesHiddenButScreenreadable)
+    );
     if (description) {
       if (refpDesc.current === null) {
         const pDesc = document.createElement('p');

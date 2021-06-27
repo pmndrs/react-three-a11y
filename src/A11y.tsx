@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useContext } from 'react';
 import { useThree } from '@react-three/fiber';
 import useAnnounceStore from './announceStore';
 import { useA11ySectionContext } from './A11ySection';
+import { stylesHiddenButScreenreadable } from './A11yConsts';
 import { Html } from './Html';
 
 interface A11yCommonProps {
@@ -104,19 +105,9 @@ export const A11y: React.FC<Props> = ({
   ...props
 }) => {
   let constHiddenButScreenreadable = Object.assign(
-    {
-      opacity: debug ? 1 : 0,
-      borderRadius: '50%',
-      width: '50px',
-      height: '50px',
-      overflow: 'hidden',
-      transform: 'translateX(-50%) translateY(-50%)',
-      display: 'inline-block',
-      userSelect: 'none' as const,
-      WebkitUserSelect: 'none' as const,
-      WebkitTouchCallout: 'none' as const,
-      margin: 0,
-    },
+    {},
+    stylesHiddenButScreenreadable,
+    { opacity: debug ? 1 : 0 },
     a11yElStyle
   );
 
