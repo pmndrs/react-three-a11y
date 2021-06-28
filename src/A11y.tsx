@@ -444,7 +444,7 @@ export const A11y: React.FC<Props> = ({
 
   const section = useA11ySectionContext();
   let portal = {};
-  if (section instanceof HTMLElement) {
+  if (section.current instanceof HTMLElement) {
     portal = { portal: section };
   }
 
