@@ -2,10 +2,11 @@ import React, { useEffect, useRef, useState, useContext } from 'react';
 import { useThree } from '@react-three/fiber';
 import useAnnounceStore from './announceStore';
 import { useA11ySectionContext } from './A11ySection';
+import { stylesHiddenButScreenreadable } from './A11yConsts';
 import { Html } from './Html';
 
 interface A11yCommonProps {
-  role: 'button' | 'togglebutton' | 'link' | 'content';
+  role: 'button' | 'togglebutton' | 'link' | 'content' | 'image';
   children: React.ReactNode;
   description: string;
   tabIndex?: number;
@@ -25,6 +26,7 @@ type RoleProps =
       href?: never;
       disabled?: never;
       startPressed?: never;
+      tag?: 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
     }
   | {
       role: 'button';
@@ -34,6 +36,7 @@ type RoleProps =
       href?: never;
       disabled?: boolean;
       startPressed?: never;
+      tag?: never;
     }
   | {
       role: 'togglebutton';
@@ -43,6 +46,7 @@ type RoleProps =
       href?: never;
       disabled?: boolean;
       startPressed?: boolean;
+      tag?: never;
     }
   | {
       role: 'link';
@@ -52,6 +56,17 @@ type RoleProps =
       href: string;
       disabled?: never;
       startPressed?: never;
+      tag?: never;
+    }
+  | {
+      role: 'image';
+      activationMsg?: never;
+      deactivationMsg?: never;
+      actionCall?: never;
+      href?: never;
+      disabled?: never;
+      startPressed?: never;
+      tag?: never;
     };
 
 type Props = A11yCommonProps & RoleProps;
@@ -85,23 +100,14 @@ export const A11y: React.FC<Props> = ({
   debug = false,
   a11yElStyle,
   startPressed = false,
+  tag = 'p',
   hidden = false,
   ...props
 }) => {
   let constHiddenButScreenreadable = Object.assign(
-    {
-      opacity: debug ? 1 : 0,
-      borderRadius: '50%',
-      width: '50px',
-      height: '50px',
-      overflow: 'hidden',
-      transform: 'translateX(-50%) translateY(-50%)',
-      display: 'inline-block',
-      userSelect: 'none' as const,
-      WebkitUserSelect: 'none' as const,
-      WebkitTouchCallout: 'none' as const,
-      margin: 0,
-    },
+    {},
+    stylesHiddenButScreenreadable,
+    { opacity: debug ? 1 : 0 },
     a11yElStyle
   );
 
@@ -136,7 +142,7 @@ export const A11y: React.FC<Props> = ({
       overHtml.current = true;
     }
     if (overHtml.current || overMesh.current) {
-      if (role !== 'content' && !disabled) {
+      if (role !== 'content' && role !== 'image' && !disabled) {
         domElement.style.cursor = 'pointer';
       }
       setA11yState({
@@ -324,37 +330,72 @@ export const A11y: React.FC<Props> = ({
             tabIndex: tabIndex,
           }
         : null;
-      return (
-        <p
-          r3f-a11y="true"
-          {...tabIndexP}
-          style={Object.assign(
-            constHiddenButScreenreadable,
-            hidden
-              ? { visibility: 'hidden' as const }
-              : { visibility: 'visible' as const }
-          )}
-          onPointerOver={handleOnPointerOver}
-          onPointerOut={handleOnPointerOut}
-          onBlur={() => {
-            setA11yState({
-              hovered: a11yState.hovered,
-              focused: false,
-              pressed: a11yState.pressed,
-            });
-          }}
-          onFocus={() => {
-            if (typeof focusCall === 'function') focusCall();
-            setA11yState({
-              hovered: a11yState.hovered,
-              focused: true,
-              pressed: a11yState.pressed,
-            });
-          }}
-        >
-          {description}
-        </p>
-      );
+      if (role === 'image') {
+        return (
+          <img
+            r3f-a11y="true"
+            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E"
+            alt={description}
+            {...tabIndexP}
+            style={Object.assign(
+              constHiddenButScreenreadable,
+              hidden
+                ? { visibility: 'hidden' as const }
+                : { visibility: 'visible' as const }
+            )}
+            onPointerOver={handleOnPointerOver}
+            onPointerOut={handleOnPointerOut}
+            onBlur={() => {
+              setA11yState({
+                hovered: a11yState.hovered,
+                focused: false,
+                pressed: a11yState.pressed,
+              });
+            }}
+            onFocus={() => {
+              if (typeof focusCall === 'function') focusCall();
+              setA11yState({
+                hovered: a11yState.hovered,
+                focused: true,
+                pressed: a11yState.pressed,
+              });
+            }}
+          />
+        );
+      } else {
+        const Tag = tag;
+        return (
+          <Tag
+            r3f-a11y="true"
+            {...tabIndexP}
+            style={Object.assign(
+              constHiddenButScreenreadable,
+              hidden
+                ? { visibility: 'hidden' as const }
+                : { visibility: 'visible' as const }
+            )}
+            onPointerOver={handleOnPointerOver}
+            onPointerOut={handleOnPointerOut}
+            onBlur={() => {
+              setA11yState({
+                hovered: a11yState.hovered,
+                focused: false,
+                pressed: a11yState.pressed,
+              });
+            }}
+            onFocus={() => {
+              if (typeof focusCall === 'function') focusCall();
+              setA11yState({
+                hovered: a11yState.hovered,
+                focused: true,
+                pressed: a11yState.pressed,
+              });
+            }}
+          >
+            {description}
+          </Tag>
+        );
+      }
     }
   };
 
@@ -366,6 +407,7 @@ export const A11y: React.FC<Props> = ({
     href,
     disabled,
     startPressed,
+    tag,
     actionCall,
     focusCall,
   ]);
@@ -402,7 +444,7 @@ export const A11y: React.FC<Props> = ({
 
   const section = useA11ySectionContext();
   let portal = {};
-  if (section instanceof HTMLElement) {
+  if (section.current instanceof HTMLElement) {
     portal = { portal: section };
   }
 
