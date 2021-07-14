@@ -120,22 +120,6 @@ export const Html = React.forwardRef(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [target]);
 
-    React.useEffect(() => {
-      if (group.current) {
-        if (a11yElAttr) {
-          for (const property in a11yElAttr) {
-            el.setAttribute(
-              property.replace(/[A-Z]/g, m => '-' + m.toLowerCase()),
-              //@ts-ignore
-              a11yElAttr[property]
-            );
-          }
-        }
-        return () => {};
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [a11yElAttrRef.current]);
-
     const styles: React.CSSProperties = React.useMemo(() => {
       return {
         position: 'absolute',
