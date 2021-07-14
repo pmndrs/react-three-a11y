@@ -62,7 +62,7 @@ function Nav({ left }) {
   return (
     <A11yTag tag="li" a11yElAttr={{ role: "treeitem", "aria-expanded": "false" }}>
       <A11y
-        role="link"
+        role="button"
         href="#"
         description={`Spin ${left ? "left" : "right"} shape`}
         a11yElAttr={state.active === 4 ? { role: "treeitem", "aria-expanded": "false" } : {}}
