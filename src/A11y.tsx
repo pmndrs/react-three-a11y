@@ -16,6 +16,7 @@ interface A11yCommonProps {
   a11yElAttr?: Object;
   a11yParentElAttr?: Object;
   hidden?: boolean;
+  parentTag?: 'li' | 'div';
 }
 
 type RoleProps =
@@ -27,7 +28,7 @@ type RoleProps =
       href?: never;
       disabled?: never;
       startPressed?: never;
-      tag?: 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'li';
+      tag?: 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
     }
   | {
       role: 'button';
@@ -105,6 +106,7 @@ export const A11y: React.FC<Props> = ({
   startPressed = false,
   tag = 'p',
   hidden = false,
+  parentTag,
   ...props
 }) => {
   let constHiddenButScreenreadable = Object.assign(
@@ -370,7 +372,7 @@ export const A11y: React.FC<Props> = ({
           />
         );
       } else {
-        const Tag = tag !== 'li' ? tag : 'p';
+        const Tag = tag;
         return (
           <Tag
             data-r3f-a11y="true"
@@ -490,7 +492,7 @@ export const A11y: React.FC<Props> = ({
             // @ts-ignore
             children.props.position ? children.props.position : 0
           }
-          tag={tag === 'li' ? tag : 'div'}
+          tag={parentTag}
           {...portal}
           a11yEl={HtmlAccessibleElement}
           a11yElAttr={a11yParentElAttr}
