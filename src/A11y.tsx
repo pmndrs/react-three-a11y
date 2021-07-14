@@ -418,6 +418,7 @@ export const A11y: React.FC<Props> = ({
     tag,
     actionCall,
     focusCall,
+    a11yElAttr,
   ]);
 
   let AltText = null;

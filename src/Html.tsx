@@ -121,7 +121,7 @@ export const Html = ({
       };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [target]);
+  }, [target, a11yElAttr]);
 
   // const styles: React.CSSProperties = React.useMemo(() => {
   //   return {
