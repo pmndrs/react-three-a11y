@@ -121,6 +121,10 @@ export const A11y: React.FC<Props> = ({
   if (!isDeepEqual(a11yElAttrRef.current, a11yElAttr)) {
     a11yElAttrRef.current = a11yElAttr;
   }
+  const a11yParentElAttrRef = useRef(a11yParentElAttr);
+  if (!isDeepEqual(a11yParentElAttrRef.current, a11yParentElAttr)) {
+    a11yParentElAttrRef.current = a11yParentElAttr;
+  }
 
   const [a11yState, setA11yState] = useState({
     hovered: false,
@@ -429,7 +433,7 @@ export const A11y: React.FC<Props> = ({
     a11yElAttrRef.current,
   ]);
 
-  let AltText = null;
+  let AltText: JSX.Element = <></>;
   if (showAltText && a11yState.hovered) {
     AltText = (
       <div
@@ -465,6 +469,37 @@ export const A11y: React.FC<Props> = ({
     portal = { portal: section };
   }
 
+  const A11yHtml = React.useMemo(() => {
+    return (
+      <Html
+        style={{ width: '0px' }}
+        position={
+          // @ts-ignore
+          children.props.position ? children.props.position : 0
+        }
+        tag={parentTag}
+        {...portal}
+        a11yElAttr={a11yParentElAttr}
+      >
+        {AltText}
+        {HtmlAccessibleElement}
+      </Html>
+    );
+  }, [
+    description,
+    a11yState,
+    hidden,
+    tabIndex,
+    href,
+    disabled,
+    startPressed,
+    tag,
+    actionCall,
+    focusCall,
+    a11yElAttrRef.current,
+    a11yParentElAttrRef.current,
+  ]);
+
   return (
     <A11yContext.Provider
       value={{
@@ -492,18 +527,7 @@ export const A11y: React.FC<Props> = ({
         onPointerOut={handleOnPointerOut}
       >
         {children}
-        <Html
-          style={{ width: '0px' }}
-          position={
-            // @ts-ignore
-            children.props.position ? children.props.position : 0
-          }
-          tag={parentTag}
-          {...portal}
-        >
-          {AltText}
-          {HtmlAccessibleElement}
-        </Html>
+        {A11yHtml}
       </group>
     </A11yContext.Provider>
   );
