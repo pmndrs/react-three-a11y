@@ -102,6 +102,9 @@ export const Html = ({
     a11yElAttrRef.current = a11yElAttr;
   }
 
+  console.log(a11yEl);
+  console.log(a11yElAttr);
+
   React.useEffect(() => {
     if (group.current) {
       scene.updateMatrixWorld();
@@ -112,8 +115,8 @@ export const Html = ({
         target.appendChild(el);
       }
       return () => {
-        // if (target) target.removeChild(el);
-        // ReactDOM.unmountComponentAtNode(el);
+        if (target) target.removeChild(el);
+        ReactDOM.unmountComponentAtNode(el);
       };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
