@@ -11,6 +11,7 @@ import {
 } from 'three';
 import { Assign } from 'utility-types';
 import { ReactThreeFiber, useFrame, useThree } from '@react-three/fiber';
+import isDeepEqual from 'fast-deep-equal/react';
 
 const v1 = new Vector3();
 const v2 = new Vector3();
@@ -96,21 +97,16 @@ export const Html = ({
   const oldPosition = React.useRef([0, 0]);
   const target = portal?.current ?? gl.domElement.parentNode;
 
+  const a11yElAttrRef = React.useRef(a11yElAttr);
+  if (!isDeepEqual(a11yElAttrRef.current, a11yElAttr)) {
+    a11yElAttrRef.current = a11yElAttr;
+  }
+
   React.useEffect(() => {
     if (group.current) {
       scene.updateMatrixWorld();
       const vec = calculatePosition(group.current, camera, size);
       el.style.cssText = `position:absolute;top:0;left:0;transform:translate3d(${vec[0]}px,${vec[1]}px,0);transform-origin:0 0;`;
-
-      if (a11yElAttr) {
-        for (const property in a11yElAttr) {
-          el.setAttribute(
-            property.replace(/[A-Z]/g, m => '-' + m.toLowerCase()),
-            //@ts-ignore
-            a11yElAttr[property]
-          );
-        }
-      }
 
       if (target) {
         target.appendChild(el);
@@ -121,7 +117,23 @@ export const Html = ({
       };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [target, a11yElAttr]);
+  }, [target]);
+
+  React.useEffect(() => {
+    if (group.current) {
+      if (a11yElAttr) {
+        for (const property in a11yElAttr) {
+          el.setAttribute(
+            property.replace(/[A-Z]/g, m => '-' + m.toLowerCase()),
+            //@ts-ignore
+            a11yElAttr[property]
+          );
+        }
+      }
+      return () => {};
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [a11yElAttrRef.current]);
 
   // const styles: React.CSSProperties = React.useMemo(() => {
   //   return {

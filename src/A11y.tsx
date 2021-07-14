@@ -3,6 +3,7 @@ import useAnnounceStore from './announceStore';
 import { useA11yTagContext } from './A11yTag';
 import { stylesHiddenButScreenreadable } from './A11yConsts';
 import { Html } from './Html';
+import isDeepEqual from 'fast-deep-equal/react';
 
 interface A11yCommonProps {
   role: 'button' | 'togglebutton' | 'link' | 'content' | 'image';
@@ -115,6 +116,11 @@ export const A11y: React.FC<Props> = ({
     { opacity: debug ? 1 : 0 },
     a11yElStyle
   );
+
+  const a11yElAttrRef = useRef(a11yElAttr);
+  if (!isDeepEqual(a11yElAttrRef.current, a11yElAttr)) {
+    a11yElAttrRef.current = a11yElAttr;
+  }
 
   const [a11yState, setA11yState] = useState({
     hovered: false,
@@ -420,7 +426,7 @@ export const A11y: React.FC<Props> = ({
     tag,
     actionCall,
     focusCall,
-    a11yElAttr,
+    a11yElAttrRef.current,
   ]);
 
   let AltText = null;
