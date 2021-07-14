@@ -60,11 +60,13 @@ function Nav({ left }) {
   const viewport = useThree(state => state.viewport)
   const radius = Math.min(12, viewport.width / 2.5)
   return (
-    <A11yTag tag="li">
+    <A11yTag tag="li" a11yElAttr={{ role: "treeitem", "aria-expanded": "false" }}>
       <A11y
         role="link"
         href="#"
         description={`Spin ${left ? "left" : "right"} shape`}
+        a11yElAttr={{ role: "treeitem", "aria-expanded": "false" }}
+        a11yParentElAttr={{ role: "treeitem", "aria-expanded": "false" }}
         activationMsg="shape showing"
         actionCall={() => {
           state.rotation = snap.rotation + ((Math.PI * 2) / 5) * (left ? -1 : 1)

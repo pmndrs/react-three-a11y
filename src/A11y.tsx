@@ -13,6 +13,8 @@ interface A11yCommonProps {
   focusCall?: (...args: any[]) => any;
   debug?: boolean;
   a11yElStyle?: Object;
+  a11yElAttr?: Object;
+  a11yParentElAttr?: Object;
   hidden?: boolean;
 }
 
@@ -98,6 +100,8 @@ export const A11y: React.FC<Props> = ({
   disabled,
   debug = false,
   a11yElStyle,
+  a11yElAttr,
+  a11yParentElAttr,
   startPressed = false,
   tag = 'p',
   hidden = false,
@@ -206,6 +210,7 @@ export const A11y: React.FC<Props> = ({
           <button
             data-r3f-a11y="true"
             {...disabledBtnAttr}
+            {...a11yElAttr}
             aria-pressed={a11yState.pressed ? 'true' : 'false'}
             tabIndex={tabIndex ? tabIndex : 0}
             style={Object.assign(
@@ -249,6 +254,7 @@ export const A11y: React.FC<Props> = ({
           <button
             data-r3f-a11y="true"
             {...disabledBtnAttr}
+            {...a11yElAttr}
             tabIndex={tabIndex ? tabIndex : 0}
             style={Object.assign(
               constHiddenButScreenreadable,
@@ -290,6 +296,7 @@ export const A11y: React.FC<Props> = ({
       return (
         <a
           data-r3f-a11y="true"
+          {...a11yElAttr}
           style={Object.assign(
             constHiddenButScreenreadable,
             hidden
@@ -336,6 +343,7 @@ export const A11y: React.FC<Props> = ({
             src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E"
             alt={description}
             {...tabIndexP}
+            {...a11yElAttr}
             style={Object.assign(
               constHiddenButScreenreadable,
               hidden
@@ -367,6 +375,7 @@ export const A11y: React.FC<Props> = ({
           <Tag
             data-r3f-a11y="true"
             {...tabIndexP}
+            {...a11yElAttr}
             style={Object.assign(
               constHiddenButScreenreadable,
               hidden
@@ -483,6 +492,7 @@ export const A11y: React.FC<Props> = ({
           tag={tag === 'li' ? tag : 'div'}
           {...portal}
           a11yEl={HtmlAccessibleElement}
+          a11yElAttr={a11yParentElAttr}
         >
           {AltText}
         </Html>

@@ -71,83 +71,90 @@ export interface HtmlProps
   zIndexRange?: Array<number>;
   tag?: 'div' | 'li';
   a11yEl: JSX.Element;
+  a11yElAttr?: Object;
 }
 
-export const Html = React.forwardRef(
-  ({
-    children,
-    eps = 0.001,
-    style,
-    className,
-    portal,
-    zIndexRange = [16777271, 0],
-    tag = 'div',
-    a11yEl,
-    ...props
-  }: HtmlProps) => {
-    const gl = useThree(({ gl }) => gl);
-    const camera = useThree(({ camera }) => camera);
-    const scene = useThree(({ scene }) => scene);
-    const size = useThree(({ size }) => size);
-    const [el] = React.useState(() => document.createElement(tag));
-    const group = React.useRef<Group>(null);
-    const oldZoom = React.useRef(0);
-    const oldPosition = React.useRef([0, 0]);
-    const target = portal?.current ?? gl.domElement.parentNode;
+export const Html = ({
+  children,
+  eps = 0.001,
+  style,
+  className,
+  portal,
+  zIndexRange = [16777271, 0],
+  tag = 'div',
+  a11yEl,
+  a11yElAttr,
+  ...props
+}: HtmlProps) => {
+  const gl = useThree(({ gl }) => gl);
+  const camera = useThree(({ camera }) => camera);
+  const scene = useThree(({ scene }) => scene);
+  const size = useThree(({ size }) => size);
+  const [el] = React.useState(() => document.createElement(tag));
+  const group = React.useRef<Group>(null);
+  const oldZoom = React.useRef(0);
+  const oldPosition = React.useRef([0, 0]);
+  const target = portal?.current ?? gl.domElement.parentNode;
 
-    React.useEffect(() => {
-      if (group.current) {
-        scene.updateMatrixWorld();
-        const vec = calculatePosition(group.current, camera, size);
-        el.style.cssText = `position:absolute;top:0;left:0;transform:translate3d(${vec[0]}px,${vec[1]}px,0);transform-origin:0 0;`;
-        if (target) {
-          target.appendChild(el);
-        }
-        return () => {
-          if (target) target.removeChild(el);
-          ReactDOM.unmountComponentAtNode(el);
-        };
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [target]);
+  React.useEffect(() => {
+    if (group.current) {
+      scene.updateMatrixWorld();
+      const vec = calculatePosition(group.current, camera, size);
+      el.style.cssText = `position:absolute;top:0;left:0;transform:translate3d(${vec[0]}px,${vec[1]}px,0);transform-origin:0 0;`;
 
-    // const styles: React.CSSProperties = React.useMemo(() => {
-    //   return {
-    //     position: 'absolute',
-    //     transform: 'none',
-    //     ...style,
-    //   };
-    // }, [style, size]);
-
-    React.useLayoutEffect(() => {
-      ReactDOM.render(a11yEl, el);
-    });
-
-    useFrame(() => {
-      if (group.current) {
-        camera.updateMatrixWorld();
-        const vec = calculatePosition(group.current, camera, size);
-
-        if (
-          Math.abs(oldZoom.current - camera.zoom) > eps ||
-          Math.abs(oldPosition.current[0] - vec[0]) > eps ||
-          Math.abs(oldPosition.current[1] - vec[1]) > eps
-        ) {
-          el.style.display = !isObjectBehindCamera(group.current, camera)
-            ? 'block'
-            : 'none';
-          el.style.zIndex = `${objectZIndex(
-            group.current,
-            camera,
-            zIndexRange
-          )}`;
-          el.style.transform = `translate3d(${vec[0]}px,${vec[1]}px,0) scale(1)`;
-          oldPosition.current = vec;
-          oldZoom.current = camera.zoom;
+      if (a11yElAttr) {
+        for (const property in a11yElAttr) {
+          el.setAttribute(
+            property.replace(/[A-Z]/g, m => '-' + m.toLowerCase()),
+            //@ts-ignore
+            a11yElAttr[property]
+          );
         }
       }
-    });
 
-    return <group {...props} ref={group} />;
-  }
-);
+      if (target) {
+        target.appendChild(el);
+      }
+      return () => {
+        if (target) target.removeChild(el);
+        ReactDOM.unmountComponentAtNode(el);
+      };
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [target]);
+
+  // const styles: React.CSSProperties = React.useMemo(() => {
+  //   return {
+  //     position: 'absolute',
+  //     transform: 'none',
+  //     ...style,
+  //   };
+  // }, [style, size]);
+
+  React.useLayoutEffect(() => {
+    ReactDOM.render(a11yEl, el);
+  });
+
+  useFrame(() => {
+    if (group.current) {
+      camera.updateMatrixWorld();
+      const vec = calculatePosition(group.current, camera, size);
+
+      if (
+        Math.abs(oldZoom.current - camera.zoom) > eps ||
+        Math.abs(oldPosition.current[0] - vec[0]) > eps ||
+        Math.abs(oldPosition.current[1] - vec[1]) > eps
+      ) {
+        el.style.display = !isObjectBehindCamera(group.current, camera)
+          ? 'block'
+          : 'none';
+        el.style.zIndex = `${objectZIndex(group.current, camera, zIndexRange)}`;
+        el.style.transform = `translate3d(${vec[0]}px,${vec[1]}px,0) scale(1)`;
+        oldPosition.current = vec;
+        oldZoom.current = camera.zoom;
+      }
+    }
+  });
+
+  return <group {...props} ref={group} />;
+};
