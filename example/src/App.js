@@ -68,6 +68,7 @@ function Nav({ left }) {
         a11yElAttr={{ role: "treeitem", "aria-expanded": "false" }}
         a11yParentElAttr={{ role: "treeitem", "aria-expanded": "false" }}
         activationMsg="shape showing"
+        parentTag="li"
         actionCall={() => {
           state.rotation = snap.rotation + ((Math.PI * 2) / 5) * (left ? -1 : 1)
           state.active = left ? (snap.active === 0 ? 4 : snap.active - 1) : snap.active === 4 ? 0 : snap.active + 1
