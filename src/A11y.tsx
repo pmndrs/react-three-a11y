@@ -469,37 +469,6 @@ export const A11y: React.FC<Props> = ({
     portal = { portal: section };
   }
 
-  const A11yHtml = React.useMemo(() => {
-    return (
-      <Html
-        style={{ width: '0px' }}
-        position={
-          // @ts-ignore
-          children.props.position ? children.props.position : 0
-        }
-        tag={parentTag}
-        {...portal}
-        a11yElAttr={a11yParentElAttr}
-      >
-        {AltText}
-        {HtmlAccessibleElement}
-      </Html>
-    );
-  }, [
-    description,
-    a11yState,
-    hidden,
-    tabIndex,
-    href,
-    disabled,
-    startPressed,
-    tag,
-    actionCall,
-    focusCall,
-    a11yElAttrRef.current,
-    a11yParentElAttrRef.current,
-  ]);
-
   return (
     <A11yContext.Provider
       value={{
@@ -527,7 +496,19 @@ export const A11y: React.FC<Props> = ({
         onPointerOut={handleOnPointerOut}
       >
         {children}
-        {A11yHtml}
+        <Html
+          style={{ width: '0px' }}
+          position={
+            // @ts-ignore
+            children.props.position ? children.props.position : 0
+          }
+          tag={parentTag}
+          {...portal}
+          a11yElAttr={a11yParentElAttr}
+        >
+          {AltText}
+          {HtmlAccessibleElement}
+        </Html>
       </group>
     </A11yContext.Provider>
   );

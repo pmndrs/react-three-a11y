@@ -141,9 +141,7 @@ export const Html = ({
   //   };
   // }, [style, size]);
 
-  React.useLayoutEffect(() => {
-    ReactDOM.render(<>{children}</>, el);
-  });
+  ReactDOM.render(<>{children}</>, el);
 
   useFrame(() => {
     if (group.current) {
