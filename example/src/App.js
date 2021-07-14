@@ -2,7 +2,7 @@ import * as THREE from "three"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import React, { Suspense, useCallback, useEffect, useRef, useContext } from "react"
 import { ContactShadows, Text, Html } from "@react-three/drei"
-import { A11y, useA11y, A11yAnnouncer, A11yUserPreferences, useUserPreferences, A11ySection, A11yDebuger } from "../../"
+import { A11y, A11yTag, useA11y, A11yAnnouncer, A11yUserPreferences, useUserPreferences, A11ySection, A11yDebuger } from "../../"
 import { ResizeObserver } from "@juggle/resize-observer"
 import { proxy, useProxy } from "valtio"
 import { EffectComposer, SSAO, SMAA } from "@react-three/postprocessing"
@@ -60,17 +60,20 @@ function Nav({ left }) {
   const viewport = useThree(state => state.viewport)
   const radius = Math.min(12, viewport.width / 2.5)
   return (
-    <A11y
-      role="button"
-      description={`Spin ${left ? "left" : "right"} shape`}
-      activationMsg="shape showing"
-      actionCall={() => {
-        state.rotation = snap.rotation + ((Math.PI * 2) / 5) * (left ? -1 : 1)
-        state.active = left ? (snap.active === 0 ? 4 : snap.active - 1) : snap.active === 4 ? 0 : snap.active + 1
-      }}
-      disabled={snap.disabled}>
-      <Diamond position={[left ? -radius : radius, 0, 0]} rotation={[0, 0, -Math.PI / 4]} />
-    </A11y>
+    <A11yTag tag="li">
+      <A11y
+        role="link"
+        href="#"
+        description={`Spin ${left ? "left" : "right"} shape`}
+        activationMsg="shape showing"
+        actionCall={() => {
+          state.rotation = snap.rotation + ((Math.PI * 2) / 5) * (left ? -1 : 1)
+          state.active = left ? (snap.active === 0 ? 4 : snap.active - 1) : snap.active === 4 ? 0 : snap.active + 1
+        }}
+        disabled={snap.disabled}>
+        <Diamond position={[left ? -radius : radius, 0, 0]} rotation={[0, 0, -Math.PI / 4]} />
+      </A11y>
+    </A11yTag>
   )
 }
 
@@ -160,7 +163,7 @@ function Carroussel() {
   return (
     <group ref={group}>
       {["sphere", "pyramid", "donut", "octahedron", "icosahedron"].map((name, i) => (
-        <A11y key={name} role="content" description={`a ${name}`} tabIndex={-1} hidden={snap.active !== i}>
+        <A11y key={name} role="content" tag="p" description={`a ${name}`} tabIndex={-1} hidden={snap.active !== i}>
           <Shape
             index={i}
             position={[radius * Math.cos(i * ((Math.PI * 2) / 5)), 0, radius * Math.sin(i * ((Math.PI * 2) / 5))]}
@@ -213,13 +216,19 @@ export default function App() {
     <main className={snap.dark ? "dark" : "bright"}>
       <Canvas resize={{ polyfill: ResizeObserver }} camera={{ position: [0, 0, 15], near: 4, far: 30 }} pixelRatio={[1, 1.5]}>
         <A11yUserPreferences debug={true}>
-          <A11yDebuger />
+          {/* <A11yDebuger /> */}
           {/* <ResponsiveText /> */}
           <pointLight position={[100, 100, 100]} intensity={snap.disabled ? 0.2 : 0.5} />
           <pointLight position={[-100, -100, -100]} intensity={1.5} color="red" />
           <ambientLight intensity={snap.disabled ? 0.2 : 0.8} />
           <group position-y={2}>
-            <CarrousselAll />
+            <A11yTag tag="header">
+              <A11yTag tag="nav">
+                <A11yTag tag="ul">
+                  <CarrousselAll />
+                </A11yTag>
+              </A11yTag>
+            </A11yTag>
             <A11y role="image" description="Je suis un test">
               <SwitchButton position={[-3, 3, 7]} />
             </A11y>

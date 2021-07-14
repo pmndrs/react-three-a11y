@@ -2,7 +2,7 @@ import * as THREE from "three"
 import ReactDOM from "react-dom"
 import React, { useRef, useState } from "react"
 import { Canvas, useFrame } from "@react-three/fiber"
-import { A11y, useA11y, A11yAnnouncer, A11yUserPreferences, useUserPreferences, A11ySection, A11yDebuger } from "../../"
+import { A11y, A11yTag, useA11y, A11yAnnouncer, A11yUserPreferences, useUserPreferences, A11ySection, A11yDebuger } from "../../"
 
 /* just to test tsx autocomplete etc */
 function Box(props: JSX.IntrinsicElements["mesh"]) {

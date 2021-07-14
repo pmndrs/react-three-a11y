@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
 import { useThree } from '@react-three/fiber';
 import useAnnounceStore from './announceStore';
-import { useA11ySectionContext } from './A11ySection';
+import { useA11yTagContext } from './A11yTag';
 import { stylesHiddenButScreenreadable } from './A11yConsts';
 import { Html } from './Html';
 
@@ -26,7 +26,7 @@ type RoleProps =
       href?: never;
       disabled?: never;
       startPressed?: never;
-      tag?: 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+      tag?: 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'li';
     }
   | {
       role: 'button';
@@ -205,7 +205,7 @@ export const A11y: React.FC<Props> = ({
       if (role === 'togglebutton') {
         return (
           <button
-            r3f-a11y="true"
+            data-r3f-a11y="true"
             {...disabledBtnAttr}
             aria-pressed={a11yState.pressed ? 'true' : 'false'}
             tabIndex={tabIndex ? tabIndex : 0}
@@ -248,7 +248,7 @@ export const A11y: React.FC<Props> = ({
         //regular btn
         return (
           <button
-            r3f-a11y="true"
+            data-r3f-a11y="true"
             {...disabledBtnAttr}
             tabIndex={tabIndex ? tabIndex : 0}
             style={Object.assign(
@@ -290,7 +290,7 @@ export const A11y: React.FC<Props> = ({
     } else if (role === 'link') {
       return (
         <a
-          r3f-a11y="true"
+          data-r3f-a11y="true"
           style={Object.assign(
             constHiddenButScreenreadable,
             hidden
@@ -333,7 +333,7 @@ export const A11y: React.FC<Props> = ({
       if (role === 'image') {
         return (
           <img
-            r3f-a11y="true"
+            data-r3f-a11y="true"
             src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E"
             alt={description}
             {...tabIndexP}
@@ -363,10 +363,10 @@ export const A11y: React.FC<Props> = ({
           />
         );
       } else {
-        const Tag = tag;
+        const Tag = tag !== 'li' ? tag : 'p';
         return (
           <Tag
-            r3f-a11y="true"
+            data-r3f-a11y="true"
             {...tabIndexP}
             style={Object.assign(
               constHiddenButScreenreadable,
@@ -442,7 +442,7 @@ export const A11y: React.FC<Props> = ({
     );
   }
 
-  const section = useA11ySectionContext();
+  const section = useA11yTagContext();
   let portal = {};
   if (section.current instanceof HTMLElement) {
     portal = { portal: section };
@@ -481,6 +481,7 @@ export const A11y: React.FC<Props> = ({
             // @ts-ignore
             children.props.position ? children.props.position : 0
           }
+          tag={tag === 'li' ? tag : 'div'}
           {...portal}
         >
           {AltText}

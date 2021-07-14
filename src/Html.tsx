@@ -69,26 +69,25 @@ export interface HtmlProps
   eps?: number;
   portal?: React.MutableRefObject<HTMLElement>;
   zIndexRange?: Array<number>;
+  tag?: 'div' | 'li';
 }
 
 export const Html = React.forwardRef(
-  (
-    {
-      children,
-      eps = 0.001,
-      style,
-      className,
-      portal,
-      zIndexRange = [16777271, 0],
-      ...props
-    }: HtmlProps,
-    ref: React.Ref<HTMLDivElement>
-  ) => {
+  ({
+    children,
+    eps = 0.001,
+    style,
+    className,
+    portal,
+    zIndexRange = [16777271, 0],
+    tag = 'div',
+    ...props
+  }: HtmlProps) => {
     const gl = useThree(({ gl }) => gl);
     const camera = useThree(({ camera }) => camera);
     const scene = useThree(({ scene }) => scene);
     const size = useThree(({ size }) => size);
-    const [el] = React.useState(() => document.createElement('div'));
+    const [el] = React.useState(() => document.createElement(tag));
     const group = React.useRef<Group>(null);
     const oldZoom = React.useRef(0);
     const oldPosition = React.useRef([0, 0]);
@@ -110,22 +109,21 @@ export const Html = React.forwardRef(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [target]);
 
-    const styles: React.CSSProperties = React.useMemo(() => {
-      return {
-        position: 'absolute',
-        transform: 'none',
-        ...style,
-      };
-    }, [style, size]);
+    // const styles: React.CSSProperties = React.useMemo(() => {
+    //   return {
+    //     position: 'absolute',
+    //     transform: 'none',
+    //     ...style,
+    //   };
+    // }, [style, size]);
 
     React.useLayoutEffect(() => {
       ReactDOM.render(
-        <div
-          ref={ref}
-          style={styles}
-          className={className}
-          children={children}
-        />,
+        <>
+          {children &&
+            //@ts-ignore
+            children.map(child => <>{child}</>)}
+        </>,
         el
       );
     });
