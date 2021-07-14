@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
-import { useThree } from '@react-three/fiber';
 import useAnnounceStore from './announceStore';
 import { useA11yTagContext } from './A11yTag';
 import { stylesHiddenButScreenreadable } from './A11yConsts';
@@ -122,13 +121,13 @@ export const A11y: React.FC<Props> = ({
   const overHtml = useRef(false);
   const overMesh = useRef(false);
 
-  const domElement = useThree(state => state.gl.domElement);
+  const documentElement = document.documentElement;
 
   // temporary fix to prevent error -> keep track of our component's mounted state
   const componentIsMounted = useRef(true);
   useEffect(() => {
     return () => {
-      domElement.style.cursor = 'default';
+      documentElement.style.cursor = 'default';
       componentIsMounted.current = false;
     };
   }, []); // Using an empty dependency array ensures this on
@@ -143,7 +142,7 @@ export const A11y: React.FC<Props> = ({
     }
     if (overHtml.current || overMesh.current) {
       if (role !== 'content' && role !== 'image' && !disabled) {
-        domElement.style.cursor = 'pointer';
+        documentElement.style.cursor = 'pointer';
       }
       setA11yState({
         hovered: true,
@@ -161,7 +160,7 @@ export const A11y: React.FC<Props> = ({
     }
     if (!overHtml.current && !overMesh.current) {
       if (componentIsMounted.current) {
-        domElement.style.cursor = 'default';
+        documentElement.style.cursor = 'default';
         setA11yState({
           hovered: false,
           focused: a11yState.focused,
@@ -483,9 +482,9 @@ export const A11y: React.FC<Props> = ({
           }
           tag={tag === 'li' ? tag : 'div'}
           {...portal}
+          a11yEl={HtmlAccessibleElement}
         >
           {AltText}
-          {HtmlAccessibleElement}
         </Html>
       </group>
     </A11yContext.Provider>

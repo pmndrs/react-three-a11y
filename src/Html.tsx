@@ -70,6 +70,7 @@ export interface HtmlProps
   portal?: React.MutableRefObject<HTMLElement>;
   zIndexRange?: Array<number>;
   tag?: 'div' | 'li';
+  a11yEl: JSX.Element;
 }
 
 export const Html = React.forwardRef(
@@ -81,6 +82,7 @@ export const Html = React.forwardRef(
     portal,
     zIndexRange = [16777271, 0],
     tag = 'div',
+    a11yEl,
     ...props
   }: HtmlProps) => {
     const gl = useThree(({ gl }) => gl);
@@ -118,14 +120,7 @@ export const Html = React.forwardRef(
     // }, [style, size]);
 
     React.useLayoutEffect(() => {
-      ReactDOM.render(
-        <>
-          {children &&
-            //@ts-ignore
-            children.map(child => <>{child}</>)}
-        </>,
-        el
-      );
+      ReactDOM.render(a11yEl, el);
     });
 
     useFrame(() => {
