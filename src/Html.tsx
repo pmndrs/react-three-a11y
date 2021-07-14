@@ -71,7 +71,6 @@ export interface HtmlProps
   portal?: React.MutableRefObject<HTMLElement>;
   zIndexRange?: Array<number>;
   tag?: 'div' | 'li';
-  a11yEl: JSX.Element;
   a11yElAttr?: Object;
 }
 
@@ -83,7 +82,6 @@ export const Html = ({
   portal,
   zIndexRange = [16777271, 0],
   tag = 'div',
-  a11yEl,
   a11yElAttr,
   ...props
 }: HtmlProps) => {
@@ -101,9 +99,6 @@ export const Html = ({
   if (!isDeepEqual(a11yElAttrRef.current, a11yElAttr)) {
     a11yElAttrRef.current = a11yElAttr;
   }
-
-  console.log(a11yEl);
-  console.log(a11yElAttr);
 
   React.useEffect(() => {
     if (group.current) {
@@ -147,7 +142,7 @@ export const Html = ({
   // }, [style, size]);
 
   React.useLayoutEffect(() => {
-    ReactDOM.render(a11yEl, el);
+    ReactDOM.render(<>{children}</>, el);
   });
 
   useFrame(() => {
