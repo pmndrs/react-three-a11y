@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
-import { useThree } from '@react-three/fiber';
 import useAnnounceStore from './announceStore';
-import { useA11ySectionContext } from './A11ySection';
+import { useA11yTagContext } from './A11yTag';
 import { stylesHiddenButScreenreadable } from './A11yConsts';
 import { Html } from './Html';
+import isDeepEqual from 'fast-deep-equal/react';
 
 interface A11yCommonProps {
-  role: 'button' | 'togglebutton' | 'link' | 'content' | 'image';
+  role: 'button' | 'togglebutton' | 'link' | 'content' | 'image' | 'input';
   children: React.ReactNode;
   description: string;
   tabIndex?: number;
@@ -14,7 +14,10 @@ interface A11yCommonProps {
   focusCall?: (...args: any[]) => any;
   debug?: boolean;
   a11yElStyle?: Object;
+  a11yElAttr?: Object;
+  parentElAttr?: Object;
   hidden?: boolean;
+  parentTag?: 'li' | 'div';
 }
 
 type RoleProps =
@@ -67,6 +70,16 @@ type RoleProps =
       disabled?: never;
       startPressed?: never;
       tag?: never;
+    }
+  | {
+      role: 'input';
+      activationMsg?: string;
+      deactivationMsg?: string;
+      actionCall?: () => any;
+      href?: never;
+      disabled?: boolean;
+      startPressed?: never;
+      tag?: never;
     };
 
 type Props = A11yCommonProps & RoleProps;
@@ -99,9 +112,12 @@ export const A11y: React.FC<Props> = ({
   disabled,
   debug = false,
   a11yElStyle,
+  a11yElAttr,
+  parentElAttr,
   startPressed = false,
   tag = 'p',
   hidden = false,
+  parentTag,
   ...props
 }) => {
   let constHiddenButScreenreadable = Object.assign(
@@ -110,6 +126,15 @@ export const A11y: React.FC<Props> = ({
     { opacity: debug ? 1 : 0 },
     a11yElStyle
   );
+
+  const a11yElAttrRef = useRef(a11yElAttr);
+  if (!isDeepEqual(a11yElAttrRef.current, a11yElAttr)) {
+    a11yElAttrRef.current = a11yElAttr;
+  }
+  const parentElAttrRef = useRef(parentElAttr);
+  if (!isDeepEqual(parentElAttrRef.current, parentElAttr)) {
+    parentElAttrRef.current = parentElAttr;
+  }
 
   const [a11yState, setA11yState] = useState({
     hovered: false,
@@ -122,13 +147,13 @@ export const A11y: React.FC<Props> = ({
   const overHtml = useRef(false);
   const overMesh = useRef(false);
 
-  const domElement = useThree(state => state.gl.domElement);
+  const documentElement = document.documentElement;
 
   // temporary fix to prevent error -> keep track of our component's mounted state
   const componentIsMounted = useRef(true);
   useEffect(() => {
     return () => {
-      domElement.style.cursor = 'default';
+      documentElement.style.cursor = 'default';
       componentIsMounted.current = false;
     };
   }, []); // Using an empty dependency array ensures this on
@@ -143,7 +168,7 @@ export const A11y: React.FC<Props> = ({
     }
     if (overHtml.current || overMesh.current) {
       if (role !== 'content' && role !== 'image' && !disabled) {
-        domElement.style.cursor = 'pointer';
+        documentElement.style.cursor = 'pointer';
       }
       setA11yState({
         hovered: true,
@@ -161,7 +186,7 @@ export const A11y: React.FC<Props> = ({
     }
     if (!overHtml.current && !overMesh.current) {
       if (componentIsMounted.current) {
-        domElement.style.cursor = 'default';
+        documentElement.style.cursor = 'default';
         setA11yState({
           hovered: false,
           focused: a11yState.focused,
@@ -205,8 +230,9 @@ export const A11y: React.FC<Props> = ({
       if (role === 'togglebutton') {
         return (
           <button
-            r3f-a11y="true"
+            data-r3f-a11y="true"
             {...disabledBtnAttr}
+            {...a11yElAttr}
             aria-pressed={a11yState.pressed ? 'true' : 'false'}
             tabIndex={tabIndex ? tabIndex : 0}
             style={Object.assign(
@@ -248,8 +274,9 @@ export const A11y: React.FC<Props> = ({
         //regular btn
         return (
           <button
-            r3f-a11y="true"
+            data-r3f-a11y="true"
             {...disabledBtnAttr}
+            {...a11yElAttr}
             tabIndex={tabIndex ? tabIndex : 0}
             style={Object.assign(
               constHiddenButScreenreadable,
@@ -290,7 +317,8 @@ export const A11y: React.FC<Props> = ({
     } else if (role === 'link') {
       return (
         <a
-          r3f-a11y="true"
+          data-r3f-a11y="true"
+          {...a11yElAttr}
           style={Object.assign(
             constHiddenButScreenreadable,
             hidden
@@ -333,10 +361,11 @@ export const A11y: React.FC<Props> = ({
       if (role === 'image') {
         return (
           <img
-            r3f-a11y="true"
+            data-r3f-a11y="true"
             src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E"
             alt={description}
             {...tabIndexP}
+            {...a11yElAttr}
             style={Object.assign(
               constHiddenButScreenreadable,
               hidden
@@ -362,12 +391,57 @@ export const A11y: React.FC<Props> = ({
             }}
           />
         );
+      } else if (role === 'input') {
+        return (
+          <label
+            style={Object.assign(
+              constHiddenButScreenreadable,
+              hidden
+                ? { visibility: 'hidden' as const }
+                : { visibility: 'visible' as const },
+              { display: 'block' }
+            )}
+            onPointerOver={handleOnPointerOver}
+            onPointerOut={handleOnPointerOut}
+          >
+            {description}
+            <input
+              data-r3f-a11y="true"
+              tabIndex={tabIndex ? tabIndex : 0}
+              {...a11yElAttr}
+              onChange={() => {}}
+              onClick={e => {
+                e.stopPropagation();
+                if (disabled) {
+                  return;
+                }
+                handleBtnClick();
+              }}
+              onBlur={() => {
+                setA11yState({
+                  hovered: a11yState.hovered,
+                  focused: false,
+                  pressed: a11yState.pressed,
+                });
+              }}
+              onFocus={() => {
+                if (typeof focusCall === 'function') focusCall();
+                setA11yState({
+                  hovered: a11yState.hovered,
+                  focused: true,
+                  pressed: a11yState.pressed,
+                });
+              }}
+            />
+          </label>
+        );
       } else {
         const Tag = tag;
         return (
           <Tag
-            r3f-a11y="true"
+            data-r3f-a11y="true"
             {...tabIndexP}
+            {...a11yElAttr}
             style={Object.assign(
               constHiddenButScreenreadable,
               hidden
@@ -410,9 +484,10 @@ export const A11y: React.FC<Props> = ({
     tag,
     actionCall,
     focusCall,
+    a11yElAttrRef.current,
   ]);
 
-  let AltText = null;
+  let AltText: JSX.Element = <></>;
   if (showAltText && a11yState.hovered) {
     AltText = (
       <div
@@ -442,7 +517,7 @@ export const A11y: React.FC<Props> = ({
     );
   }
 
-  const section = useA11ySectionContext();
+  const section = useA11yTagContext();
   let portal = {};
   if (section.current instanceof HTMLElement) {
     portal = { portal: section };
@@ -463,7 +538,7 @@ export const A11y: React.FC<Props> = ({
           if (disabled) {
             return;
           }
-          if (role === 'button') {
+          if (role === 'button' || role === 'input') {
             handleBtnClick();
           } else if (role === 'togglebutton') {
             handleToggleBtnClick();
@@ -473,6 +548,7 @@ export const A11y: React.FC<Props> = ({
         }}
         onPointerOver={handleOnPointerOver}
         onPointerOut={handleOnPointerOut}
+        // visible={!hidden}
       >
         {children}
         <Html
@@ -481,7 +557,9 @@ export const A11y: React.FC<Props> = ({
             // @ts-ignore
             children.props.position ? children.props.position : 0
           }
+          tag={parentTag}
           {...portal}
+          a11yElAttr={parentElAttr}
         >
           {AltText}
           {HtmlAccessibleElement}

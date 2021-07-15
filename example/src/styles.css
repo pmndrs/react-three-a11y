@@ -21,7 +21,7 @@ main.dark {
   background: lightgrey;
 }
 
-a {
+main > a {
   cursor: pointer;
   position: absolute;
   bottom: 25px;

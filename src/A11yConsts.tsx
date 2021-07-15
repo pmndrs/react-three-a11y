@@ -9,6 +9,7 @@ let stylesHiddenButScreenreadable = {
   userSelect: 'none' as const,
   WebkitUserSelect: 'none' as const,
   WebkitTouchCallout: 'none' as const,
+  cursor: 'unset',
   margin: 0,
 };
 

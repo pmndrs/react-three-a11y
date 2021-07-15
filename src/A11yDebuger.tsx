@@ -24,7 +24,7 @@ export const A11yDebuger: React.FC<Props> = ({}) => {
     const selectActiveEl = () => {
       console.log('focused: ', document.activeElement);
       let r3fa11ydebugidref = document.activeElement?.getAttribute(
-        'r3f-a11y-debug-id'
+        'data-r3f-a11y-debug-id'
       );
       if (r3fa11ydebugidref) {
         document.querySelectorAll('[r3fa11ydebugidref]').forEach(node => {
@@ -46,8 +46,8 @@ export const A11yDebuger: React.FC<Props> = ({}) => {
       let r3fPosId = 0;
       //@ts-ignore
       let elements = [];
-      document.querySelectorAll('[r3f-a11y]').forEach(node => {
-        node.setAttribute('r3f-a11y-debug-id', '' + r3fPosId);
+      document.querySelectorAll('[data-r3f-a11y]').forEach(node => {
+        node.setAttribute('data-r3f-a11y-debug-id', '' + r3fPosId);
         // let li = document.createElement('li');
         // li.innerHTML = node.tagName ;
         // //@ts-ignore

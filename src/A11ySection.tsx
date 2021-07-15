@@ -42,7 +42,7 @@ export const A11ySection: React.FC<Props> = ({
     if (label) {
       el.setAttribute('aria-label', label);
     }
-    el.setAttribute('r3f-a11y', 'true');
+    el.setAttribute('data-r3f-a11y', 'true');
     el.setAttribute(
       'style',
       (styles => {
