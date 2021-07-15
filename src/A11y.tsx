@@ -6,7 +6,7 @@ import { Html } from './Html';
 import isDeepEqual from 'fast-deep-equal/react';
 
 interface A11yCommonProps {
-  role: 'button' | 'togglebutton' | 'link' | 'content' | 'image';
+  role: 'button' | 'togglebutton' | 'link' | 'content' | 'image' | 'input';
   children: React.ReactNode;
   description: string;
   tabIndex?: number;
@@ -68,6 +68,16 @@ type RoleProps =
       actionCall?: never;
       href?: never;
       disabled?: never;
+      startPressed?: never;
+      tag?: never;
+    }
+  | {
+      role: 'input';
+      activationMsg?: string;
+      deactivationMsg?: string;
+      actionCall?: () => any;
+      href?: never;
+      disabled?: boolean;
       startPressed?: never;
       tag?: never;
     };
@@ -381,6 +391,50 @@ export const A11y: React.FC<Props> = ({
             }}
           />
         );
+      } else if (role === 'input') {
+        return (
+          <label
+            style={Object.assign(
+              constHiddenButScreenreadable,
+              hidden
+                ? { visibility: 'hidden' as const }
+                : { visibility: 'visible' as const },
+              { display: 'block' }
+            )}
+            onPointerOver={handleOnPointerOver}
+            onPointerOut={handleOnPointerOut}
+          >
+            {description}
+            <input
+              data-r3f-a11y="true"
+              tabIndex={tabIndex ? tabIndex : 0}
+              {...a11yElAttr}
+              onChange={() => {}}
+              onClick={e => {
+                e.stopPropagation();
+                if (disabled) {
+                  return;
+                }
+                handleBtnClick();
+              }}
+              onBlur={() => {
+                setA11yState({
+                  hovered: a11yState.hovered,
+                  focused: false,
+                  pressed: a11yState.pressed,
+                });
+              }}
+              onFocus={() => {
+                if (typeof focusCall === 'function') focusCall();
+                setA11yState({
+                  hovered: a11yState.hovered,
+                  focused: true,
+                  pressed: a11yState.pressed,
+                });
+              }}
+            />
+          </label>
+        );
       } else {
         const Tag = tag;
         return (
@@ -484,7 +538,7 @@ export const A11y: React.FC<Props> = ({
           if (disabled) {
             return;
           }
-          if (role === 'button') {
+          if (role === 'button' || role === 'input') {
             handleBtnClick();
           } else if (role === 'togglebutton') {
             handleToggleBtnClick();

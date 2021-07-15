@@ -1,6 +1,6 @@
 import * as THREE from "three"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
-import React, { Suspense, useCallback, useEffect, useRef, useContext } from "react"
+import React, { Suspense, useCallback, useEffect, useRef, useContext, useState } from "react"
 import { ContactShadows, Text, Html } from "@react-three/drei"
 import { A11y, A11yTag, useA11y, A11yAnnouncer, A11yUserPreferences, useUserPreferences, A11ySection, A11yDebuger } from "../../"
 import { ResizeObserver } from "@juggle/resize-observer"
@@ -31,7 +31,7 @@ function SwitchButton(props) {
   const a11y = useA11y()
   return (
     <>
-      <mesh {...props} rotation={[0, 0, a11y.pressed ? Math.PI / 4 : -Math.PI / 4]}>
+      <mesh {...props} rotation={[0, 0, a11y.pressed || props.checked ? Math.PI / 4 : -Math.PI / 4]}>
         <boxBufferGeometry args={[0.3, 2, 0.3]} />
         <meshStandardMaterial color={a11y.focus ? "lightsalmon" : a11y.hover ? "lightpink" : "lightblue"} />
       </mesh>
@@ -212,6 +212,7 @@ export default function App() {
   //   sectionRefref.current = node
   // }, [])
   const snap = useProxy(state)
+  const [checkedSize, setcheckedSize] = useState(false)
 
   return (
     <main className={snap.dark ? "dark" : "bright"}>
@@ -234,7 +235,37 @@ export default function App() {
               </A11yTag>
             </A11yTag>
             <A11yTag tag="footer"></A11yTag>
-
+            <A11yTag tag="p">Pick size</A11yTag>
+            <A11y
+              role="input"
+              description="small"
+              a11yElAttr={{
+                type: "radio",
+                name: "drone",
+                value: "small",
+                checked: checkedSize === "small",
+              }}
+              actionCall={() => {
+                setcheckedSize("small")
+              }}
+              description="Je suis input1">
+              <SwitchButton checked={checkedSize === "small"} position={[-1, 3, 7]} />
+            </A11y>
+            <A11y
+              role="input"
+              description="medium"
+              a11yElAttr={{
+                type: "radio",
+                name: "drone",
+                value: "medium",
+                checked: checkedSize === "medium",
+              }}
+              actionCall={() => {
+                setcheckedSize("medium")
+              }}
+              description="Je suis input2">
+              <SwitchButton checked={checkedSize === "medium"} position={[1, 3, 7]} />
+            </A11y>
             <A11y
               role="togglebutton"
               startPressed={false}
