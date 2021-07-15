@@ -15,7 +15,7 @@ interface A11yCommonProps {
   debug?: boolean;
   a11yElStyle?: Object;
   a11yElAttr?: Object;
-  a11yParentElAttr?: Object;
+  parentElAttr?: Object;
   hidden?: boolean;
   parentTag?: 'li' | 'div';
 }
@@ -103,7 +103,7 @@ export const A11y: React.FC<Props> = ({
   debug = false,
   a11yElStyle,
   a11yElAttr,
-  a11yParentElAttr,
+  parentElAttr,
   startPressed = false,
   tag = 'p',
   hidden = false,
@@ -121,9 +121,9 @@ export const A11y: React.FC<Props> = ({
   if (!isDeepEqual(a11yElAttrRef.current, a11yElAttr)) {
     a11yElAttrRef.current = a11yElAttr;
   }
-  const a11yParentElAttrRef = useRef(a11yParentElAttr);
-  if (!isDeepEqual(a11yParentElAttrRef.current, a11yParentElAttr)) {
-    a11yParentElAttrRef.current = a11yParentElAttr;
+  const parentElAttrRef = useRef(parentElAttr);
+  if (!isDeepEqual(parentElAttrRef.current, parentElAttr)) {
+    parentElAttrRef.current = parentElAttr;
   }
 
   const [a11yState, setA11yState] = useState({
