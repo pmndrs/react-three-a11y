@@ -494,7 +494,7 @@ export const A11y: React.FC<Props> = ({
         }}
         onPointerOver={handleOnPointerOver}
         onPointerOut={handleOnPointerOut}
-        visible={!hidden}
+        // visible={!hidden}
       >
         {children}
         <Html

@@ -106,9 +106,6 @@ export const Html = ({
       const vec = calculatePosition(group.current, camera, size);
       el.style.cssText = `position:absolute;top:0;left:0;transform:translate3d(${vec[0]}px,${vec[1]}px,0);transform-origin:0 0;`;
 
-      if (target) {
-        target.appendChild(el);
-      }
       return () => {
         if (target) target.removeChild(el);
         ReactDOM.unmountComponentAtNode(el);
@@ -132,6 +129,12 @@ export const Html = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [a11yElAttrRef.current]);
+
+  if (target && target !== el.parentElement) {
+    if (!document.body.contains(el)) {
+      target.append(el);
+    }
+  }
 
   // const styles: React.CSSProperties = React.useMemo(() => {
   //   return {

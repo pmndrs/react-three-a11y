@@ -86,7 +86,7 @@ export const A11yTag = ({
 
   if (target && target !== el.parentElement) {
     if (!document.body.contains(el)) {
-      target.appendChild(el);
+      target.append(el);
     }
   }
   elRef.current = el;

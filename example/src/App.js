@@ -184,9 +184,7 @@ const CarrousselAll = () => {
 
   return (
     <>
-      <A11ySection
-        label="Shape carousel"
-        description="This carousel contains 5 shapes. Use the Previous and Next buttons to cycle through all the shapes.">
+      <A11yTag tag={"section"} a11yElAttr={{ "aria-label": "Shape carousel" }}>
         <Nav left />
         <Carroussel />
         <Nav />
@@ -203,7 +201,7 @@ const CarrousselAll = () => {
           a11yElStyle={{ marginLeft: "-40px" }}>
           <ToggleButton position={[0, -3, 9]} />
         </A11y>
-      </A11ySection>
+      </A11yTag>
     </>
   )
 }
@@ -225,6 +223,9 @@ export default function App() {
           <pointLight position={[-100, -100, -100]} intensity={1.5} color="red" />
           <ambientLight intensity={snap.disabled ? 0.2 : 0.8} />
           <group position-y={2}>
+            <A11y role="image" description="Je suis un test">
+              <SwitchButton position={[-3, 3, 7]} />
+            </A11y>
             <A11yTag tag="header">
               <A11yTag tag="nav">
                 <A11yTag tag="ul">
@@ -232,9 +233,8 @@ export default function App() {
                 </A11yTag>
               </A11yTag>
             </A11yTag>
-            <A11y role="image" description="Je suis un test">
-              <SwitchButton position={[-3, 3, 7]} />
-            </A11y>
+            <A11yTag tag="footer"></A11yTag>
+
             <A11y
               role="togglebutton"
               startPressed={false}
