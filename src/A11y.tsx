@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useContext } from 'react';
 import useAnnounceStore from './announceStore';
 import { useA11yTagContext } from './A11yTag';
 import { stylesHiddenButScreenreadable } from './A11yConsts';
-import { Html } from './OldHtml';
+import { Html } from './Html';
 import isDeepEqual from 'fast-deep-equal/react';
 
 interface A11yCommonProps {
