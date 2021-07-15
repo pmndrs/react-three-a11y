@@ -504,6 +504,7 @@ export const A11y: React.FC<Props> = ({
           }
           tag={parentTag}
           {...portal}
+          a11yElAttr={parentElAttr}
         >
           {AltText}
           {HtmlAccessibleElement}

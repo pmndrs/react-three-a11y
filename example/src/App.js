@@ -66,7 +66,7 @@ function Nav({ left }) {
         href="#"
         description={`Spin ${left ? "left" : "right"} shape`}
         a11yElAttr={state.active === 4 ? { role: "treeitem", "aria-expanded": "false" } : {}}
-        a11yParentElAttr={{ role: "treeitem", "aria-expanded": "false" }}
+        parentElAttr={{ role: "treeitem", "aria-expanded": "false" }}
         activationMsg="shape showing"
         parentTag="li"
         actionCall={() => {
