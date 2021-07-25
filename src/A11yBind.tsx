@@ -6,6 +6,7 @@ import isDeepEqual from 'fast-deep-equal/react';
 
 interface Props {
   children: React.ReactNode;
+  bind: string;
   textContent: string;
   focusCall?: (...args: any[]) => any;
   debug?: boolean;
@@ -33,6 +34,7 @@ export { useA11yBind };
 
 export const A11yBind: React.FC<Props> = ({
   children,
+  bind,
   textContent,
   activationMsg,
   actionCall,
@@ -45,7 +47,7 @@ export const A11yBind: React.FC<Props> = ({
   showPointer = false,
   ...props
 }) => {
-  const bindedEl = useRef(document.getElementById('mainimg'));
+  const bindedEl = useRef(document.getElementById(bind));
 
   let constHiddenButScreenreadable = Object.assign(
     {},
