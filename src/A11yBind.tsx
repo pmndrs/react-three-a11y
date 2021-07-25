@@ -103,7 +103,7 @@ export const A11yBind: React.FC<Props> = ({
           styles[key]
         );
       });
-      bindedEl.current.textContent = textContent;
+      if (textContent) bindedEl.current.textContent = textContent;
       bindedEl.current.onpointerover = handleOnPointerOver;
       bindedEl.current.onpointerout = handleOnPointerOut;
       bindedEl.current.onclick = e => {
