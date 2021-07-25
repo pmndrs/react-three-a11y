@@ -6,7 +6,7 @@ import isDeepEqual from 'fast-deep-equal/react';
 
 interface Props {
   children: React.ReactNode;
-  description: string;
+  textContent: string;
   focusCall?: (...args: any[]) => any;
   debug?: boolean;
   a11yElStyle?: Object;
@@ -33,7 +33,7 @@ export { useA11yBind };
 
 export const A11yBind: React.FC<Props> = ({
   children,
-  description,
+  textContent,
   activationMsg,
   actionCall,
   focusCall,
@@ -103,6 +103,7 @@ export const A11yBind: React.FC<Props> = ({
           styles[key]
         );
       });
+      bindedEl.current.textContent = textContent;
       bindedEl.current.onpointerover = handleOnPointerOver;
       bindedEl.current.onpointerout = handleOnPointerOut;
       bindedEl.current.onclick = e => {
