@@ -77,6 +77,7 @@ export const A11yBind: React.FC<Props> = ({
   const componentIsMounted = useRef(true);
   useEffect(() => {
     bindedEl.current = document.getElementById(bind);
+    console.log(bind, bindedEl.current);
     if (bindedEl.current) {
       if (bindedEl.current.tagName === 'IMG')
         bindedEl.current.setAttribute(
