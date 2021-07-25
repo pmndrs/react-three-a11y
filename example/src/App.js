@@ -228,7 +228,8 @@ export default function App() {
               <A11yBind
                 bind="mainimg"
                 actionCall={() => {
-                  console.log("okok")
+                  console.log(checkedSize)
+                  setcheckedSize(!checkedSize)
                 }}>
                 <SwitchButton position={[-3, 3, 7]} />
               </A11yBind>

@@ -77,7 +77,6 @@ export const A11yBind: React.FC<Props> = ({
   const componentIsMounted = useRef(true);
   useEffect(() => {
     bindedEl.current = document.getElementById(bind);
-    console.log(bind, bindedEl.current);
     if (bindedEl.current) {
       if (bindedEl.current.tagName === 'IMG')
         bindedEl.current.setAttribute(
@@ -141,7 +140,7 @@ export const A11yBind: React.FC<Props> = ({
       documentElement.style.cursor = 'default';
       componentIsMounted.current = false;
     };
-  }, []);
+  }, [actionCall, focusCall, bind, a11yElAttrRef.current]);
 
   React.Children.only(children);
   // @ts-ignore
