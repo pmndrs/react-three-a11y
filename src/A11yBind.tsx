@@ -47,7 +47,7 @@ export const A11yBind: React.FC<Props> = ({
   showPointer = false,
   ...props
 }) => {
-  const bindedEl = useRef(document.getElementById(bind));
+  const bindedEl = useRef<HTMLElement | null>(null);
 
   let constHiddenButScreenreadable = Object.assign(
     {},
@@ -76,6 +76,7 @@ export const A11yBind: React.FC<Props> = ({
   // temporary fix to prevent error -> keep track of our component's mounted state
   const componentIsMounted = useRef(true);
   useEffect(() => {
+    bindedEl.current = document.getElementById(bind);
     if (bindedEl.current) {
       if (bindedEl.current.tagName === 'IMG')
         bindedEl.current.setAttribute(
