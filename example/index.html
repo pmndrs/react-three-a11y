@@ -8,6 +8,55 @@
   </head>
 
   <body>
+    <header>
+      <img src="" alt="logo" id="mainimg" />
+      <h1>STARTER SELECTION</h1>
+      <nav>
+        <ul role="menu">
+          <li role="none">
+            <button aria-controls="mainnav" aria-expanded="false" role="menuitem" tabindex="0">
+              PICK YOUR STARTER
+            </button>
+          </li>
+          <ul id="mainnav">
+            <li role="none">
+              <a href="/">GRASS TYPE</a>
+            </li>
+            <li>
+              <a href="/red">FIRE TYPE</a>
+            </li>
+            <li>
+              <a href="/blue">WATER TYPE</a>
+            </li>
+          </ul>
+        </ul>
+      </nav>
+    </header>
+    <form>
+      <fieldset>
+        <legend>
+          <p>Select option</p>
+        </legend>
+        <label>
+          Large
+          <input tabindex="0" type="radio" name="sizeoption" value="large" checked="" />
+        </label>
+        <label>
+          Medium
+          <input tabindex="0" type="radio" name="sizeoption" value="medium" />
+        </label>
+        <label>
+          Small
+          <input tabindex="0" type="radio" name="sizeoption" value="small" />
+        </label>
+      </fieldset>
+    </form>
+    <div>
+      <button tabindex="0">rotate left</button>
+    </div>
+    <div>
+      <button tabindex="0">rotate right</button>
+    </div>
     <div id="root"></div>
     <script src="./src/index.js"></script>
   </body>

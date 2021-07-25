@@ -17,7 +17,7 @@ interface A11yCommonProps {
   a11yElAttr?: Object;
   parentElAttr?: Object;
   hidden?: boolean;
-  parentTag?: 'li' | 'div';
+  parentTag?: 'li' | 'div' | 'legend';
 }
 
 type RoleProps =
@@ -29,7 +29,7 @@ type RoleProps =
       href?: never;
       disabled?: never;
       startPressed?: never;
-      tag?: 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+      tag?: 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'legend';
     }
   | {
       role: 'button';

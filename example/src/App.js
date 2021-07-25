@@ -2,7 +2,7 @@ import * as THREE from "three"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import React, { Suspense, useCallback, useEffect, useRef, useContext, useState } from "react"
 import { ContactShadows, Text, Html } from "@react-three/drei"
-import { A11y, A11yTag, useA11y, A11yAnnouncer, A11yUserPreferences, useUserPreferences, A11ySection, A11yDebuger } from "../../"
+import { A11yBind, A11y, A11yTag, useA11y, A11yAnnouncer, A11yUserPreferences, useUserPreferences, A11ySection, A11yDebuger } from "../../"
 import { ResizeObserver } from "@juggle/resize-observer"
 import { proxy, useProxy } from "valtio"
 import { EffectComposer, SSAO, SMAA } from "@react-three/postprocessing"
@@ -215,78 +215,25 @@ export default function App() {
   const [checkedSize, setcheckedSize] = useState(false)
 
   return (
-    <main className={snap.dark ? "dark" : "bright"}>
-      <Canvas resize={{ polyfill: ResizeObserver }} camera={{ position: [0, 0, 15], near: 4, far: 30 }} pixelRatio={[1, 1.5]}>
-        <A11yUserPreferences debug={true}>
-          {/* <A11yDebuger /> */}
-          {/* <ResponsiveText /> */}
-          <pointLight position={[100, 100, 100]} intensity={snap.disabled ? 0.2 : 0.5} />
-          <pointLight position={[-100, -100, -100]} intensity={1.5} color="red" />
-          <ambientLight intensity={snap.disabled ? 0.2 : 0.8} />
-          <group position-y={2}>
-            <A11y role="image" description="Je suis un test">
-              <SwitchButton position={[-3, 3, 7]} />
-            </A11y>
-            <A11yTag tag="header">
-              <A11yTag tag="nav">
-                <A11yTag tag="ul">
-                  <CarrousselAll />
-                </A11yTag>
-              </A11yTag>
-            </A11yTag>
-            <A11yTag tag="footer"></A11yTag>
-            <A11yTag tag="p">Pick size</A11yTag>
-            <A11y
-              role="input"
-              description="small"
-              a11yElAttr={{
-                type: "radio",
-                name: "drone",
-                value: "small",
-                checked: checkedSize === "small",
-              }}
-              actionCall={() => {
-                setcheckedSize("small")
-              }}
-              description="Je suis input1">
-              <SwitchButton checked={checkedSize === "small"} position={[-1, 3, 7]} />
-            </A11y>
-            <A11y
-              role="input"
-              description="medium"
-              a11yElAttr={{
-                type: "radio",
-                name: "drone",
-                value: "medium",
-                checked: checkedSize === "medium",
-              }}
-              actionCall={() => {
-                setcheckedSize("medium")
-              }}
-              description="Je suis input2">
-              <SwitchButton checked={checkedSize === "medium"} position={[1, 3, 7]} />
-            </A11y>
-            <A11y
-              role="togglebutton"
-              startPressed={false}
-              description="Power button, click to disable the scene"
-              pressedDescription="Power button, click to turn on the scene"
-              actionCall={() => (state.disabled = !snap.disabled)}
-              activationMsg="Scene activated"
-              deactivationMsg="Scene disabled">
-              <SwitchButton position={[-3, -5, 7]} />
-            </A11y>
-          </group>
-          {/* <Suspense fallback={null}>
-          <EffectComposer multisampling={0}>
-            <SSAO radius={20} intensity={50} luminanceInfluence={0.1} color="#154073" />
-            <SMAA />
-          </EffectComposer>
-        </Suspense> */}
-        </A11yUserPreferences>
-      </Canvas>
-      <Badge />
-      <A11yAnnouncer />
-    </main>
+    <>
+      <main className={snap.dark ? "dark" : "bright"}>
+        <Canvas resize={{ polyfill: ResizeObserver }} camera={{ position: [0, 0, 15], near: 4, far: 30 }} pixelRatio={[1, 1.5]}>
+          <A11yUserPreferences debug={true}>
+            {/* <A11yDebuger /> */}
+            {/* <ResponsiveText /> */}
+            <pointLight position={[100, 100, 100]} intensity={snap.disabled ? 0.2 : 0.5} />
+            <pointLight position={[-100, -100, -100]} intensity={1.5} color="red" />
+            <ambientLight intensity={snap.disabled ? 0.2 : 0.8} />
+            <group position-y={2}>
+              <A11yBind bind="mainimg">
+                <SwitchButton position={[-3, 3, 7]} />
+              </A11yBind>
+            </group>
+          </A11yUserPreferences>
+        </Canvas>
+        <Badge />
+        <A11yAnnouncer />
+      </main>
+    </>
   )
 }
