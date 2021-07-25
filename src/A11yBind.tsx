@@ -73,10 +73,57 @@ export const A11yBind: React.FC<Props> = ({
 
   const documentElement = document.documentElement;
 
-  // temporary fix to prevent error -> keep track of our component's mounted state
   const componentIsMounted = useRef(true);
   useEffect(() => {
     bindedEl.current = document.getElementById(bind);
+    editEl();
+    return () => {
+      bindedEl.current = null;
+      documentElement.style.cursor = 'default';
+      componentIsMounted.current = false;
+    };
+  }, [bind]);
+
+  // @ts-ignore
+  const handleOnPointerOver = e => {
+    if (e.eventObject) {
+      overMesh.current = true;
+    } else {
+      overHtml.current = true;
+    }
+    if (overHtml.current || overMesh.current) {
+      if (
+        bindedEl.current?.tagName === 'A' ||
+        bindedEl.current?.tagName === 'BUTTON' ||
+        showPointer
+      ) {
+        documentElement.style.cursor = 'pointer';
+      }
+      setA11yState({
+        hovered: true,
+        focused: a11yState.focused,
+      });
+    }
+  };
+  // @ts-ignore
+  const handleOnPointerOut = e => {
+    if (e.eventObject) {
+      overMesh.current = false;
+    } else {
+      overHtml.current = false;
+    }
+    if (!overHtml.current && !overMesh.current) {
+      if (componentIsMounted.current) {
+        documentElement.style.cursor = 'default';
+        setA11yState({
+          hovered: false,
+          focused: a11yState.focused,
+        });
+      }
+    }
+  };
+
+  const editEl = () => {
     if (bindedEl.current) {
       if (bindedEl.current.tagName === 'IMG')
         bindedEl.current.setAttribute(
@@ -135,52 +182,11 @@ export const A11yBind: React.FC<Props> = ({
         });
       };
     }
+  };
 
-    return () => {
-      documentElement.style.cursor = 'default';
-      componentIsMounted.current = false;
-    };
-  }, [actionCall, focusCall, bind, a11yElAttrRef.current]);
+  editEl();
 
   React.Children.only(children);
-  // @ts-ignore
-  const handleOnPointerOver = e => {
-    if (e.eventObject) {
-      overMesh.current = true;
-    } else {
-      overHtml.current = true;
-    }
-    if (overHtml.current || overMesh.current) {
-      if (
-        bindedEl.current?.tagName === 'A' ||
-        bindedEl.current?.tagName === 'BUTTON' ||
-        showPointer
-      ) {
-        documentElement.style.cursor = 'pointer';
-      }
-      setA11yState({
-        hovered: true,
-        focused: a11yState.focused,
-      });
-    }
-  };
-  // @ts-ignore
-  const handleOnPointerOut = e => {
-    if (e.eventObject) {
-      overMesh.current = false;
-    } else {
-      overHtml.current = false;
-    }
-    if (!overHtml.current && !overMesh.current) {
-      if (componentIsMounted.current) {
-        documentElement.style.cursor = 'default';
-        setA11yState({
-          hovered: false,
-          focused: a11yState.focused,
-        });
-      }
-    }
-  };
 
   return (
     <A11yContext.Provider
