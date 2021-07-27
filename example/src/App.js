@@ -216,8 +216,18 @@ export default function App() {
 
   return (
     <>
+      <h2 id="h2test">test</h2>
       <main className={snap.dark ? "dark" : "bright"}>
         <Canvas resize={{ polyfill: ResizeObserver }} camera={{ position: [0, 0, 15], near: 4, far: 30 }} pixelRatio={[1, 1.5]}>
+          <A11yBind bind="h1id">
+            <SwitchButton position={[-3, 0, 7]} />
+          </A11yBind>
+          <A11yBind bind="h2test">
+            <SwitchButton position={[-3, -3, 7]} />
+          </A11yBind>
+          <A11yBind bind="h3test">
+            <SwitchButton position={[0, 0, 7]} />
+          </A11yBind>
           <A11yUserPreferences debug={true}>
             {/* <A11yDebuger /> */}
             {/* <ResponsiveText /> */}
@@ -239,6 +249,7 @@ export default function App() {
         <Badge />
         <A11yAnnouncer />
       </main>
+      <h3 id="h3test">test</h3>
     </>
   )
 }

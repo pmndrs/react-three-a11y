@@ -104,6 +104,7 @@ export const HtmlBind = ({
             camera,
             zIndexRange
           )}`;
+          console.log(vec[0], vec[1]);
           target.current.style.transform = `translate3d(${vec[0]}px,${vec[1]}px,0) scale(1) translate(-50%,-50%)`;
         }
         oldPosition.current = vec;

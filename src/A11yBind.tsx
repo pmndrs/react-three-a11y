@@ -52,7 +52,7 @@ export const A11yBind: React.FC<Props> = ({
   let constHiddenButScreenreadable = Object.assign(
     {},
     stylesHiddenButScreenreadable,
-    { opacity: debug ? 1 : 0 },
+    { opacity: debug ? 1 : 0, position: 'fixed', top: 0, left: 0 },
     a11yElStyle
   );
 
