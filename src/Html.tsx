@@ -13,7 +13,6 @@ import { ReactThreeFiber, useFrame, useThree } from '@react-three/fiber';
 
 const v1 = new Vector3();
 const v2 = new Vector3();
-const v3 = new Vector3();
 
 function calculatePosition(
   el: Object3D,
@@ -28,14 +27,6 @@ function calculatePosition(
     objectPos.x * widthHalf + widthHalf,
     -(objectPos.y * heightHalf) + heightHalf,
   ];
-}
-
-function isObjectBehindCamera(el: Object3D, camera: Camera) {
-  const objectPos = v1.setFromMatrixPosition(el.matrixWorld);
-  const cameraPos = v2.setFromMatrixPosition(camera.matrixWorld);
-  const deltaCamObj = objectPos.sub(cameraPos);
-  const camDir = camera.getWorldDirection(v3);
-  return deltaCamObj.angleTo(camDir) > Math.PI / 2;
 }
 
 function objectZIndex(
