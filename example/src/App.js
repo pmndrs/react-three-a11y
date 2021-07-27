@@ -2,7 +2,7 @@ import * as THREE from "three"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import React, { Suspense, useCallback, useEffect, useRef, useContext, useState } from "react"
 import { ContactShadows, Text, Html } from "@react-three/drei"
-import { A11yBind, useA11yBind, A11yAnnouncer, A11yUserPreferences, useUserPreferences } from "../../"
+import { A11y, useA11y, A11yAnnouncer, A11yUserPreferences, useUserPreferences } from "../../"
 import { ResizeObserver } from "@juggle/resize-observer"
 import { proxy, useProxy } from "valtio"
 import { EffectComposer, SSAO, SMAA } from "@react-three/postprocessing"
@@ -18,7 +18,7 @@ const geometries = [
 ]
 
 // function ToggleButton(props) {
-//   const a11y = useA11yBind()
+//   const a11y = useA11y()
 //   return (
 //     <mesh {...props}>
 //       <torusGeometry args={[0.5, a11y.pressed ? 0.28 : 0.25, 16, 32]} />
@@ -28,7 +28,7 @@ const geometries = [
 // }
 
 function SwitchButton(props) {
-  const a11y = useA11yBind()
+  const a11y = useA11y()
   return (
     <>
       <mesh {...props} rotation={[0, 0, props.checked ? Math.PI / 4 : -Math.PI / 4]}>
@@ -81,7 +81,7 @@ function SwitchButton(props) {
 // }
 
 // function Diamond({ position, rotation }) {
-//   const a11y = useA11yBind()
+//   const a11y = useA11y()
 //   return (
 //     <mesh position={position} rotation={rotation}>
 //       <tetrahedronBufferGeometry />
@@ -219,15 +219,15 @@ export default function App() {
       <h2 id="h2test">test</h2>
       <main className={snap.dark ? "dark" : "bright"}>
         <Canvas resize={{ polyfill: ResizeObserver }} camera={{ position: [0, 0, 15], near: 4, far: 30 }} pixelRatio={[1, 1.5]}>
-          <A11yBind bind="h1id">
+          <A11y bind="h1id">
             <SwitchButton position={[-3, 0, 7]} />
-          </A11yBind>
-          <A11yBind bind="h2test">
+          </A11y>
+          <A11y bind="h2test">
             <SwitchButton position={[-3, -3, 7]} />
-          </A11yBind>
-          <A11yBind bind="h3test">
+          </A11y>
+          <A11y bind="h3test">
             <SwitchButton position={[0, 0, 7]} />
-          </A11yBind>
+          </A11y>
           <A11yUserPreferences debug={true}>
             {/* <A11yDebuger /> */}
             {/* <ResponsiveText /> */}
@@ -235,14 +235,14 @@ export default function App() {
             <pointLight position={[-100, -100, -100]} intensity={1.5} color="red" />
             <ambientLight intensity={snap.disabled ? 0.2 : 0.8} />
             <group position-y={2}>
-              <A11yBind
+              <A11y
                 bind="mainimg"
                 actionCall={() => {
                   console.log(checkedSize)
                   setcheckedSize(!checkedSize)
                 }}>
                 <SwitchButton position={[-3, 3, 7]} />
-              </A11yBind>
+              </A11y>
             </group>
           </A11yUserPreferences>
         </Canvas>
