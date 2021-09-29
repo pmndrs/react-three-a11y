@@ -58,23 +58,31 @@ export const A11yUserPreferences: React.FC<Props> = ({ children }) => {
       });
     };
 
-    prefersReducedMotionMediaQuery.addEventListener(
-      'change',
-      handleReducedMotionPrefChange
-    );
-    prefersDarkSchemeMediaQuery.addEventListener(
-      'change',
-      handleDarkSchemePrefChange
-    );
-    return () => {
-      prefersReducedMotionMediaQuery.removeEventListener(
+    if (prefersReducedMotionMediaQuery) {
+      prefersReducedMotionMediaQuery.addEventListener(
         'change',
         handleReducedMotionPrefChange
       );
-      prefersDarkSchemeMediaQuery.removeEventListener(
+    }
+    if (prefersDarkSchemeMediaQuery) {
+      prefersDarkSchemeMediaQuery.addEventListener(
         'change',
         handleDarkSchemePrefChange
       );
+    }
+    return () => {
+      if (prefersReducedMotionMediaQuery) {
+        prefersReducedMotionMediaQuery.removeEventListener(
+          'change',
+          handleReducedMotionPrefChange
+        );
+      }
+      if (prefersDarkSchemeMediaQuery) {
+        prefersDarkSchemeMediaQuery.removeEventListener(
+          'change',
+          handleDarkSchemePrefChange
+        );
+      }
     };
   }, []);
 

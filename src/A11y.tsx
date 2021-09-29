@@ -1,80 +1,27 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
-import { useThree } from '@react-three/fiber';
 import useAnnounceStore from './announceStore';
-import { useA11ySectionContext } from './A11ySection';
 import { stylesHiddenButScreenreadable } from './A11yConsts';
 import { Html } from './Html';
+import isDeepEqual from 'fast-deep-equal/react';
 
-interface A11yCommonProps {
-  role: 'button' | 'togglebutton' | 'link' | 'content' | 'image';
+interface Props {
   children: React.ReactNode;
-  description: string;
-  tabIndex?: number;
-  showAltText?: boolean;
+  bind: string;
+  textContent: string;
   focusCall?: (...args: any[]) => any;
   debug?: boolean;
   a11yElStyle?: Object;
+  a11yElAttr?: Object;
   hidden?: boolean;
+  activationMsg?: string;
+  actionCall?: () => any;
+  disabled?: boolean;
+  showPointer?: boolean;
 }
-
-type RoleProps =
-  | {
-      role: 'content';
-      activationMsg?: never;
-      deactivationMsg?: never;
-      actionCall?: never;
-      href?: never;
-      disabled?: never;
-      startPressed?: never;
-      tag?: 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
-    }
-  | {
-      role: 'button';
-      activationMsg?: string;
-      deactivationMsg?: never;
-      actionCall?: () => any;
-      href?: never;
-      disabled?: boolean;
-      startPressed?: never;
-      tag?: never;
-    }
-  | {
-      role: 'togglebutton';
-      activationMsg?: string;
-      deactivationMsg?: string;
-      actionCall?: () => any;
-      href?: never;
-      disabled?: boolean;
-      startPressed?: boolean;
-      tag?: never;
-    }
-  | {
-      role: 'link';
-      activationMsg?: never;
-      deactivationMsg?: never;
-      actionCall: () => any;
-      href: string;
-      disabled?: never;
-      startPressed?: never;
-      tag?: never;
-    }
-  | {
-      role: 'image';
-      activationMsg?: never;
-      deactivationMsg?: never;
-      actionCall?: never;
-      href?: never;
-      disabled?: never;
-      startPressed?: never;
-      tag?: never;
-    };
-
-type Props = A11yCommonProps & RoleProps;
 
 const A11yContext = React.createContext({
   focus: false,
   hover: false,
-  pressed: false,
 });
 
 A11yContext.displayName = 'A11yContext';
@@ -87,34 +34,36 @@ export { useA11y };
 
 export const A11y: React.FC<Props> = ({
   children,
-  description,
+  bind,
+  textContent,
   activationMsg,
-  deactivationMsg,
-  tabIndex,
-  href,
-  role,
-  showAltText = false,
   actionCall,
   focusCall,
   disabled,
   debug = false,
   a11yElStyle,
-  startPressed = false,
-  tag = 'p',
+  a11yElAttr,
   hidden = false,
+  showPointer = false,
   ...props
 }) => {
+  const bindedEl = useRef<HTMLElement | null>(null);
+
   let constHiddenButScreenreadable = Object.assign(
     {},
     stylesHiddenButScreenreadable,
-    { opacity: debug ? 1 : 0 },
+    { opacity: debug ? 1 : 0, position: 'fixed', top: 0, left: 0 },
     a11yElStyle
   );
+
+  const a11yElAttrRef = useRef(a11yElAttr);
+  if (!isDeepEqual(a11yElAttrRef.current, a11yElAttr)) {
+    a11yElAttrRef.current = a11yElAttr;
+  }
 
   const [a11yState, setA11yState] = useState({
     hovered: false,
     focused: false,
-    pressed: startPressed ? startPressed : false,
   });
 
   const a11yScreenReader = useAnnounceStore(state => state.a11yScreenReader);
@@ -122,18 +71,19 @@ export const A11y: React.FC<Props> = ({
   const overHtml = useRef(false);
   const overMesh = useRef(false);
 
-  const domElement = useThree(state => state.gl.domElement);
+  const documentElement = document.documentElement;
 
-  // temporary fix to prevent error -> keep track of our component's mounted state
   const componentIsMounted = useRef(true);
   useEffect(() => {
+    bindedEl.current = document.getElementById(bind);
+    editEl();
     return () => {
-      domElement.style.cursor = 'default';
+      bindedEl.current = null;
+      documentElement.style.cursor = 'default';
       componentIsMounted.current = false;
     };
-  }, []); // Using an empty dependency array ensures this on
+  }, [bind]);
 
-  React.Children.only(children);
   // @ts-ignore
   const handleOnPointerOver = e => {
     if (e.eventObject) {
@@ -142,13 +92,16 @@ export const A11y: React.FC<Props> = ({
       overHtml.current = true;
     }
     if (overHtml.current || overMesh.current) {
-      if (role !== 'content' && role !== 'image' && !disabled) {
-        domElement.style.cursor = 'pointer';
+      if (
+        bindedEl.current?.tagName === 'A' ||
+        bindedEl.current?.tagName === 'BUTTON' ||
+        showPointer
+      ) {
+        documentElement.style.cursor = 'pointer';
       }
       setA11yState({
         hovered: true,
         focused: a11yState.focused,
-        pressed: a11yState.pressed,
       });
     }
   };
@@ -161,299 +114,85 @@ export const A11y: React.FC<Props> = ({
     }
     if (!overHtml.current && !overMesh.current) {
       if (componentIsMounted.current) {
-        domElement.style.cursor = 'default';
+        documentElement.style.cursor = 'default';
         setA11yState({
           hovered: false,
           focused: a11yState.focused,
-          pressed: a11yState.pressed,
         });
       }
     }
   };
 
-  function handleBtnClick() {
-    //msg is the same need to be clean for it to trigger again in case of multiple press in a row
-    a11yScreenReader('');
-    window.setTimeout(() => {
-      if (typeof activationMsg === 'string') a11yScreenReader(activationMsg);
-    }, 100);
-    if (typeof actionCall === 'function') actionCall();
-  }
-
-  function handleToggleBtnClick() {
-    if (a11yState.pressed) {
-      if (typeof deactivationMsg === 'string')
-        a11yScreenReader(deactivationMsg);
-    } else {
-      if (typeof activationMsg === 'string') a11yScreenReader(activationMsg);
-    }
-    setA11yState({
-      hovered: a11yState.hovered,
-      focused: a11yState.focused,
-      pressed: !a11yState.pressed,
-    });
-    if (typeof actionCall === 'function') actionCall();
-  }
-
-  const returnHtmlA11yEl = () => {
-    if (role === 'button' || role === 'togglebutton') {
-      let disabledBtnAttr = disabled
-        ? {
-            disabled: true,
-          }
-        : null;
-      if (role === 'togglebutton') {
-        return (
-          <button
-            r3f-a11y="true"
-            {...disabledBtnAttr}
-            aria-pressed={a11yState.pressed ? 'true' : 'false'}
-            tabIndex={tabIndex ? tabIndex : 0}
-            style={Object.assign(
-              constHiddenButScreenreadable,
-              disabled ? { cursor: 'default' } : { cursor: 'pointer' },
-              hidden
-                ? { visibility: 'hidden' as const }
-                : { visibility: 'visible' as const }
-            )}
-            onPointerOver={handleOnPointerOver}
-            onPointerOut={handleOnPointerOut}
-            onClick={e => {
-              e.stopPropagation();
-              if (disabled) {
-                return;
-              }
-              handleToggleBtnClick();
-            }}
-            onFocus={() => {
-              if (typeof focusCall === 'function') focusCall();
-              setA11yState({
-                hovered: a11yState.hovered,
-                focused: true,
-                pressed: a11yState.pressed,
-              });
-            }}
-            onBlur={() => {
-              setA11yState({
-                hovered: a11yState.hovered,
-                focused: false,
-                pressed: a11yState.pressed,
-              });
-            }}
-          >
-            {description}
-          </button>
+  const editEl = () => {
+    if (bindedEl.current) {
+      if (bindedEl.current.tagName === 'IMG')
+        bindedEl.current.setAttribute(
+          'src',
+          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E"
         );
-      } else {
-        //regular btn
-        return (
-          <button
-            r3f-a11y="true"
-            {...disabledBtnAttr}
-            tabIndex={tabIndex ? tabIndex : 0}
-            style={Object.assign(
-              constHiddenButScreenreadable,
-              disabled ? { cursor: 'default' } : { cursor: 'pointer' },
-              hidden
-                ? { visibility: 'hidden' as const }
-                : { visibility: 'visible' as const }
-            )}
-            onPointerOver={handleOnPointerOver}
-            onPointerOut={handleOnPointerOut}
-            onClick={e => {
-              e.stopPropagation();
-              if (disabled) {
-                return;
-              }
-              handleBtnClick();
-            }}
-            onFocus={() => {
-              if (typeof focusCall === 'function') focusCall();
-              setA11yState({
-                hovered: a11yState.hovered,
-                focused: true,
-                pressed: a11yState.pressed,
-              });
-            }}
-            onBlur={() => {
-              setA11yState({
-                hovered: a11yState.hovered,
-                focused: false,
-                pressed: a11yState.pressed,
-              });
-            }}
-          >
-            {description}
-          </button>
-        );
+      bindedEl.current.setAttribute('data-r3f-a11y', 'true');
+      if (a11yElAttr) {
+        for (const property in a11yElAttr) {
+          bindedEl.current.setAttribute(
+            property.replace(/[A-Z]/g, m => '-' + m.toLowerCase()),
+            //@ts-ignore
+            a11yElAttr[property]
+          );
+        }
       }
-    } else if (role === 'link') {
-      return (
-        <a
-          r3f-a11y="true"
-          style={Object.assign(
-            constHiddenButScreenreadable,
-            hidden
-              ? { visibility: 'hidden' as const }
-              : { visibility: 'visible' as const }
-          )}
-          href={href}
-          onPointerOver={handleOnPointerOver}
-          onPointerOut={handleOnPointerOut}
-          onClick={e => {
-            e.stopPropagation();
-            e.preventDefault();
-            if (typeof actionCall === 'function') actionCall();
-          }}
-          onFocus={() => {
-            if (typeof focusCall === 'function') focusCall();
-            setA11yState({
-              hovered: a11yState.hovered,
-              focused: true,
-              pressed: a11yState.pressed,
-            });
-          }}
-          onBlur={() => {
-            setA11yState({
-              hovered: a11yState.hovered,
-              focused: false,
-              pressed: a11yState.pressed,
-            });
-          }}
-        >
-          {description}
-        </a>
+      const styles = Object.assign(
+        constHiddenButScreenreadable,
+        hidden
+          ? { visibility: 'hidden' as const }
+          : { visibility: 'visible' as const }
       );
-    } else {
-      let tabIndexP = tabIndex
-        ? {
-            tabIndex: tabIndex,
-          }
-        : null;
-      if (role === 'image') {
-        return (
-          <img
-            r3f-a11y="true"
-            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E"
-            alt={description}
-            {...tabIndexP}
-            style={Object.assign(
-              constHiddenButScreenreadable,
-              hidden
-                ? { visibility: 'hidden' as const }
-                : { visibility: 'visible' as const }
-            )}
-            onPointerOver={handleOnPointerOver}
-            onPointerOut={handleOnPointerOut}
-            onBlur={() => {
-              setA11yState({
-                hovered: a11yState.hovered,
-                focused: false,
-                pressed: a11yState.pressed,
-              });
-            }}
-            onFocus={() => {
-              if (typeof focusCall === 'function') focusCall();
-              setA11yState({
-                hovered: a11yState.hovered,
-                focused: true,
-                pressed: a11yState.pressed,
-              });
-            }}
-          />
+      Object.keys(styles).forEach((key: string) => {
+        bindedEl.current?.style.setProperty(
+          key.replace(/[A-Z]/g, m => '-' + m.toLowerCase()),
+          //@ts-ignore
+          styles[key]
         );
-      } else {
-        const Tag = tag;
-        return (
-          <Tag
-            r3f-a11y="true"
-            {...tabIndexP}
-            style={Object.assign(
-              constHiddenButScreenreadable,
-              hidden
-                ? { visibility: 'hidden' as const }
-                : { visibility: 'visible' as const }
-            )}
-            onPointerOver={handleOnPointerOver}
-            onPointerOut={handleOnPointerOut}
-            onBlur={() => {
-              setA11yState({
-                hovered: a11yState.hovered,
-                focused: false,
-                pressed: a11yState.pressed,
-              });
-            }}
-            onFocus={() => {
-              if (typeof focusCall === 'function') focusCall();
-              setA11yState({
-                hovered: a11yState.hovered,
-                focused: true,
-                pressed: a11yState.pressed,
-              });
-            }}
-          >
-            {description}
-          </Tag>
-        );
-      }
+      });
+      if (textContent) bindedEl.current.textContent = textContent;
+      bindedEl.current.onpointerover = handleOnPointerOver;
+      bindedEl.current.onpointerout = handleOnPointerOut;
+      bindedEl.current.onclick = e => {
+        e.stopPropagation();
+        if (disabled) {
+          return;
+        }
+        if (typeof actionCall === 'function') actionCall();
+        a11yScreenReader('');
+        window.setTimeout(() => {
+          if (typeof activationMsg === 'string')
+            a11yScreenReader(activationMsg);
+        }, 100);
+      };
+      bindedEl.current.onfocus = () => {
+        if (typeof focusCall === 'function') focusCall();
+        setA11yState({
+          hovered: a11yState.hovered,
+          focused: true,
+        });
+      };
+      bindedEl.current.onblur = () => {
+        setA11yState({
+          hovered: a11yState.hovered,
+          focused: false,
+        });
+      };
     }
   };
 
-  const HtmlAccessibleElement = React.useMemo(returnHtmlA11yEl, [
-    description,
-    a11yState,
-    hidden,
-    tabIndex,
-    href,
-    disabled,
-    startPressed,
-    tag,
-    actionCall,
-    focusCall,
-  ]);
+  editEl();
 
-  let AltText = null;
-  if (showAltText && a11yState.hovered) {
-    AltText = (
-      <div
-        aria-hidden={true}
-        style={{
-          width: 'auto',
-          maxWidth: '300px',
-          display: 'block',
-          position: 'absolute',
-          top: '0px',
-          left: '0px',
-          transform: 'translate(-50%,-50%)',
-          background: 'white',
-          borderRadius: '4px',
-          padding: '4px',
-        }}
-      >
-        <p
-          aria-hidden={true}
-          style={{
-            margin: '0px',
-          }}
-        >
-          {description}
-        </p>
-      </div>
-    );
-  }
-
-  const section = useA11ySectionContext();
-  let portal = {};
-  if (section.current instanceof HTMLElement) {
-    portal = { portal: section };
-  }
+  React.Children.only(children);
 
   return (
     <A11yContext.Provider
       value={{
         hover: a11yState.hovered,
         focus: a11yState.focused,
-        pressed: a11yState.pressed,
       }}
     >
       <group
@@ -463,16 +202,11 @@ export const A11y: React.FC<Props> = ({
           if (disabled) {
             return;
           }
-          if (role === 'button') {
-            handleBtnClick();
-          } else if (role === 'togglebutton') {
-            handleToggleBtnClick();
-          } else {
-            if (typeof actionCall === 'function') actionCall();
-          }
+          if (typeof actionCall === 'function') actionCall();
         }}
         onPointerOver={handleOnPointerOver}
         onPointerOut={handleOnPointerOut}
+        // visible={!hidden}
       >
         {children}
         <Html
@@ -481,11 +215,8 @@ export const A11y: React.FC<Props> = ({
             // @ts-ignore
             children.props.position ? children.props.position : 0
           }
-          {...portal}
-        >
-          {AltText}
-          {HtmlAccessibleElement}
-        </Html>
+          target={bindedEl}
+        ></Html>
       </group>
     </A11yContext.Provider>
   );

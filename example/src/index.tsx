@@ -2,7 +2,7 @@ import * as THREE from "three"
 import ReactDOM from "react-dom"
 import React, { useRef, useState } from "react"
 import { Canvas, useFrame } from "@react-three/fiber"
-import { A11y, useA11y, A11yAnnouncer, A11yUserPreferences, useUserPreferences, A11ySection, A11yDebuger } from "../../"
+import { A11y } from "../../"
 
 /* just to test tsx autocomplete etc */
 function Box(props: JSX.IntrinsicElements["mesh"]) {
@@ -27,11 +27,14 @@ function Box(props: JSX.IntrinsicElements["mesh"]) {
 }
 
 ReactDOM.render(
-  <Canvas>
-    <ambientLight />
-    <pointLight position={[10, 10, 10]} />
-    <Box position={[-1.2, 0, 0]} />
-    <Box position={[1.2, 0, 0]} />
-  </Canvas>,
+  <>
+    <h1 id="h1id">test h1 render</h1>
+    <Canvas>
+      <ambientLight />
+      <pointLight position={[10, 10, 10]} />
+      <Box position={[-1.2, 0, 0]} />
+      <Box position={[1.2, 0, 0]} />
+    </Canvas>
+  </>,
   document.getElementById("root"),
 )
