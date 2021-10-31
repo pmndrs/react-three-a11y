@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
 import { useThree } from '@react-three/fiber';
 import useAnnounceStore from './announceStore';
+import useA11yStore from './a11yStore';
 import { useA11ySectionContext } from './A11ySection';
 import { stylesHiddenButScreenreadable } from './A11yConsts';
 import { Html } from './Html';
@@ -115,23 +116,36 @@ export const A11y: React.FC<Props> = ({
     hovered: false,
     focused: false,
     pressed: startPressed ? startPressed : false,
+    autoUpdate: false,
+    needUpdate: false,
   });
 
   const a11yScreenReader = useAnnounceStore(state => state.a11yScreenReader);
+  const registerA11YObj = useA11yStore(state => state.registerA11YObj);
 
   const overHtml = useRef(false);
   const overMesh = useRef(false);
+  const refHtml = useRef(null);
 
   const domElement = useThree(state => state.gl.domElement);
 
   // temporary fix to prevent error -> keep track of our component's mounted state
   const componentIsMounted = useRef(true);
   useEffect(() => {
+    registerA11YObj(setA11yState);
     return () => {
       domElement.style.cursor = 'default';
       componentIsMounted.current = false;
     };
   }, []); // Using an empty dependency array ensures this on
+
+  useEffect(() => {
+    if (refHtml.current) {
+      // @ts-ignore
+      refHtml.current.needUpdate = a11yState.needUpdate;
+    }
+    return () => {};
+  }, [a11yState.needUpdate]);
 
   React.Children.only(children);
   // @ts-ignore
@@ -149,6 +163,8 @@ export const A11y: React.FC<Props> = ({
         hovered: true,
         focused: a11yState.focused,
         pressed: a11yState.pressed,
+        autoUpdate: a11yState.autoUpdate,
+        needUpdate: a11yState.needUpdate,
       });
     }
   };
@@ -166,6 +182,8 @@ export const A11y: React.FC<Props> = ({
           hovered: false,
           focused: a11yState.focused,
           pressed: a11yState.pressed,
+          autoUpdate: a11yState.autoUpdate,
+          needUpdate: a11yState.needUpdate,
         });
       }
     }
@@ -191,6 +209,8 @@ export const A11y: React.FC<Props> = ({
       hovered: a11yState.hovered,
       focused: a11yState.focused,
       pressed: !a11yState.pressed,
+      autoUpdate: a11yState.autoUpdate,
+      needUpdate: a11yState.needUpdate,
     });
     if (typeof actionCall === 'function') actionCall();
   }
@@ -231,6 +251,8 @@ export const A11y: React.FC<Props> = ({
                 hovered: a11yState.hovered,
                 focused: true,
                 pressed: a11yState.pressed,
+                autoUpdate: a11yState.autoUpdate,
+                needUpdate: a11yState.needUpdate,
               });
             }}
             onBlur={() => {
@@ -238,6 +260,8 @@ export const A11y: React.FC<Props> = ({
                 hovered: a11yState.hovered,
                 focused: false,
                 pressed: a11yState.pressed,
+                autoUpdate: a11yState.autoUpdate,
+                needUpdate: a11yState.needUpdate,
               });
             }}
           >
@@ -273,6 +297,8 @@ export const A11y: React.FC<Props> = ({
                 hovered: a11yState.hovered,
                 focused: true,
                 pressed: a11yState.pressed,
+                autoUpdate: a11yState.autoUpdate,
+                needUpdate: a11yState.needUpdate,
               });
             }}
             onBlur={() => {
@@ -280,6 +306,8 @@ export const A11y: React.FC<Props> = ({
                 hovered: a11yState.hovered,
                 focused: false,
                 pressed: a11yState.pressed,
+                autoUpdate: a11yState.autoUpdate,
+                needUpdate: a11yState.needUpdate,
               });
             }}
           >
@@ -311,6 +339,8 @@ export const A11y: React.FC<Props> = ({
               hovered: a11yState.hovered,
               focused: true,
               pressed: a11yState.pressed,
+              autoUpdate: a11yState.autoUpdate,
+              needUpdate: a11yState.needUpdate,
             });
           }}
           onBlur={() => {
@@ -318,6 +348,8 @@ export const A11y: React.FC<Props> = ({
               hovered: a11yState.hovered,
               focused: false,
               pressed: a11yState.pressed,
+              autoUpdate: a11yState.autoUpdate,
+              needUpdate: a11yState.needUpdate,
             });
           }}
         >
@@ -350,6 +382,8 @@ export const A11y: React.FC<Props> = ({
                 hovered: a11yState.hovered,
                 focused: false,
                 pressed: a11yState.pressed,
+                autoUpdate: a11yState.autoUpdate,
+                needUpdate: a11yState.needUpdate,
               });
             }}
             onFocus={() => {
@@ -358,6 +392,8 @@ export const A11y: React.FC<Props> = ({
                 hovered: a11yState.hovered,
                 focused: true,
                 pressed: a11yState.pressed,
+                autoUpdate: a11yState.autoUpdate,
+                needUpdate: a11yState.needUpdate,
               });
             }}
           />
@@ -381,6 +417,8 @@ export const A11y: React.FC<Props> = ({
                 hovered: a11yState.hovered,
                 focused: false,
                 pressed: a11yState.pressed,
+                autoUpdate: a11yState.autoUpdate,
+                needUpdate: a11yState.needUpdate,
               });
             }}
             onFocus={() => {
@@ -389,6 +427,8 @@ export const A11y: React.FC<Props> = ({
                 hovered: a11yState.hovered,
                 focused: true,
                 pressed: a11yState.pressed,
+                autoUpdate: a11yState.autoUpdate,
+                needUpdate: a11yState.needUpdate,
               });
             }}
           >
@@ -482,6 +522,7 @@ export const A11y: React.FC<Props> = ({
             children.props.position ? children.props.position : 0
           }
           {...portal}
+          ref={refHtml}
         >
           {AltText}
           {HtmlAccessibleElement}
