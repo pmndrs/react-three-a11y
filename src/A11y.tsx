@@ -117,8 +117,6 @@ export const A11y: React.FC<Props> = ({
     hovered: false,
     focused: false,
     pressed: startPressed ? startPressed : false,
-    autoUpdate: false,
-    needUpdate: false,
   });
 
   const a11yScreenReader = useAnnounceStore(state => state.a11yScreenReader);
@@ -133,7 +131,7 @@ export const A11y: React.FC<Props> = ({
   // temporary fix to prevent error -> keep track of our component's mounted state
   const componentIsMounted = useRef(true);
   useEffect(() => {
-    registerA11YObj(setA11yState);
+    registerA11YObj(refHtml.current);
     return () => {
       domElement.style.cursor = 'default';
       componentIsMounted.current = false;
@@ -156,8 +154,6 @@ export const A11y: React.FC<Props> = ({
         hovered: true,
         focused: a11yState.focused,
         pressed: a11yState.pressed,
-        autoUpdate: a11yState.autoUpdate,
-        needUpdate: a11yState.needUpdate,
       });
     }
   };
@@ -175,8 +171,6 @@ export const A11y: React.FC<Props> = ({
           hovered: false,
           focused: a11yState.focused,
           pressed: a11yState.pressed,
-          autoUpdate: a11yState.autoUpdate,
-          needUpdate: a11yState.needUpdate,
         });
       }
     }
@@ -202,8 +196,6 @@ export const A11y: React.FC<Props> = ({
       hovered: a11yState.hovered,
       focused: a11yState.focused,
       pressed: !a11yState.pressed,
-      autoUpdate: a11yState.autoUpdate,
-      needUpdate: a11yState.needUpdate,
     });
     if (typeof actionCall === 'function') actionCall();
   }
@@ -244,8 +236,6 @@ export const A11y: React.FC<Props> = ({
                 hovered: a11yState.hovered,
                 focused: true,
                 pressed: a11yState.pressed,
-                autoUpdate: a11yState.autoUpdate,
-                needUpdate: a11yState.needUpdate,
               });
             }}
             onBlur={() => {
@@ -253,8 +243,6 @@ export const A11y: React.FC<Props> = ({
                 hovered: a11yState.hovered,
                 focused: false,
                 pressed: a11yState.pressed,
-                autoUpdate: a11yState.autoUpdate,
-                needUpdate: a11yState.needUpdate,
               });
             }}
           >
@@ -290,8 +278,6 @@ export const A11y: React.FC<Props> = ({
                 hovered: a11yState.hovered,
                 focused: true,
                 pressed: a11yState.pressed,
-                autoUpdate: a11yState.autoUpdate,
-                needUpdate: a11yState.needUpdate,
               });
             }}
             onBlur={() => {
@@ -299,8 +285,6 @@ export const A11y: React.FC<Props> = ({
                 hovered: a11yState.hovered,
                 focused: false,
                 pressed: a11yState.pressed,
-                autoUpdate: a11yState.autoUpdate,
-                needUpdate: a11yState.needUpdate,
               });
             }}
           >
@@ -332,8 +316,6 @@ export const A11y: React.FC<Props> = ({
               hovered: a11yState.hovered,
               focused: true,
               pressed: a11yState.pressed,
-              autoUpdate: a11yState.autoUpdate,
-              needUpdate: a11yState.needUpdate,
             });
           }}
           onBlur={() => {
@@ -341,8 +323,6 @@ export const A11y: React.FC<Props> = ({
               hovered: a11yState.hovered,
               focused: false,
               pressed: a11yState.pressed,
-              autoUpdate: a11yState.autoUpdate,
-              needUpdate: a11yState.needUpdate,
             });
           }}
         >
@@ -375,8 +355,6 @@ export const A11y: React.FC<Props> = ({
                 hovered: a11yState.hovered,
                 focused: false,
                 pressed: a11yState.pressed,
-                autoUpdate: a11yState.autoUpdate,
-                needUpdate: a11yState.needUpdate,
               });
             }}
             onFocus={() => {
@@ -385,8 +363,6 @@ export const A11y: React.FC<Props> = ({
                 hovered: a11yState.hovered,
                 focused: true,
                 pressed: a11yState.pressed,
-                autoUpdate: a11yState.autoUpdate,
-                needUpdate: a11yState.needUpdate,
               });
             }}
           />
@@ -410,8 +386,6 @@ export const A11y: React.FC<Props> = ({
                 hovered: a11yState.hovered,
                 focused: false,
                 pressed: a11yState.pressed,
-                autoUpdate: a11yState.autoUpdate,
-                needUpdate: a11yState.needUpdate,
               });
             }}
             onFocus={() => {
@@ -420,8 +394,6 @@ export const A11y: React.FC<Props> = ({
                 hovered: a11yState.hovered,
                 focused: true,
                 pressed: a11yState.pressed,
-                autoUpdate: a11yState.autoUpdate,
-                needUpdate: a11yState.needUpdate,
               });
             }}
           >

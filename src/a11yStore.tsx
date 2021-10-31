@@ -1,28 +1,9 @@
+import { Group } from 'three';
 import create from 'zustand';
 
 type State = {
-  a11yObj: Array<
-    React.Dispatch<
-      React.SetStateAction<{
-        hovered: boolean;
-        focused: boolean;
-        pressed: boolean;
-        autoUpdate: boolean;
-        needUpdate: boolean;
-      }>
-    >
-  >;
-  registerA11YObj: (
-    a11yObj: React.Dispatch<
-      React.SetStateAction<{
-        hovered: boolean;
-        focused: boolean;
-        pressed: boolean;
-        autoUpdate: boolean;
-        needUpdate: boolean;
-      }>
-    >
-  ) => void;
+  a11yObj: Array<React.Ref<Group>>;
+  registerA11YObj: (a11yObj: React.Ref<Group>) => void;
 };
 
 const useA11yStore = create<State>(set => {
