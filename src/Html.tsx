@@ -127,8 +127,12 @@ export const Html = React.forwardRef(
     });
 
     useFrame(() => {
-      //@ts-ignore
-      if (ref.current && ref.current.a11yNeedUpdate) {
+      if (
+        //@ts-ignore
+        (ref.current && ref.current.a11yAutoUpdate) ||
+        //@ts-ignore
+        ref.current.a11yNeedUpdate
+      ) {
         camera.updateMatrixWorld();
         //@ts-ignore
         const vec = calculatePosition(ref.current, camera, size);
@@ -148,6 +152,8 @@ export const Html = React.forwardRef(
           oldPosition.current = vec;
           oldZoom.current = camera.zoom;
         }
+        //@ts-ignore
+        ref.current.a11yNeedUpdate = false;
       }
     });
 

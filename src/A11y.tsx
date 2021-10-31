@@ -76,6 +76,7 @@ const A11yContext = React.createContext({
   focus: false,
   hover: false,
   pressed: false,
+  refHtml: null,
 });
 
 A11yContext.displayName = 'A11yContext';
@@ -138,14 +139,6 @@ export const A11y: React.FC<Props> = ({
       componentIsMounted.current = false;
     };
   }, []); // Using an empty dependency array ensures this on
-
-  useEffect(() => {
-    if (refHtml.current) {
-      // @ts-ignore
-      refHtml.current.needUpdate = a11yState.needUpdate;
-    }
-    return () => {};
-  }, [a11yState.needUpdate]);
 
   React.Children.only(children);
   // @ts-ignore
@@ -494,6 +487,7 @@ export const A11y: React.FC<Props> = ({
         hover: a11yState.hovered,
         focus: a11yState.focused,
         pressed: a11yState.pressed,
+        refHtml: refHtml.current,
       }}
     >
       <group
