@@ -15,6 +15,7 @@ interface A11yCommonProps {
   debug?: boolean;
   a11yElStyle?: Object;
   hidden?: boolean;
+  dragThreshold?: number;
 }
 
 type RoleProps =
@@ -102,6 +103,7 @@ export const A11y: React.FC<Props> = ({
   startPressed = false,
   tag = 'p',
   hidden = false,
+  dragThreshold,
   ...props
 }) => {
   let constHiddenButScreenreadable = Object.assign(
@@ -460,7 +462,7 @@ export const A11y: React.FC<Props> = ({
         {...props}
         onClick={e => {
           e.stopPropagation();
-          if (disabled) {
+          if (disabled || (dragThreshold && e.delta > dragThreshold)) {
             return;
           }
           if (role === 'button') {
