@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
 import { useThree } from '@react-three/fiber';
 import useAnnounceStore from './announceStore';
+import useA11yStore from './a11yStore';
 import { useA11ySectionContext } from './A11ySection';
 import { stylesHiddenButScreenreadable } from './A11yConsts';
 import { Html } from './Html';
@@ -76,6 +77,7 @@ const A11yContext = React.createContext({
   focus: false,
   hover: false,
   pressed: false,
+  refHtml: null,
 });
 
 A11yContext.displayName = 'A11yContext';
@@ -120,15 +122,18 @@ export const A11y: React.FC<Props> = ({
   });
 
   const a11yScreenReader = useAnnounceStore(state => state.a11yScreenReader);
+  const registerA11YObj = useA11yStore(state => state.registerA11YObj);
 
   const overHtml = useRef(false);
   const overMesh = useRef(false);
+  const refHtml = useRef(null);
 
   const domElement = useThree(state => state.gl.domElement);
 
   // temporary fix to prevent error -> keep track of our component's mounted state
   const componentIsMounted = useRef(true);
   useEffect(() => {
+    registerA11YObj(refHtml.current);
     return () => {
       domElement.style.cursor = 'default';
       componentIsMounted.current = false;
@@ -456,6 +461,7 @@ export const A11y: React.FC<Props> = ({
         hover: a11yState.hovered,
         focus: a11yState.focused,
         pressed: a11yState.pressed,
+        refHtml: refHtml.current,
       }}
     >
       <group
@@ -484,6 +490,7 @@ export const A11y: React.FC<Props> = ({
             children.props.position ? children.props.position : 0
           }
           {...portal}
+          ref={refHtml}
         >
           {AltText}
           {HtmlAccessibleElement}

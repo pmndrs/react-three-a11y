@@ -19,8 +19,14 @@ const geometries = [
 
 function ToggleButton(props) {
   const a11y = useA11y()
+  console.log(a11y)
   return (
-    <mesh {...props}>
+    <mesh
+      {...props}
+      onClick={() => {
+        console.log(a11y)
+        a11y.refHtml.a11yNeedUpdate = true
+      }}>
       <torusGeometry args={[0.5, a11y.pressed ? 0.28 : 0.25, 16, 32]} />
       <meshStandardMaterial color={a11y.focus ? "lightsalmon" : a11y.hover ? "lightpink" : "lightblue"} />
     </mesh>

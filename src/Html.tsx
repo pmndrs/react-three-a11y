@@ -82,22 +82,23 @@ export const Html = React.forwardRef(
       zIndexRange = [16777271, 0],
       ...props
     }: HtmlProps,
-    ref: React.Ref<HTMLDivElement>
+    ref: React.Ref<Group>
   ) => {
     const gl = useThree(({ gl }) => gl);
     const camera = useThree(({ camera }) => camera);
     const scene = useThree(({ scene }) => scene);
     const size = useThree(({ size }) => size);
     const [el] = React.useState(() => document.createElement('div'));
-    const group = React.useRef<Group>(null);
     const oldZoom = React.useRef(0);
     const oldPosition = React.useRef([0, 0]);
     const target = portal?.current ?? gl.domElement.parentNode;
 
     React.useEffect(() => {
-      if (group.current) {
+      //@ts-ignore
+      if (ref.current) {
         scene.updateMatrixWorld();
-        const vec = calculatePosition(group.current, camera, size);
+        //@ts-ignore
+        const vec = calculatePosition(ref.current, camera, size);
         el.style.cssText = `position:absolute;top:0;left:0;transform:translate3d(${vec[0]}px,${vec[1]}px,0);transform-origin:0 0;`;
         if (target) {
           target.appendChild(el);
@@ -120,41 +121,42 @@ export const Html = React.forwardRef(
 
     React.useLayoutEffect(() => {
       ReactDOM.render(
-        <div
-          ref={ref}
-          style={styles}
-          className={className}
-          children={children}
-        />,
+        <div style={styles} className={className} children={children} />,
         el
       );
     });
 
     useFrame(() => {
-      if (group.current) {
+      if (
+        //@ts-ignore
+        (ref.current && ref.current.a11yAutoUpdate) ||
+        //@ts-ignore
+        ref.current.a11yNeedUpdate
+      ) {
         camera.updateMatrixWorld();
-        const vec = calculatePosition(group.current, camera, size);
+        //@ts-ignore
+        const vec = calculatePosition(ref.current, camera, size);
 
         if (
           Math.abs(oldZoom.current - camera.zoom) > eps ||
           Math.abs(oldPosition.current[0] - vec[0]) > eps ||
           Math.abs(oldPosition.current[1] - vec[1]) > eps
         ) {
-          el.style.display = !isObjectBehindCamera(group.current, camera)
+          //@ts-ignore
+          el.style.display = !isObjectBehindCamera(ref.current, camera)
             ? 'block'
             : 'none';
-          el.style.zIndex = `${objectZIndex(
-            group.current,
-            camera,
-            zIndexRange
-          )}`;
+          //@ts-ignore
+          el.style.zIndex = `${objectZIndex(ref.current, camera, zIndexRange)}`;
           el.style.transform = `translate3d(${vec[0]}px,${vec[1]}px,0) scale(1)`;
           oldPosition.current = vec;
           oldZoom.current = camera.zoom;
         }
+        //@ts-ignore
+        ref.current.a11yNeedUpdate = false;
       }
     });
 
-    return <group {...props} ref={group} />;
+    return <group {...props} ref={ref} />;
   }
 );
