@@ -4,7 +4,7 @@ import React, { Suspense, useCallback, useEffect, useRef, useContext } from "rea
 import { ContactShadows, Text, Html } from "@react-three/drei"
 import { A11y, useA11y, A11yAnnouncer, A11yUserPreferences, useUserPreferences, A11ySection, A11yDebuger } from "../../"
 import { ResizeObserver } from "@juggle/resize-observer"
-import { proxy, useProxy } from "valtio"
+import { proxy, useSnapshot } from "valtio"
 import { EffectComposer, SSAO, SMAA } from "@react-three/postprocessing"
 import { Badge, Logo, LogoFull } from "@pmndrs/branding"
 
@@ -17,7 +17,7 @@ const geometries = [
   new THREE.IcosahedronBufferGeometry(1.5),
 ]
 
-function ToggleButton(props) {
+function ToggleButton (props) {
   const a11y = useA11y()
   return (
     <mesh {...props}>
@@ -27,7 +27,7 @@ function ToggleButton(props) {
   )
 }
 
-function SwitchButton(props) {
+function SwitchButton (props) {
   const a11y = useA11y()
   return (
     <>
@@ -43,7 +43,7 @@ function SwitchButton(props) {
   )
 }
 
-function Floor(props) {
+function Floor (props) {
   return (
     <>
       <ContactShadows rotation-x={Math.PI / 2} position={[0, -5, 0]} opacity={0.4} width={30} height={30} blur={1} far={15} />
@@ -55,8 +55,8 @@ function Floor(props) {
   )
 }
 
-function Nav({ left }) {
-  const snap = useProxy(state)
+function Nav ({ left }) {
+  const snap = useSnapshot(state)
   const viewport = useThree(state => state.viewport)
   const radius = Math.min(12, viewport.width / 2.5)
   return (
@@ -74,7 +74,7 @@ function Nav({ left }) {
   )
 }
 
-function Diamond({ position, rotation }) {
+function Diamond ({ position, rotation }) {
   const a11y = useA11y()
   return (
     <mesh position={position} rotation={rotation}>
@@ -84,8 +84,8 @@ function Diamond({ position, rotation }) {
   )
 }
 
-function Shape({ index, active, ...props }) {
-  const snap = useProxy(state)
+function Shape ({ index, active, ...props }) {
+  const snap = useSnapshot(state)
   const vec = new THREE.Vector3()
   const ref = useRef()
   const { a11yPrefersState } = useUserPreferences()
@@ -144,9 +144,9 @@ function Shape({ index, active, ...props }) {
 //   )
 // }
 
-function Carroussel() {
+function Carroussel () {
   const viewport = useThree(state => state.viewport)
-  const snap = useProxy(state)
+  const snap = useSnapshot(state)
   const group = useRef()
   const radius = Math.min(6, viewport.width / 5)
   const { a11yPrefersState } = useUserPreferences()
@@ -174,7 +174,7 @@ function Carroussel() {
 }
 
 const CarrousselAll = () => {
-  const snap = useProxy(state)
+  const snap = useSnapshot(state)
 
   return (
     <>
@@ -202,16 +202,16 @@ const CarrousselAll = () => {
   )
 }
 
-export default function App() {
+export default function App () {
   // const sectionRef = useCallback(node => {
   //   console.log(node)
   //   sectionRefref.current = node
   // }, [])
-  const snap = useProxy(state)
+  const snap = useSnapshot(state)
 
   return (
     <main className={snap.dark ? "dark" : "bright"}>
-      <Canvas resize={{ polyfill: ResizeObserver }} camera={{ position: [0, 0, 15], near: 4, far: 30 }} pixelRatio={[1, 1.5]}>
+      <Canvas resize={{ polyfill: ResizeObserver }} camera={{ position: [0, 0, 15], near: 4, far: 30 }}>
         <A11yUserPreferences debug={true}>
           <A11yDebuger />
           {/* <ResponsiveText /> */}

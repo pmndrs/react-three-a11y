@@ -4,14 +4,17 @@ import { useUserPreferences } from './A11yUserPreferences';
 interface Props {}
 
 export const A11yDebuger: React.FC<Props> = ({}) => {
+  const domStructureRef = useRef(null);
   const [el] = useState(() => document.createElement('div'));
+  // ref: https://github.com/DefinitelyTyped/DefinitelyTyped/issues/43848
+  // @ts-ignore
+  const root = React.useMemo<any>(() => domStructureRef.current && ReactDOM.createRoot(domStructureRef.current), [domStructureRef.current]);
   const [boundingStyle, setBoundingStyle] = useState({});
   const [debugState, setDebugState] = useState({
     prefersDarkScheme: false,
     prefersReducedMotion: false,
   });
   const { a11yPrefersState, setA11yPrefersState } = useUserPreferences();
-  const domStructureRef = useRef(null);
 
   useEffect(() => {
     el.style.cssText = 'position:fixed;top:0;left:0;';
@@ -76,11 +79,11 @@ export const A11yDebuger: React.FC<Props> = ({}) => {
         r3fPosId++;
       });
       //@ts-ignore
-      ReactDOM.render(<>{elements}</>, domStructureRef.current);
+      if (root) root.render(<>{elements}</>);
     }, 2000);
     return () => {
       clearInterval(superinterval);
-      ReactDOM.unmountComponentAtNode(el);
+      if (root) root.unmount();
       console.log('remove ev');
       document.removeEventListener('focus', selectActiveEl, true);
     };
@@ -102,7 +105,7 @@ export const A11yDebuger: React.FC<Props> = ({}) => {
   };
 
   useLayoutEffect(() => {
-    return void ReactDOM.render(
+    return void root && root.render(
       <>
         <label>
           Prefer dark mode

@@ -14,7 +14,7 @@ function Box(props: JSX.IntrinsicElements["mesh"]) {
     <A11y role="link" description="" actionCall={() => {}} href="/">
       <mesh
         {...props}
-        ref={mesh}
+        ref={mesh as any}
         scale={active ? 1.5 : 1}
         onClick={event => setActive(!active)}
         onPointerOver={event => setHover(true)}
@@ -26,12 +26,16 @@ function Box(props: JSX.IntrinsicElements["mesh"]) {
   )
 }
 
-ReactDOM.render(
+const rootElement = document.getElementById("root");
+
+// @ts-ignore
+const root = ReactDOM.createRoot(rootElement);
+
+root.render(
   <Canvas>
     <ambientLight />
     <pointLight position={[10, 10, 10]} />
     <Box position={[-1.2, 0, 0]} />
     <Box position={[1.2, 0, 0]} />
   </Canvas>,
-  document.getElementById("root"),
 )
