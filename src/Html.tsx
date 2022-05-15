@@ -1,6 +1,6 @@
 //https://raw.githubusercontent.com/pmndrs/drei/master/src/web/Html.tsx
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 import {
   Vector3,
   Group,
@@ -89,6 +89,7 @@ export const Html = React.forwardRef(
     const scene = useThree(({ scene }) => scene);
     const size = useThree(({ size }) => size);
     const [el] = React.useState(() => document.createElement('div'));
+    const root = React.useMemo(() => ReactDOM.createRoot(el), [el])
     const group = React.useRef<Group>(null);
     const oldZoom = React.useRef(0);
     const oldPosition = React.useRef([0, 0]);
@@ -104,7 +105,7 @@ export const Html = React.forwardRef(
         }
         return () => {
           if (target) target.removeChild(el);
-          ReactDOM.unmountComponentAtNode(el);
+          root.unmount()
         };
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -119,14 +120,13 @@ export const Html = React.forwardRef(
     }, [style, size]);
 
     React.useLayoutEffect(() => {
-      ReactDOM.render(
+      root.render(
         <div
           ref={ref}
           style={styles}
           className={className}
           children={children}
-        />,
-        el
+        />
       );
     });
 

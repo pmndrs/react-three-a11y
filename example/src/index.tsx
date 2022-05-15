@@ -1,5 +1,5 @@
 import * as THREE from "three"
-import ReactDOM from "react-dom"
+import ReactDOM from 'react-dom/client';
 import React, { useRef, useState } from "react"
 import { Canvas, useFrame } from "@react-three/fiber"
 import { A11y, useA11y, A11yAnnouncer, A11yUserPreferences, useUserPreferences, A11ySection, A11yDebuger } from "../../"
@@ -26,12 +26,14 @@ function Box(props: JSX.IntrinsicElements["mesh"]) {
   )
 }
 
-ReactDOM.render(
+const rootElement = document.getElementById("root")
+const root = React.useMemo(() => ReactDOM.createRoot(rootElement), [rootElement])
+
+root.render(
   <Canvas>
     <ambientLight />
     <pointLight position={[10, 10, 10]} />
     <Box position={[-1.2, 0, 0]} />
     <Box position={[1.2, 0, 0]} />
-  </Canvas>,
-  document.getElementById("root"),
+  </Canvas>
 )

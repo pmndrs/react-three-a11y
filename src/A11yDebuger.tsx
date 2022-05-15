@@ -1,10 +1,11 @@
 import React, { useLayoutEffect, useEffect, useState, useRef } from 'react';
-import * as ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 import { useUserPreferences } from './A11yUserPreferences';
 interface Props {}
 
 export const A11yDebuger: React.FC<Props> = ({}) => {
   const [el] = useState(() => document.createElement('div'));
+  const root = React.useMemo(() => ReactDOM.createRoot(el), [el])
   const [boundingStyle, setBoundingStyle] = useState({});
   const [debugState, setDebugState] = useState({
     prefersDarkScheme: false,
@@ -40,6 +41,8 @@ export const A11yDebuger: React.FC<Props> = ({}) => {
         }
       }
     };
+      //@ts-ignore
+    const root = ReactDOM.createRoot(domStructureRef.current)
     console.log('enregistre ev');
     document.addEventListener('focus', selectActiveEl, true);
     let superinterval = window.setInterval(() => {
@@ -76,11 +79,11 @@ export const A11yDebuger: React.FC<Props> = ({}) => {
         r3fPosId++;
       });
       //@ts-ignore
-      ReactDOM.render(<>{elements}</>, domStructureRef.current);
+      root.render(<>{elements}</>);
     }, 2000);
     return () => {
       clearInterval(superinterval);
-      ReactDOM.unmountComponentAtNode(el);
+      root.unmount();
       console.log('remove ev');
       document.removeEventListener('focus', selectActiveEl, true);
     };
@@ -102,7 +105,7 @@ export const A11yDebuger: React.FC<Props> = ({}) => {
   };
 
   useLayoutEffect(() => {
-    return void ReactDOM.render(
+    return void root.render(
       <>
         <label>
           Prefer dark mode
@@ -138,8 +141,7 @@ export const A11yDebuger: React.FC<Props> = ({}) => {
             boundingStyle
           )}
         ></div>
-      </>,
-      el
+      </>
     );
   });
 
