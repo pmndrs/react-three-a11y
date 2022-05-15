@@ -89,7 +89,7 @@ export const Html = React.forwardRef(
     const scene = useThree(({ scene }) => scene);
     const size = useThree(({ size }) => size);
     const [el] = React.useState(() => document.createElement('div'));
-    const root = React.useMemo(() => ReactDOM.createRoot(el), [el])
+    const root = React.useMemo(() => ReactDOM.createRoot(el), [el]);
     const group = React.useRef<Group>(null);
     const oldZoom = React.useRef(0);
     const oldPosition = React.useRef([0, 0]);
@@ -105,7 +105,7 @@ export const Html = React.forwardRef(
         }
         return () => {
           if (target) target.removeChild(el);
-          root.unmount()
+          root.unmount();
         };
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps

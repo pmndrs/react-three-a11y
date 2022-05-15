@@ -14,7 +14,7 @@ const offScreenStyle = {
 };
 
 export const A11yAnnouncer: React.FC = () => {
-  const message = useAnnounceStore(state => state.message);
+  const message = useAnnounceStore((state) => state.message);
 
   useEffect(() => {
     const mouseClickListener = (e: MouseEvent) => {

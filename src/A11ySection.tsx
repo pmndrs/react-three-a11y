@@ -33,7 +33,7 @@ export const A11ySection: React.FC<Props> = ({
 }) => {
   const ref = useRef<HTMLElement | null>(null);
   const refpDesc = useRef<HTMLParagraphElement | null>(null);
-  const gl = useThree(state => state.gl);
+  const gl = useThree((state) => state.gl);
   const [el] = React.useState(() => document.createElement('section'));
   const target = gl.domElement.parentNode;
 
@@ -45,7 +45,7 @@ export const A11ySection: React.FC<Props> = ({
     el.setAttribute('r3f-a11y', 'true');
     el.setAttribute(
       'style',
-      (styles => {
+      ((styles) => {
         return Object.keys(styles).reduce(
           (acc, key) =>
             acc +
