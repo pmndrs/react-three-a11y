@@ -119,12 +119,12 @@ export const A11y: React.FC<Props> = ({
     pressed: startPressed ? startPressed : false,
   });
 
-  const a11yScreenReader = useAnnounceStore(state => state.a11yScreenReader);
+  const a11yScreenReader = useAnnounceStore((state) => state.a11yScreenReader);
 
   const overHtml = useRef(false);
   const overMesh = useRef(false);
 
-  const domElement = useThree(state => state.gl.domElement);
+  const domElement = useThree((state) => state.gl.domElement);
 
   // temporary fix to prevent error -> keep track of our component's mounted state
   const componentIsMounted = useRef(true);
@@ -137,7 +137,7 @@ export const A11y: React.FC<Props> = ({
 
   React.Children.only(children);
   // @ts-ignore
-  const handleOnPointerOver = e => {
+  const handleOnPointerOver = (e) => {
     if (e.eventObject) {
       overMesh.current = true;
     } else {
@@ -155,7 +155,7 @@ export const A11y: React.FC<Props> = ({
     }
   };
   // @ts-ignore
-  const handleOnPointerOut = e => {
+  const handleOnPointerOut = (e) => {
     if (e.eventObject) {
       overMesh.current = false;
     } else {
@@ -220,7 +220,7 @@ export const A11y: React.FC<Props> = ({
             )}
             onPointerOver={handleOnPointerOver}
             onPointerOut={handleOnPointerOut}
-            onClick={e => {
+            onClick={(e) => {
               e.stopPropagation();
               if (disabled) {
                 return;
@@ -262,7 +262,7 @@ export const A11y: React.FC<Props> = ({
             )}
             onPointerOver={handleOnPointerOver}
             onPointerOut={handleOnPointerOut}
-            onClick={e => {
+            onClick={(e) => {
               e.stopPropagation();
               if (disabled) {
                 return;
@@ -302,7 +302,7 @@ export const A11y: React.FC<Props> = ({
           href={href}
           onPointerOver={handleOnPointerOver}
           onPointerOut={handleOnPointerOut}
-          onClick={e => {
+          onClick={(e) => {
             e.stopPropagation();
             e.preventDefault();
             if (typeof actionCall === 'function') actionCall();
@@ -460,7 +460,7 @@ export const A11y: React.FC<Props> = ({
     >
       <group
         {...props}
-        onClick={e => {
+        onClick={(e) => {
           e.stopPropagation();
           if (disabled || (dragThreshold && e.delta > dragThreshold)) {
             return;

@@ -1,10 +1,11 @@
 import React, { useLayoutEffect, useEffect, useState, useRef } from 'react';
-import * as ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 import { useUserPreferences } from './A11yUserPreferences';
 interface Props {}
 
 export const A11yDebuger: React.FC<Props> = ({}) => {
   const [el] = useState(() => document.createElement('div'));
+  const root = React.useMemo(() => ReactDOM.createRoot(el), [el]);
   const [boundingStyle, setBoundingStyle] = useState({});
   const [debugState, setDebugState] = useState({
     prefersDarkScheme: false,
@@ -27,7 +28,7 @@ export const A11yDebuger: React.FC<Props> = ({}) => {
         'r3f-a11y-debug-id'
       );
       if (r3fa11ydebugidref) {
-        document.querySelectorAll('[r3fa11ydebugidref]').forEach(node => {
+        document.querySelectorAll('[r3fa11ydebugidref]').forEach((node) => {
           //@ts-ignore
           node.style.color = null;
         });
@@ -40,13 +41,15 @@ export const A11yDebuger: React.FC<Props> = ({}) => {
         }
       }
     };
+    //@ts-ignore
+    const root = ReactDOM.createRoot(domStructureRef.current);
     console.log('enregistre ev');
     document.addEventListener('focus', selectActiveEl, true);
     let superinterval = window.setInterval(() => {
       let r3fPosId = 0;
       //@ts-ignore
       let elements = [];
-      document.querySelectorAll('[r3f-a11y]').forEach(node => {
+      document.querySelectorAll('[r3f-a11y]').forEach((node) => {
         node.setAttribute('r3f-a11y-debug-id', '' + r3fPosId);
         // let li = document.createElement('li');
         // li.innerHTML = node.tagName ;
@@ -76,18 +79,18 @@ export const A11yDebuger: React.FC<Props> = ({}) => {
         r3fPosId++;
       });
       //@ts-ignore
-      ReactDOM.render(<>{elements}</>, domStructureRef.current);
+      root.render(<>{elements}</>);
     }, 2000);
     return () => {
       clearInterval(superinterval);
-      ReactDOM.unmountComponentAtNode(el);
+      root.unmount();
       console.log('remove ev');
       document.removeEventListener('focus', selectActiveEl, true);
     };
   }, [a11yPrefersState]);
 
   // @ts-ignore
-  const handleChange = e => {
+  const handleChange = (e) => {
     // @ts-ignore
     setA11yPrefersState({
       prefersDarkScheme:
@@ -102,7 +105,7 @@ export const A11yDebuger: React.FC<Props> = ({}) => {
   };
 
   useLayoutEffect(() => {
-    return void ReactDOM.render(
+    return void root.render(
       <>
         <label>
           Prefer dark mode
@@ -138,8 +141,7 @@ export const A11yDebuger: React.FC<Props> = ({}) => {
             boundingStyle
           )}
         ></div>
-      </>,
-      el
+      </>
     );
   });
 

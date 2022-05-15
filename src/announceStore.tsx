@@ -5,10 +5,10 @@ type State = {
   a11yScreenReader: (message: string) => void;
 };
 
-const useAnnounceStore = create<State>(set => {
+const useAnnounceStore = create<State>((set) => {
   return {
     message: '',
-    a11yScreenReader: message => {
+    a11yScreenReader: (message) => {
       set(() => {
         return { message: message };
       });

@@ -1,12 +1,10 @@
 import * as THREE from "three"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
-import React, { Suspense, useCallback, useEffect, useRef, useContext } from "react"
-import { ContactShadows, Text, Html } from "@react-three/drei"
+import React, { useRef } from "react"
 import { A11y, useA11y, A11yAnnouncer, A11yUserPreferences, useUserPreferences, A11ySection, A11yDebuger } from "../../"
 import { ResizeObserver } from "@juggle/resize-observer"
 import { proxy, useProxy } from "valtio"
-import { EffectComposer, SSAO, SMAA } from "@react-three/postprocessing"
-import { Badge, Logo, LogoFull } from "@pmndrs/branding"
+import { Badge } from "@pmndrs/branding"
 
 const state = proxy({ dark: false, active: 0, rotation: 0, disabled: false, section: undefined })
 const geometries = [
@@ -46,7 +44,6 @@ function SwitchButton(props) {
 function Floor(props) {
   return (
     <>
-      <ContactShadows rotation-x={Math.PI / 2} position={[0, -5, 0]} opacity={0.4} width={30} height={30} blur={1} far={15} />
       <mesh {...props} position={[0, -5.1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeBufferGeometry args={[30, 30, 1]} />
         <meshStandardMaterial color={"#eef5f7"} />
