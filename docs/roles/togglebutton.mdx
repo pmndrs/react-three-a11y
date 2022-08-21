@@ -1,0 +1,57 @@
+---
+title: ToggleButton
+description: This page will tell you all you need to know about emulating an accessible togglable button in your react-three-fiber app with @react-three-a11y
+nav: 5
+---
+
+## Role ToggleButton of the A11y component
+
+This is mostly the same as the [button role](/a11y/roles/button).
+The difference is that this button will have the aria-pressed attribute and that you'll be able to use the following deactivationMsg property in addition to the usual description and activationMsg properties.
+
+Since this role is meant to emulate the behaviour of togglable button.
+It will display a cursor pointer when your cursor is over the linked 3D object.
+It will call a function on click but also on any kind of action that would trigger a focused button (Enter, Double-Tap, ...).
+It is also actionnable by user using a screen reader.
+
+```jsx
+<A11y
+  role="togglebutton"
+  description="Dark theme"
+  startPressed={false}
+  actionCall="()=>switchTheme()"
+  ...>
+  <Some3DComponent />
+</A11y>
+```
+
+Using it like this makes it focusable to all kind of users.
+
+<Hint>
+  You might have noticed the startPressed prop. Depending on your need, you might want to have your
+  button starting in a pressed state. This is what this prop is for.
+</Hint>
+
+You should also use the useA11y() hook within the encapsulated components to adjust the rendering on hover and focus and pressed state. Doing so greatly improve the accessibility of your page.
+Take a look at this code sample to see how to use it.
+You can also play with it in [this demo](https://n4rzi.csb.app)
+
+```jsx
+function Some3DComponent() {
+  const a11y = useA11y() // access pressed, hover and focus
+  return (
+    <mesh>
+      <boxBufferGeometry />
+      <meshStandardMaterial
+        metalness={1}
+        roughness={0.8}
+        color={a11y.focus || a11y.hover ? '#cc66dd' : '#ffffff'}
+        emissive={a11y.focus ? '#cc4444' : a11y.hover ? '#339922' : '#003399'}
+      />
+    </mesh>
+  )
+}
+```
+
+You could also specify the optional prop `activationMsg` and `deactivationMsg`.
+Respective message will be announced by screenreader when the button is activated / deactivated.

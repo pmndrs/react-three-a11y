@@ -1,0 +1,85 @@
+---
+title: User Preferences
+description: Learn how to access user preferences and how to adjust your app using react-three-fiber with @react-three-a11y
+nav: 2
+---
+
+When it comes to accessibility, some users might need to have an interface as still as possible or with a preferred color scheme.
+
+These are CSS media features and this library expose two of them
+
+1. [prefers-color-scheme](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme)
+1. [prefers-reduced-motion](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion)
+
+While you don't necessarily require this library to access them, we provide an easy way to use them and listen to their changes.
+
+## Setup
+
+For that wrap your components inside the A11yUserPreferences component
+
+```jsx
+<A11yUserPreferences>
+  <My3dObject />
+  <MySecond3dObject />
+  [...]
+</A11yUserPreferences>
+```
+
+Then, you can access the preferences in each children component where you might need them.
+
+## Reduce motions / animations for the users that request it
+
+Some user on your website might need all animation turned off or limited to what's strictly necessary.
+For those users, if your app has an animation going somewhere, consider cancelling it for those who request it.
+You can do it like so.
+
+```jsx
+const My3dObject = () => {
+  // this const will give you access to the user preferences
+  const { a11yPrefersState } = useUserPreferences()
+  const mesh = useRef()
+
+  // Rotate mesh every frame
+  useFrame(() => {
+    //unless the user prefers reduced motion
+    if (!a11yPrefersState.prefersReducedMotion) {
+      mesh.current.rotation.x = mesh.current.rotation.y += 0.01
+    }
+  })
+
+  return (
+    <mesh ref={mesh}>
+      <boxBufferGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial />
+    </mesh>
+  )
+}
+```
+
+## Adapt colour scheme depending on the user preference
+
+Some user on your website might need a darker / lighter theme. You can adapt your components according to it like so.
+
+```jsx
+const My3dObject = () => {
+  // this const will give you access to the user preferences
+  const { a11yPrefersState } = useUserPreferences()
+  const mesh = useRef()
+
+  return (
+    <mesh ref={mesh}>
+      <boxBufferGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color={a11yPrefersState.prefersDarkScheme ? 'darkblue' : 'lightblue'} />
+    </mesh>
+  )
+}
+```
+
+## Use the context outside and inside the r3f canvas
+
+At the moment React context [can not be readily used between two renderers](https://github.com/pmndrs/react-three-fiber/issues/43), this is due to a problem within React.
+If react-dom use the A11yUserPreferences provider, you will not be able to consume it within `<Canvas>`.
+
+There's a ready-made solution in drei: [useContextBridge](https://github.com/pmndrs/drei#usecontextbridge) which allows you to forward contexts provided above the `<Canvas />` to be consumed within it.
+
+You can see how it's used in the [react-three-a11y demo](https://n4rzi.csb.app)

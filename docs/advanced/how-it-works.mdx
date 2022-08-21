@@ -1,0 +1,53 @@
+---
+title: How does it work?
+description:
+  This is an advanced guide on the inner workings of @react-three/a11y, if you are just getting started, take a
+  look at our introduction!
+nav: 7
+---
+
+This library is pretty simple, if you're curious about how it works you can read the following information and look at the internals.
+
+@react-three/a11y purpose is to manage the accessibility part of what is inside your canvas by syncing semantic DOM absolutely positioned over what's currently visible in your page.
+
+Basically when you add the A11y component with a role, react-three-a11y will append the corresponding HTML tag to your document.<br />
+
+- role="link" => a
+- role="button" => button
+- role="content" => p
+- role="togglebutton" => button ( + aria-pressed )
+
+The position is synced by a minimalist fork of the [Drei Html component](/drei/misc/html)
+
+Inside an A11y component, you can access the hover, focused and pressed state through the useA11y() hook.
+This hook returns the context of the A11y component.
+
+The A11yAnnouncer is used to communicate with screen readers through a div only visible to screen readers.
+It uses a [zustand](/zustand) store to update the div with each new message.
+The div is roughly like this.
+
+```html
+<div aria-atomic="true" aria-live="polite">{message}</div>
+```
+
+The A11ySection component appends an HTML section in which a p element describe the content of the section.
+Wrapped around some A11y components, it will cause the HTML from those component to be inside the section.
+
+You would then have a generated DOM that could look something like this.
+
+```html
+<section aria-label="label">
+  <p>description</p>
+  <button></button>
+  <p></p>
+  <button></button>
+</section>
+```
+
+For the A11yUserPreferences component, it simply exposes through a context the state of prefers-color-scheme and prefers-reduced-motion media queries.
+It watches for change through
+
+```javascript
+window.matchMedia('(prefers-reduced-motion: reduce)')
+window.matchMedia('(prefers-color-scheme: dark)')
+```
