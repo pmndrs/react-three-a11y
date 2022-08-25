@@ -1,0 +1,49 @@
+---
+title: Button
+description: This page will tell you all you need to know about emulating an accessible button in your react-three-fiber app with @react-three-a11y
+nav: 4
+---
+
+## Role Button of the A11y component
+
+This role is meant to emulate the behaviour of a button.
+It will display a cursor pointer when your cursor is over the linked 3D object.
+It will call a function on click but also on any kind of action that would trigger a focused button (Enter, Double-Tap, ...).
+It is also actionnable by user using a screen reader.
+
+```jsx
+<A11y
+  role="button"
+  description="Send email"
+  activationMsg="Sending email"
+  actionCall={()=>sendEmail()}
+  ... >
+  <Some3DComponent />
+</A11y>
+```
+
+Using it like this makes it focusable to all kind of users.
+
+You should also use the useA11y() hook within the encapsulated components to adjust the rendering on hover and focus. Doing so greatly improve the accessibility of your page.
+Take a look at this code sample to see how to use it.
+You can also play with it in [this demo](https://n4rzi.csb.app)
+
+```jsx
+function Some3DComponent() {
+  const a11y = useA11y()
+  return (
+    <mesh>
+      <boxBufferGeometry />
+      <meshStandardMaterial
+        metalness={1}
+        roughness={0.8}
+        color={a11y.focus || a11y.hover ? '#cc66dd' : '#ffffff'}
+        emissive={a11y.focus ? '#cc4444' : a11y.hover ? '#339922' : '#003399'}
+      />
+    </mesh>
+  )
+}
+```
+
+You could also specify the optional prop `activationMsg`.
+The message withinh activationMsg will be announced by screenreader when the button is activated.

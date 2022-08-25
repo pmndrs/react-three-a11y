@@ -1,0 +1,52 @@
+---
+title: Link
+description: This page will tell you all you need to know about emulating an accessible link in your react-three-fiber app with @react-three-a11y
+nav: 6
+---
+
+## Role Link of the A11y component
+
+This role is fairly straightforward
+You should think of it as the equivalent of an html link "a" tag
+Since it's meant to emulate the behaviour of a regular html link. It should be used in combination with something that will trigger navigation on click.
+
+```jsx
+<A11y
+  role="link"
+  href="/page"
+  actionCall={() => {
+    router.push(`/page`)
+  }}
+>
+  <Some3DComponent />
+</A11y>
+```
+
+Using it like this makes it focusable to all kind of users. It will also show a pointer on mouse over.
+
+You should also use the useA11y() hook within the encapsulated components to adjust the rendering on hover and focus. Doing so greatly improve the accessibility of your page.
+Take a look at this code sample to see how to use it.
+You can also play with it in [this demo](https://n4rzi.csb.app)
+
+```jsx
+function Some3DComponent() {
+  const a11y = useA11y()
+  return (
+    <mesh>
+      <boxBufferGeometry />
+      <meshStandardMaterial
+        metalness={1}
+        roughness={0.8}
+        color={a11y.focus || a11y.hover ? '#cc66dd' : '#ffffff'}
+        emissive={a11y.focus ? '#cc4444' : a11y.hover ? '#339922' : '#003399'}
+      />
+    </mesh>
+  )
+}
+```
+
+<Hint>
+  Don't forget to provide the href attribute as he is required for screen readers to read it
+  correctly !<br />
+  It will have no effect on the navigation, it's just used as information
+</Hint>
