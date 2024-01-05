@@ -113,11 +113,14 @@ export const A11y: React.FC<Props> = ({
     a11yElStyle
   );
 
-  const [a11yState, setA11yState] = useState({
-    hovered: false,
-    focused: false,
-    pressed: startPressed ? startPressed : false,
-  });
+  // const [a11yState, setA11yState] = useState({
+  //   hovered: false,
+  //   focused: false,
+  //   pressed: startPressed ? startPressed : false,
+  // });
+  const [a11yStateHovered, setA11yStateHovered] = useState(false);
+  const [a11yStateFocused, setA11yStateFocused] = useState(false);
+  const [a11yStatePressed, setA11yStatePressed] = useState(startPressed);
 
   const a11yScreenReader = useAnnounceStore((state) => state.a11yScreenReader);
 
@@ -147,11 +150,7 @@ export const A11y: React.FC<Props> = ({
       if (role !== 'content' && role !== 'image' && !disabled) {
         domElement.style.cursor = 'pointer';
       }
-      setA11yState({
-        hovered: true,
-        focused: a11yState.focused,
-        pressed: a11yState.pressed,
-      });
+      setA11yStateHovered(true);
     }
   };
   // @ts-ignore
@@ -164,11 +163,7 @@ export const A11y: React.FC<Props> = ({
     if (!overHtml.current && !overMesh.current) {
       if (componentIsMounted.current) {
         domElement.style.cursor = 'default';
-        setA11yState({
-          hovered: false,
-          focused: a11yState.focused,
-          pressed: a11yState.pressed,
-        });
+        setA11yStateHovered(false);
       }
     }
   };
@@ -183,17 +178,13 @@ export const A11y: React.FC<Props> = ({
   }
 
   function handleToggleBtnClick() {
-    if (a11yState.pressed) {
+    if (a11yStatePressed) {
       if (typeof deactivationMsg === 'string')
         a11yScreenReader(deactivationMsg);
     } else {
       if (typeof activationMsg === 'string') a11yScreenReader(activationMsg);
     }
-    setA11yState({
-      hovered: a11yState.hovered,
-      focused: a11yState.focused,
-      pressed: !a11yState.pressed,
-    });
+    setA11yStatePressed(!a11yStatePressed);
     if (typeof actionCall === 'function') actionCall();
   }
 
@@ -209,7 +200,7 @@ export const A11y: React.FC<Props> = ({
           <button
             r3f-a11y="true"
             {...disabledBtnAttr}
-            aria-pressed={a11yState.pressed ? 'true' : 'false'}
+            aria-pressed={a11yStatePressed ? 'true' : 'false'}
             tabIndex={tabIndex ? tabIndex : 0}
             style={Object.assign(
               constHiddenButScreenreadable,
@@ -229,18 +220,10 @@ export const A11y: React.FC<Props> = ({
             }}
             onFocus={() => {
               if (typeof focusCall === 'function') focusCall();
-              setA11yState({
-                hovered: a11yState.hovered,
-                focused: true,
-                pressed: a11yState.pressed,
-              });
+              setA11yStateFocused(true);
             }}
             onBlur={() => {
-              setA11yState({
-                hovered: a11yState.hovered,
-                focused: false,
-                pressed: a11yState.pressed,
-              });
+              setA11yStateFocused(false);
             }}
           >
             {description}
@@ -271,18 +254,10 @@ export const A11y: React.FC<Props> = ({
             }}
             onFocus={() => {
               if (typeof focusCall === 'function') focusCall();
-              setA11yState({
-                hovered: a11yState.hovered,
-                focused: true,
-                pressed: a11yState.pressed,
-              });
+              setA11yStateFocused(true);
             }}
             onBlur={() => {
-              setA11yState({
-                hovered: a11yState.hovered,
-                focused: false,
-                pressed: a11yState.pressed,
-              });
+              setA11yStateFocused(false);
             }}
           >
             {description}
@@ -309,18 +284,10 @@ export const A11y: React.FC<Props> = ({
           }}
           onFocus={() => {
             if (typeof focusCall === 'function') focusCall();
-            setA11yState({
-              hovered: a11yState.hovered,
-              focused: true,
-              pressed: a11yState.pressed,
-            });
+            setA11yStateFocused(true);
           }}
           onBlur={() => {
-            setA11yState({
-              hovered: a11yState.hovered,
-              focused: false,
-              pressed: a11yState.pressed,
-            });
+            setA11yStateFocused(false);
           }}
         >
           {description}
@@ -348,19 +315,11 @@ export const A11y: React.FC<Props> = ({
             onPointerOver={handleOnPointerOver}
             onPointerOut={handleOnPointerOut}
             onBlur={() => {
-              setA11yState({
-                hovered: a11yState.hovered,
-                focused: false,
-                pressed: a11yState.pressed,
-              });
+              setA11yStateFocused(false);
             }}
             onFocus={() => {
               if (typeof focusCall === 'function') focusCall();
-              setA11yState({
-                hovered: a11yState.hovered,
-                focused: true,
-                pressed: a11yState.pressed,
-              });
+              setA11yStateFocused(true);
             }}
           />
         );
@@ -379,19 +338,11 @@ export const A11y: React.FC<Props> = ({
             onPointerOver={handleOnPointerOver}
             onPointerOut={handleOnPointerOut}
             onBlur={() => {
-              setA11yState({
-                hovered: a11yState.hovered,
-                focused: false,
-                pressed: a11yState.pressed,
-              });
+              setA11yStateFocused(false);
             }}
             onFocus={() => {
               if (typeof focusCall === 'function') focusCall();
-              setA11yState({
-                hovered: a11yState.hovered,
-                focused: true,
-                pressed: a11yState.pressed,
-              });
+              setA11yStateFocused(true);
             }}
           >
             {description}
@@ -403,7 +354,9 @@ export const A11y: React.FC<Props> = ({
 
   const HtmlAccessibleElement = React.useMemo(returnHtmlA11yEl, [
     description,
-    a11yState,
+    a11yStateHovered,
+    a11yStateFocused,
+    a11yStatePressed,
     hidden,
     tabIndex,
     href,
@@ -415,7 +368,7 @@ export const A11y: React.FC<Props> = ({
   ]);
 
   let AltText = null;
-  if (showAltText && a11yState.hovered) {
+  if (showAltText && a11yStateHovered) {
     AltText = (
       <div
         aria-hidden={true}
@@ -453,9 +406,9 @@ export const A11y: React.FC<Props> = ({
   return (
     <A11yContext.Provider
       value={{
-        hover: a11yState.hovered,
-        focus: a11yState.focused,
-        pressed: a11yState.pressed,
+        hover: a11yStateHovered,
+        focus: a11yStateFocused,
+        pressed: a11yStatePressed,
       }}
     >
       <group
