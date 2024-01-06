@@ -211,6 +211,8 @@ export const A11y: React.FC<Props> = ({
             )}
             onPointerOver={handleOnPointerOver}
             onPointerOut={handleOnPointerOut}
+            onTouchStart={handleOnPointerOver}
+            onTouchEnd={handleOnPointerOut}
             onClick={(e) => {
               e.stopPropagation();
               if (disabled) {
@@ -245,6 +247,8 @@ export const A11y: React.FC<Props> = ({
             )}
             onPointerOver={handleOnPointerOver}
             onPointerOut={handleOnPointerOut}
+            onTouchStart={handleOnPointerOver}
+            onTouchEnd={handleOnPointerOut}
             onClick={(e) => {
               e.stopPropagation();
               if (disabled) {
@@ -277,6 +281,8 @@ export const A11y: React.FC<Props> = ({
           href={href}
           onPointerOver={handleOnPointerOver}
           onPointerOut={handleOnPointerOut}
+          onTouchStart={handleOnPointerOver}
+          onTouchEnd={handleOnPointerOut}
           onClick={(e) => {
             e.stopPropagation();
             e.preventDefault();
@@ -314,6 +320,8 @@ export const A11y: React.FC<Props> = ({
             )}
             onPointerOver={handleOnPointerOver}
             onPointerOut={handleOnPointerOut}
+            onTouchStart={handleOnPointerOver}
+            onTouchEnd={handleOnPointerOut}
             onBlur={() => {
               setA11yStateFocused(false);
             }}
@@ -337,6 +345,8 @@ export const A11y: React.FC<Props> = ({
             )}
             onPointerOver={handleOnPointerOver}
             onPointerOut={handleOnPointerOut}
+            onTouchStart={handleOnPointerOver}
+            onTouchEnd={handleOnPointerOut}
             onBlur={() => {
               setA11yStateFocused(false);
             }}
