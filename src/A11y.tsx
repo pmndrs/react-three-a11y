@@ -113,11 +113,6 @@ export const A11y: React.FC<Props> = ({
     a11yElStyle
   );
 
-  // const [a11yState, setA11yState] = useState({
-  //   hovered: false,
-  //   focused: false,
-  //   pressed: startPressed ? startPressed : false,
-  // });
   const [a11yStateHovered, setA11yStateHovered] = useState(false);
   const [a11yStateFocused, setA11yStateFocused] = useState(false);
   const [a11yStatePressed, setA11yStatePressed] = useState(startPressed);
