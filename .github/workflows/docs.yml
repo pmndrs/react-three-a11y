@@ -15,6 +15,7 @@ jobs:
     with:
       mdx: './docs'
       libname: 'A11y'
+      home_redirect: '/introduction'
 
   deploy:
     needs: build
