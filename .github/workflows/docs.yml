@@ -16,6 +16,8 @@ jobs:
       mdx: './docs'
       libname: 'A11y'
       home_redirect: '/introduction'
+      icon: '♿️'
+      logo: '/logo.jpg'
 
   deploy:
     needs: build
