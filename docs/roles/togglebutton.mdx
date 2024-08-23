@@ -27,10 +27,8 @@ It is also actionnable by user using a screen reader.
 
 Using it like this makes it focusable to all kind of users.
 
-<Hint>
-  You might have noticed the startPressed prop. Depending on your need, you might want to have your
-  button starting in a pressed state. This is what this prop is for.
-</Hint>
+> [!NOTE]
+> You might have noticed the startPressed prop. Depending on your need, you might want to have your button starting in a pressed state. This is what this prop is for.
 
 You should also use the useA11y() hook within the encapsulated components to adjust the rendering on hover and focus and pressed state. Doing so greatly improve the accessibility of your page.
 Take a look at this code sample to see how to use it.
@@ -38,7 +36,7 @@ You can also play with it in [this demo](https://n4rzi.csb.app)
 
 ```jsx
 function Some3DComponent() {
-  const a11y = useA11y() // access pressed, hover and focus
+  const a11y = useA11y(); // access pressed, hover and focus
   return (
     <mesh>
       <boxBufferGeometry />
@@ -49,7 +47,7 @@ function Some3DComponent() {
         emissive={a11y.focus ? '#cc4444' : a11y.hover ? '#339922' : '#003399'}
       />
     </mesh>
-  )
+  );
 }
 ```
 
