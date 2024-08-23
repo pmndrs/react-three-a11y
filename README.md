@@ -29,8 +29,8 @@ note: The full documentation can be found on the [pmndrs website](https://docs.p
 First, place the A11yAnnouncer component next to the R3F Canvas component. this componant is critical since it manage some screen-reader features.
 
 ```jsx
-import { Canvas } from '@react-three/fiber'
-import { A11yAnnouncer } from '@react-three/a11y'
+import { Canvas } from '@react-three/fiber';
+import { A11yAnnouncer } from '@react-three/a11y';
 
 function App() {
   return (
@@ -38,7 +38,7 @@ function App() {
       <Canvas />
       <A11yAnnouncer />
     </>
-  )
+  );
 }
 ```
 
@@ -141,10 +141,8 @@ Uses the `pointer` cursor. Special attributes: `href`.
 
 This role is meant to emulate the behaviour of a regular html link. It should be used in combination with something that will trigger navigation on click.
 
-<Hint>
-  - Don't forget to provide the href attribute as he is required for screen readers to read it
-  correctly ! - It will have no effect on the navigation, it's just used as information
-</Hint>
+> [!NOTE]
+> Don't forget to provide the href attribute as he is required for screen readers to read it correctly ! - It will have no effect on the navigation, it's just used as information
 
 [Read more about role link](https://docs.pmnd.rs/a11y/roles/link)
 
@@ -183,16 +181,9 @@ Use a custom tabindex with for your A11y components by providing a number to the
 <A11y tabIndex={-1} ... />
 ```
 
-⚠⚠⚠
-<br />
-Avoid using tabindex values greater than 0. Doing so makes it difficult for people who rely on
-assistive technology to navigate and operate page content. Instead, write the document with the
-elements in a logical sequence.
-<br />
-More about the use of tabIndex on{' '}
-<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex">
-  developer.mozilla.org
-</a>
+> [!CAUTION]
+> Avoid using `tabindex` values greater than 0. Doing so makes it difficult for people who rely on assistive technology to navigate and operate page content.
+> Instead, write the document with the elements in a logical sequence. More about the use of tabIndex on [developer.mozilla.org](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex)
 
 ### Author:
 

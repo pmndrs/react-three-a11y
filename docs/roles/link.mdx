@@ -15,7 +15,7 @@ Since it's meant to emulate the behaviour of a regular html link. It should be u
   role="link"
   href="/page"
   actionCall={() => {
-    router.push(`/page`)
+    router.push(`/page`);
   }}
 >
   <Some3DComponent />
@@ -30,7 +30,7 @@ You can also play with it in [this demo](https://n4rzi.csb.app)
 
 ```jsx
 function Some3DComponent() {
-  const a11y = useA11y()
+  const a11y = useA11y();
   return (
     <mesh>
       <boxBufferGeometry />
@@ -41,12 +41,10 @@ function Some3DComponent() {
         emissive={a11y.focus ? '#cc4444' : a11y.hover ? '#339922' : '#003399'}
       />
     </mesh>
-  )
+  );
 }
 ```
 
-<Hint>
-  Don't forget to provide the href attribute as he is required for screen readers to read it
-  correctly !<br />
-  It will have no effect on the navigation, it's just used as information
-</Hint>
+> [!IMPORTANT]
+> Don't forget to provide the `href` attribute as he is required for screen readers to read it correctly!
+> It will have no effect on the navigation, it's just used as information
