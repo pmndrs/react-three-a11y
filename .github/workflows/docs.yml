@@ -18,6 +18,7 @@ jobs:
       home_redirect: '/introduction'
       icon: '♿️'
       logo: '/logo.jpg'
+      github: 'https://github.com/pmndrs/react-three-a11y'
 
   deploy:
     needs: build
