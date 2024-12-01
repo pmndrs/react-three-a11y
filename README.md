@@ -187,4 +187,4 @@ Use a custom tabindex with for your A11y components by providing a number to the
 
 ### Author:
 
-- [`twitter 👋 @AlaricBaraou`](https://twitter.com/AlaricBaraou)
+- [`Bluesky 👋 @AlaricBaraou`](https://bsky.app/profile/alaricbaraou.bsky.social)
