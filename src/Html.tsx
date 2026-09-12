@@ -67,7 +67,7 @@ export interface HtmlProps
     'ref'
   > {
   eps?: number;
-  portal?: React.MutableRefObject<HTMLElement>;
+  portal?: React.RefObject<HTMLElement>;
   zIndexRange?: Array<number>;
 }
 
@@ -84,19 +84,17 @@ export const Html = React.forwardRef(
     }: HtmlProps,
     ref: React.Ref<HTMLDivElement>
   ) => {
-    const gl = useThree(({ gl }) => gl);
-    const camera = useThree(({ camera }) => camera);
-    const scene = useThree(({ scene }) => scene);
-    const size = useThree(({ size }) => size);
-    const [el] = React.useState(() => document.createElement('div'));
-    const root = React.useMemo(() => ReactDOM.createRoot(el), [el]);
-    const group = React.useRef<Group>(null);
+    const { gl, camera, scene, size } = useThree();
+    const [el] = React.useState<HTMLDivElement>(() => document.createElement('div'));
+    const root = React.useRef<ReactDOM.Root>(null!);
+    const group = React.useRef<Group>(null!);
     const oldZoom = React.useRef(0);
     const oldPosition = React.useRef([0, 0]);
     const target = portal?.current ?? gl.domElement.parentNode;
 
-    React.useEffect(() => {
+    React.useLayoutEffect(() => {        
       if (group.current) {
+        const currRoot = (root.current = ReactDOM.createRoot(el));
         scene.updateMatrixWorld();
         const vec = calculatePosition(group.current, camera, size);
         el.style.cssText = `position:absolute;top:0;left:0;transform:translate3d(${vec[0]}px,${vec[1]}px,0);transform-origin:0 0;`;
@@ -104,8 +102,8 @@ export const Html = React.forwardRef(
           target.appendChild(el);
         }
         return () => {
-          if (target) target.removeChild(el);
-          root.unmount();
+            if (target) target.removeChild(el);
+            currRoot.unmount();
         };
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -117,10 +115,10 @@ export const Html = React.forwardRef(
         transform: 'none',
         ...style,
       };
-    }, [style, size]);
+    }, [style]);
 
     React.useLayoutEffect(() => {
-      root.render(
+      root.current?.render(
         <div
           ref={ref}
           style={styles}
@@ -158,3 +156,4 @@ export const Html = React.forwardRef(
     return <group {...props} ref={group} />;
   }
 );
+
