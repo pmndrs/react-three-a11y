@@ -15,6 +15,7 @@ import { ReactThreeFiber, useFrame, useThree } from '@react-three/fiber';
 const v1 = new Vector3();
 const v2 = new Vector3();
 const v3 = new Vector3();
+const lastCameraUpdate = new WeakMap<Camera, string | number>();
 
 function calculatePosition(
   el: Object3D,
@@ -64,11 +65,12 @@ export interface HtmlProps
       React.HTMLAttributes<HTMLDivElement>,
       ReactThreeFiber.Object3DNode<Group, typeof Group>
     >,
-    'ref'
+    'ref' | 'updateMatrixWorld'
   > {
   eps?: number;
   portal?: React.MutableRefObject<HTMLElement>;
   zIndexRange?: Array<number>;
+  updateMatrixWorld?: boolean;
 }
 
 export const Html = React.forwardRef(
@@ -80,6 +82,7 @@ export const Html = React.forwardRef(
       className,
       portal,
       zIndexRange = [16777271, 0],
+      updateMatrixWorld = true,
       ...props
     }: HtmlProps,
     ref: React.Ref<HTMLDivElement>
@@ -130,9 +133,19 @@ export const Html = React.forwardRef(
       );
     });
 
-    useFrame(() => {
+    useFrame(state => {
       if (group.current) {
-        camera.updateMatrixWorld();
+        if (updateMatrixWorld && camera.matrixAutoUpdate) {
+          const frameId =
+            state.gl?.info?.render?.frame !== undefined
+              ? `${state.gl.info.render.frame}-${state.clock.elapsedTime}`
+              : state.clock.elapsedTime;
+
+          if (lastCameraUpdate.get(camera) !== frameId) {
+            camera.updateMatrixWorld();
+            lastCameraUpdate.set(camera, frameId);
+          }
+        }
         const vec = calculatePosition(group.current, camera, size);
 
         if (
