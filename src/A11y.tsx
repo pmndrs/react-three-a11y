@@ -12,6 +12,7 @@ interface A11yCommonProps {
   tabIndex?: number;
   showAltText?: boolean;
   focusCall?: (...args: any[]) => any;
+  blurCall?: (...args: any[]) => any;
   debug?: boolean;
   a11yElStyle?: Object;
   hidden?: boolean;
@@ -97,6 +98,7 @@ export const A11y: React.FC<Props> = ({
   showAltText = false,
   actionCall,
   focusCall,
+  blurCall,
   disabled,
   debug = false,
   a11yElStyle,
@@ -236,6 +238,7 @@ export const A11y: React.FC<Props> = ({
               });
             }}
             onBlur={() => {
+              if (typeof blurCall === 'function') blurCall();
               setA11yState({
                 hovered: a11yState.hovered,
                 focused: false,
@@ -278,6 +281,7 @@ export const A11y: React.FC<Props> = ({
               });
             }}
             onBlur={() => {
+              if (typeof blurCall === 'function') blurCall();
               setA11yState({
                 hovered: a11yState.hovered,
                 focused: false,
@@ -316,6 +320,7 @@ export const A11y: React.FC<Props> = ({
             });
           }}
           onBlur={() => {
+            if (typeof blurCall === 'function') blurCall();
             setA11yState({
               hovered: a11yState.hovered,
               focused: false,
@@ -348,6 +353,7 @@ export const A11y: React.FC<Props> = ({
             onPointerOver={handleOnPointerOver}
             onPointerOut={handleOnPointerOut}
             onBlur={() => {
+              if (typeof blurCall === 'function') blurCall();
               setA11yState({
                 hovered: a11yState.hovered,
                 focused: false,
@@ -379,6 +385,7 @@ export const A11y: React.FC<Props> = ({
             onPointerOver={handleOnPointerOver}
             onPointerOut={handleOnPointerOut}
             onBlur={() => {
+              if (typeof blurCall === 'function') blurCall();
               setA11yState({
                 hovered: a11yState.hovered,
                 focused: false,
@@ -412,6 +419,7 @@ export const A11y: React.FC<Props> = ({
     tag,
     actionCall,
     focusCall,
+    blurCall,
   ]);
 
   let AltText = null;

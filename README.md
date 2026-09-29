@@ -65,6 +65,14 @@ The `focusCall` prop of `A11y` will be called each time this component receives 
 <A11y role="content" focusCall={()=> console.log("in focus")} ... />
 ```
 
+## Call function on blur
+
+The `blurCall` prop of `A11y` will be called each time this component loses focus.
+
+```jsx
+<A11y role="content" blurCall={()=> console.log("lost focus")} ... />
+```
+
 ## Call function on click / keyboard Click
 
 The `actionCall` prop of `A11y` will be called each time this component gets clicked, focused, keyboard activated etc.
