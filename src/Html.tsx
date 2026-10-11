@@ -23,6 +23,9 @@ function calculatePosition(
 ) {
   const objectPos = v1.setFromMatrixPosition(el.matrixWorld);
   objectPos.project(camera);
+  if (isNaN(objectPos.x) || isNaN(objectPos.y)) {
+    return [0, 0];
+  }
   const widthHalf = size.width / 2;
   const heightHalf = size.height / 2;
   return [
